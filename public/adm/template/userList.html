@@ -1,0 +1,55 @@
+<div class="user-list">
+    <div class="page-title">
+        <span>用户管理</span>
+        <div class="page-btn">
+            <a ng-click="editUser()" ng-if="userInfo.type==1" class="btn btn-green">新建用户</a>
+            <a ng-click="bindOTP()" ng-if="userInfo.type==1 && userInfo.isEnableOtp==0" class="btn btn-orange">绑定安全令</a>
+            <a ng-click="unbindOTP()" ng-if="userInfo.type==1 && userInfo.isEnableOtp==1" class="btn btn-orange">解绑安全令</a>
+        </div>
+    </div>
+
+    <div class="table">
+        <table>
+            <thead>
+                <tr>
+                    <td>用户名</td>
+                    <td>备注</td>
+                    <td>所属平台</td>
+                    <td>最后登录时间</td>
+                    <td>最后登录IP</td>
+                    <td>状态</td>
+                    <td ng-if="userInfo.type==1">操作</td>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-if="!table.ready">
+                    <td colspan="7">正在加载。。。</td>
+                </tr>
+                <tr ng-if="table.error">
+                    <td colspan="7">获取列表错误，{{table.errorMsg}}<br/>请刷新页面</td>
+                </tr>
+                <tr ng-if="table.ready && !table.error && table.list==0">
+                    <td colspan="7">没有查询到用户</td>
+                </tr>
+                <tr ng-if="table.ready && !table.error" ng-repeat="list in table.list">
+                    <td ng-bind="list.username"></td>
+                    <td ng-bind="list.realname"></td>
+                    <td>
+                        <span class="ml-1" ng-repeat="company in list.company_ids.split(',')" ng-bind="companyInfo[company].name"></span>
+                    </td>
+                    <td ng-bind="list.lastlogin"></td>
+                    <td ng-bind="list.ip"></td>
+                    <td ng-if="list.status==1" class="color-green">正常</td>
+                    <td ng-if="list.status==0" class="color-red">禁用</td>
+                    <td ng-if="userInfo.type==1">
+                        <a ng-click="editUser(list)"><i class="icon-edit"></i> 修改</a>
+                        <a ng-if="list.status==1 && list.type!=1" ng-click="disableUser(list,0)"><i class="icon-pause"></i> 禁用</a>
+                        <a ng-if="list.status==0 && list.type!=1" ng-click="disableUser(list,1)"><i class="icon-start"></i> 启用</a>
+                        <a ng-if="list.type!=1" ng-click="resetPassword(list)"><i class="icon-shuaxin"></i> 重置密码</a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <div table-page="table"></div>
+    </div>
+</div>

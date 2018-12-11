@@ -1,0 +1,105 @@
+@import "base.less";
+.ngdialog.ngdialog-theme-default .ngdialog-content{
+  background: #f7f7f7;
+  border-radius: 0;
+  box-shadow: 0 2px 2px 0 rgba(0,0,0,0.14), 0 1px 5px 0 rgba(0,0,0,0.12), 0 3px 1px -2px rgba(0,0,0,0.2);
+}
+.ngdialog.ngdialog-tip{
+  left: 50%;
+  right: 50%;
+  position: absolute;
+  overflow: visible;
+  .ngdialog-overlay{
+    display: none;
+  }
+  .ngdialog-content{
+    width: 400px;
+    position: absolute;
+    left: -200px;
+    padding: 10px;
+    top: 10px;
+    background-color: #009ce9;
+    color: #fff;
+    text-align: center;
+    box-shadow: 0 2px 2px 0 rgba(0,0,0,0.14), 0 1px 5px 0 rgba(0,0,0,0.12), 0 3px 1px -2px rgba(0,0,0,0.2);
+    line-height: 30px;
+  }
+}
+.ngdialog.ngdialog-tip.tipError{
+  .ngdialog-content{
+    background-color: #cc3030;
+  }
+}
+.ngdialog.ngdialog-tip.tipSuccess{
+  .ngdialog-content{
+    background-color: #00cc68;
+  }
+}
+.ngdialog.ngdialog-theme-default.max .ngdialog-content{
+  width: 1000px;
+}
+
+.ngdialog.ngdialog-theme-default.large .ngdialog-content{
+  width: 860px;
+}
+.ngdialog.ngdialog-theme-default.middle .ngdialog-content{
+  width: 650px;
+}
+
+.dialog-title{
+  font-size: 18px;
+  text-align: center;
+  margin-bottom: 20px;
+}
+.confirm-dialog{
+  font-family: '微软雅黑','Microsoft Yahei',Tahoma, Geneva, sans-serif;
+  text-align: center;
+  h2{
+    font-size: 19px;
+  }
+}
+
+.user-dialog,.password-Dialog{
+  font-family: '微软雅黑','Microsoft Yahei',Tahoma, Geneva, sans-serif;
+  font-size: 14px;
+  line-height: 30px;
+  .input-box{
+    display: block;
+    margin-bottom: 10px;
+    &>span{
+      display: block;
+      float: left;
+      width: 130px;
+      text-align: right;
+    }
+    label{
+      display: inline-block;
+      white-space:nowrap;
+    }
+  }
+  .content-box{
+    margin-left: 120px;
+    margin-right: 36px;
+    word-break: break-all;
+  }
+  .content-box.request{
+    position: relative;
+    &:after{
+      content:"*";
+      color: #d9534f;
+      font-style: italic;
+      position: absolute;
+      right: 10px;
+      top: 0;
+    }
+  }
+  input[type=text],input[type=password],select{
+    width: 240px;
+  }
+  textarea{
+    width: 250px;
+    height: 100px;
+    resize: none;
+    vertical-align: text-top;
+  }
+}

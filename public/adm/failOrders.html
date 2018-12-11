@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="zh_cn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="renderer" content="webkit" />
+    <meta http-equiv="renderer" content="webkit" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta http-equiv="X-UA-Compatible" content="chrome=1" />
+    <title>支付失败、放弃支付订单</title>
+    <script src="//cdn.bootcss.com/jquery/3.1.1/jquery.min.js"></script>
+    <style type="text/css">
+    body {
+        padding: 10px;
+        margin: 0;
+    }
+    a {
+        text-decoration: none;
+    }
+    table.gridtable {
+        width: 100%;
+        font-family: verdana,arial,sans-serif;
+        font-size: 11px;
+        color: #333333;
+        border-width: 1px;
+        border-color: #666666;
+        border-collapse: collapse;
+    }
+    table.gridtable th {
+        border-width: 1px;
+        padding: 8px;
+        border-style: solid;
+        border-color: #666666;
+        background-color: #dedede;
+    }
+    table.gridtable td {
+        border-width: 1px;
+        padding: 8px;
+        border-style: solid;
+        border-color: #666666;
+        background-color: #ffffff;
+    }
+    .page {
+        text-align: right;
+    }
+    .currentPage {
+        color: red;
+    }
+    .messages {
+        text-align: center;
+        color: red;
+    }
+    </style>
+</head>
+<body>
+<table class="gridtable">
+    <thead>
+        <tr>
+            <td>ID</td>
+            <td>支付方式</td>
+            <td>支付编码</td>
+            <td>会员</td>
+            <td>充值终端</td>
+            <td>订单号</td>
+            <td>流水号</td>
+            <td>金额</td>
+            <!--td>入款人ID</td-->
+            <!--td>入款人</td-->
+            <!--td>入款状态</td-->
+            <td>订单状态</td>
+            <td>业务平台</td>
+            <!--td>支付平台</td-->
+            <td>支付平台</td>
+            <td>支付时间</td>
+            <td>详情</td>
+            <td>创建时间</td>
+            <td>更新时间</td>
+        </tr>
+    </thead>
+    <tbody>
+    </tbody>
+    <tfoot>
+        <tr>
+            <td colspan="16" class="page">
+                总共 <span class="total">0</span> 条
+                <span class="hrefPage"></span>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="16">
+                支付方式: 1 网银，2 微信，3 支付宝<br />
+                充值终端: 1 pc端，2 手机端<br />
+                订单状态: 0 为支付成功，1 为放弃支付(流水号为空时为放弃支付)或支付失败(流水号不为空)<br />
+                支付平台: 1 雅付、2 闪付、3 讯宝、4 乐盈、5 自由付、6 沃雷特、7 金海哲
+            </td>
+        </tr>
+    </tfoot>
+</table>
+<script>
+$(document).ready(function(){
+    var perPage = 20;
+    var failOrdersUrl = '/admin/getFailOrders';
+    var getPage = function (curPage, totalPage) {
+        var result = "";
+        for (var i = 1; i <= totalPage; i++) {
+            if (i == 2 && curPage - 6 > 1) {
+                i = curPage - 6;
+            } else if (i == curPage + 6 && curPage + 6 < totalPage) {
+                i = totalPage - 1;
+            } else {
+                if (i == curPage) {
+                    result += " <a class='currentPage goto' href='javascript:;' data-val='" + failOrdersUrl + "?page=" + i + "&perPage=" + perPage + "'>" + i + "</a> ";
+                } else {
+                    result += " <a class='goto' href='javascript:;' data-val='" + failOrdersUrl + "?page=" + i + "&perPage=" + perPage + "'>" + i + "</a> ";
+                }
+            }
+        }
+        return result;
+    };
+    var gotoPage = function (url) {
+        $('tbody').html('<tr><td colspan="16" class="messages">正在苦逼的拉取数据中，请稍后......</td></tr>');
+        $.ajax({
+            url: url,
+            success: function (result) {
+                var html = '';
+                $.each(result.data, function (index, val) {
+                    html += '<tr>';
+                    html += '<td>' + val.id + '</td>';
+                    html += '<td>' + val.pay_type + '</td>';
+                    html += '<td>' + val.pay_code + '</td>';
+                    html += '<td>' + val.user + '</td>';
+                    html += '<td>' + val.device + '</td>';
+                    html += '<td>' + val.order_no + '</td>';
+                    html += '<td>' + val.vendor_order_no + '</td>';
+                    html += '<td>' + val.money + '</td>';
+                    html += '<!--td>' + val.rk_user_id + '</td-->';
+                    html += '<!--td>' + val.rk_user + '</td-->';
+                    html += '<!--td>' + val.rk_status + '</td-->';
+                    html += '<td>' + val.status + '</td>';
+                    html += '<td>' + val.company_id + '</td>';
+                    html += '<!--td>' + val.vendor_id + '</td-->';
+                    html += '<td>' + val.vendor_type + '</td>';
+                    html += '<td>' + val.pay_datetime + '</td>';
+                    html += '<td>' + val.remark + '</td>';
+                    html += '<td>' + val.created_at + '</td>';
+                    html += '<td>' + val.updated_at + '</td>';
+                    html += '</tr>';
+                });
+                $('tbody').html(html);
+
+                $('.total').html(result.total);
+
+                $('.hrefPage').html(getPage(result.current_page, result.last_page));
+            },
+            statusCode: {
+                401: function() {
+                    $('tbody').html('<tr><td colspan="16" class="messages">提示：请先 <a href="/" title="登录">登录</a> 再访问此页面！</td></tr>');
+                }
+            }
+        });
+    };
+    $('.page').on('click', 'a.goto', function() {
+        var url = $(this).attr('data-val');
+        gotoPage(url);
+    });
+    gotoPage(failOrdersUrl + '?page=1&perPage=' + perPage);
+});
+</script>
+</body>
+</html>

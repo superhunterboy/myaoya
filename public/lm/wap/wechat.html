@@ -1,0 +1,43 @@
+
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="utf-8">
+    <meta content="width=device-width,initial-scale=1.0, user-scalable=no" name="viewport" />
+    <meta content="yes" name=" apple-mobile-web-app-capable" />
+    <meta content="no" name="apple-touch-fullscreen" />
+    <meta content="black" name=" apple-mobile-web-app-status-bar-style" />
+    <meta content="telephone=no" name="format-detection"/>
+    <title>龙门微信支付</title>
+    <link rel="stylesheet" href="css/style.css"/>
+    <script type="text/javascript" src="js/jquery.min.js"></script>
+    <script type="text/javascript" src="js/tc.min.js"></script>
+    <script type="text/javascript" src="js/pay.js"></script>
+    <script type="text/javascript">
+        var iWidth = document.documentElement.clientWidth,iHeight = document.documentElement.clientHeight;
+        if(isFirefox=navigator.userAgent.indexOf("Firefox")>0){
+            iWidth = window.outerWidth;
+            iHeight = window.outerHeight;
+        }
+        document.getElementsByTagName("html")[0].style.fontSize=iWidth/10+"px";
+    </script>
+</head>
+<body class="wechat">
+<div class="top"></div>
+<div class="head">
+    <a target="_blank" href="http://lm696.com/"><i class="home"></i>返回首页</a>
+    <a target="_blank" href="http://au85.com/"><i class="act"></i>活动申请大厅</a>
+    <a target="_blank" href="https://chat7.livechatvalue.com/chat/chatClient/chatbox.jsp?companyID=864668&configID=59189&jid=6825762018&s=1"><i class="service"></i>在线客服</a>
+</div>
+<div class="content">
+    <img id="wechat" class="qrcode" src="img/qrcode.jpg">
+    <div class="change">
+        <a href="wechat.html" class="type-wechat act">微信快捷支付</a>
+        <a href="alipay.html" class="type-alipay">支付宝快捷支付</a>
+    </div>
+    <div class="footer">
+        Copyright © 龙门娱乐 Reserved
+    </div>
+</div>
+</body>
+</html>

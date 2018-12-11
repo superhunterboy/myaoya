@@ -1,0 +1,53 @@
+<div class="upload-img table">
+    <div class="table-title">
+        在线支付二维码
+        <select ng-show="companyList.length>1" class="input" ng-change="changeCompany()" ng-model="nowCompany">
+            <option ng-repeat="list in companyList" value="{{list}}" ng-bind="companyInfo[list].name"></option>
+        </select>
+    </div>
+    <div class="img-setting">
+        <div class="setting-left">
+            <div class="img-title">微信加好友二维码</div>
+            <div class="img-box">
+                <input ng-if="setting[0]" type="file" img-upload="temp[0].picture" accept="image/gif,image/jpeg,image/jpg,image/png" />
+                <div ng-if="setting[0]" class="img-mask">点击上传微信二维码<br>建议尺寸：300x300</div>
+                <img ng-if="setting[0]" ng-src="{{temp[0].picture}}" />
+                <img ng-if="!setting[0]" ng-src="{{img[nowCompany][0].picture}}" />
+            </div>
+            <div class="img-btn">
+                <button ng-if="!setting[0]" class="btn btn-red" ng-click="edit(0)">修改</button>
+                <button ng-if="setting[0]" class="btn btn-green" ng-click="save(0)">保存</button>
+                <button ng-if="setting[0]" class="btn btn-default" ng-click="cancel(0)">取消</button>
+            </div>
+        </div>
+        <div class="setting-left">
+            <div class="img-title">支付宝加好友二维码</div>
+            <div class="img-box">
+                <input ng-if="setting[1]" type="file" img-upload="temp[1].picture" accept="image/gif,image/jpeg,image/jpg,image/png" />
+                <div ng-if="setting[1]" class="img-mask">点击上传支付宝二维码<br>建议尺寸：300x300</div>
+                <img ng-if="setting[1]" ng-src="{{temp[1].picture}}" />
+                <img ng-if="!setting[1]" ng-src="{{img[nowCompany][1].picture}}" />
+            </div>
+            <div class="img-btn">
+                <button ng-if="!setting[1]" class="btn btn-red" ng-click="edit(1)">修改</button>
+                <button ng-if="setting[1]" class="btn btn-green" ng-click="save(1)">保存</button>
+                <button ng-if="setting[1]" class="btn btn-default" ng-click="cancel(1)">取消</button>
+            </div>
+        </div>
+        <div class="setting-right">
+            <div class="img-title">多码合一</div>
+            <div class="img-box">
+                <input ng-if="setting[2]" type="file" img-upload="temp[2].picture" accept="image/gif,image/jpeg,image/jpg,image/png" />
+                <div ng-if="setting[2]" class="img-mask">点击上传多码合一二维码<br>建议尺寸：300x300</div>
+                <img ng-if="setting[2]" ng-src="{{temp[2].picture}}" />
+                <img ng-if="!setting[2]" ng-src="{{img[nowCompany][2].picture}}" />
+            </div>
+            <div class="img-btn">
+                <button ng-if="!setting[2]" class="btn btn-red" ng-click="edit(2)">修改</button>
+                <button ng-if="setting[2]" class="btn btn-green" ng-click="save(2)">保存</button>
+                <button ng-if="setting[2]" class="btn btn-default" ng-click="cancel(2)">取消</button>
+            </div>
+        </div>
+    </div>
+
+</div>

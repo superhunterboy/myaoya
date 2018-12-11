@@ -1,0 +1,16 @@
+<div class="user-dialog">
+    <div ng-if="!notice.id" class="dialog-title">新建公告</div>
+    <div ng-if="notice.id" class="dialog-title">修改公告</div>
+    <label class="input-box"><span>标题：</span>
+        <input class="input" type="text" maxlength="20" ng-model="notice.title" /><i class="color-red ml-1">*</i>
+    </label>
+    <label class="input-box"><span>内容：</span>
+        <textarea class="input" maxlength="100" ng-model="notice.content" ></textarea>
+    </label>
+    <div align="center" class="color-red" ng-show="error" ng-bind="errorMsg"></div>
+    <div align="center">
+        <button ng-if="!notice.id" class="btn btn-green" ng-click="save()">确定</button>
+        <button ng-if="notice.id" class="btn btn-green" ng-click="update()">确定</button>
+        <button class="btn btn-default" ng-click="closeThisDialog()">取消</button>
+    </div>
+</div>

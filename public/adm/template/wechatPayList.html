@@ -1,0 +1,241 @@
+<div class="wechat-pay-list">
+    <div class="page-title">微信支付记录</div>
+    <div class="table">
+        <div class="wechat-setting-box">
+            <div ng-if="!setting.isEdit">
+                <span>微信支付设置：</span>
+                <span>{{dict[setting.wechat_single_qrcode]}}</span>&nbsp;&nbsp;
+                <button class="btn btn-default" ng-click="beginEdit()">编辑</button>
+            </div>
+            <div ng-if="setting.isEdit">
+                <span>微信支付设置：</span>
+                <select class="input" ng-model="setting.wechat_single_qrcode">
+                    <option value="{{key}}" ng-repeat="(key,value) in dict">{{value}}</option>
+                </select>&nbsp;&nbsp;
+                <button class="btn btn-green" ng-click="updateWechatSetting()">保存</button>&nbsp;&nbsp;
+                <button class="btn" ng-click="cancelEdit()">取消</button>
+            </div>
+        </div>
+
+        <div class="table-advanced-search">
+            <div class="advanced-search-box" style="width: 35%">
+                <span class="search-box-text">支付时间(美东)：</span>
+                <input style="width: 150px" onchange="" class="input" datepicker="yyyy-MM-dd HH:mm:ss" max="setting.query.endtime" type="text"
+                    ng-model="setting.query.startime" /> 至
+                <input style="width: 150px" onchange="" class="input" type="text" datepicker="yyyy-MM-dd HH:mm:ss" min="setting.query.startime"
+                    ng-model="setting.query.endtime" />
+            </div>
+            <label class="advanced-search-box">
+                <span class="search-box-text">关键字：</span>
+                <input class="input" style="width:275px;" type="text" maxlength="30" ng-model="setting.query.key_word" placeholder="{{setting.placeholder}}" />
+            </label>
+            <div class="advanced-search-box">
+                <span class="search-box-text"> </span>
+                <button type="button" class="btn btn-default" ng-click="search()">搜索</button>
+            </div>
+            <div class="advanced-search-box" style="width: 100%">
+                <span class="search-box-text">支付类别：</span>
+                <div class="table-tab">
+                    <a ng-class="{active:setting.currentTable==='personal'}" ng-click="displayTable('personal')">个人微信扫码</a><!--
+                    --><a ng-class="{active:setting.currentTable==='merchant'}" ng-click="displayTable('merchant')">商家微信扫码</a><!--
+                    --><a ng-class="{active:setting.currentTable==='group'}" ng-click="displayTable('group')">智能微信扫码</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="personal-pay" ng-if="setting.currentTable==='personal'">
+            <table>
+                <thead class="personal-table-thead">
+                    <tr>
+                        <td>二维码编号</td>
+                        <td>会员账户</td>
+                        <td>充值金额</td>
+                        <td>微信昵称</td>
+                        <td>支付时间</td>
+                        <td>结果</td>
+                        <td>状态</td>
+                        <td>操作</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-if="!ptable.ready">
+                        <td colspan="8">正在加载。。。</td>
+                    </tr>
+                    <tr ng-if="ptable.error">
+                        <td colspan="8">获取列表错误，{{ptable.errorMsg}}
+                            <br/>请刷新页面</td>
+                    </tr>
+                    <tr ng-if="ptable.ready && !ptable.error && ptable.list==0">
+                        <td colspan="8">没有查询到记录</td>
+                    </tr>
+                    <tr ng-if="ptable.ready && !ptable.error" ng-repeat="list in ptable.list">
+                        <td ng-bind="list.qrcode_id"></td>
+                        <td ng-bind="list.member"></td>
+                        <td ng-bind="list.money"></td>
+                        <td ng-bind="list.drawee"></td>
+                        <!--td ng-bind="list.created_at"></td-->
+                        <td>{{list.created_at}}(当地)<br/>{{list.created_at_edt}}(美东)</td>
+                        <td ng-bind="list.msg"></td>
+                        <td>
+                            <span ng-if="list.status==0" class="color-red">未处理</span>
+                            <span ng-if="list.status==1" class="color-green">已入款</span>
+                            <span ng-if="list.status==2">忽略</span>
+                        </td>
+                        <td>
+                            <a ng-if="list.status==0" ng-click="act(list,1,'personal')">入款</a>
+                            <a class="ml-1" ng-if="list.status==0" ng-click="act(list,2,'personal')">忽略</a>
+                            <span ng-if="list.status!=0">-</span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="table-num">共查询出
+                <span ng-bind="ptable.total"></span> 条记录，每页显示
+                <select class="input" ng-model="ptable.query.perPage" ng-change="ptable.getList(1)">
+                    <option value="10">10</option>
+                    <option value="20">20</option>
+                    <option value="50">50</option>
+                    <option value="100">100</option>
+                </select> 条
+            </div>
+            <div table-page="ptable"></div>
+        </div>
+
+        <div class="merchant-pay" ng-if="setting.currentTable==='merchant'">
+            <table>
+                <thead class="merchant-table-thead">
+                    <tr>
+                        <td>会员账户</td>
+                        <td>充值金额</td>
+                        <td>交易单号/商户单号</td>
+                        <td>商户编号</td>
+                        <td>商户名称</td>
+                        <td>原始金额</td>
+                        <td>优惠金额</td>
+                        <td>实际交易</td>
+                        <td>手续费</td>
+                        <td>支付时间</td>
+                        <td>状态</td>
+                        <td>操作</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-if="!mtable.ready">
+                        <td colspan="12">正在加载。。。</td>
+                    </tr>
+                    <tr ng-if="mtable.error">
+                        <td colspan="12">获取列表错误，{{mtable.errorMsg}}
+                            <br/>请刷新页面</td>
+                    </tr>
+                    <tr ng-if="mtable.ready && !mtable.error && mtable.list==0">
+                        <td colspan="12">没有查询到记录</td>
+                    </tr>
+                    <tr ng-if="mtable.ready && !mtable.error" ng-repeat="list in mtable.list">
+                        <td ng-bind="list.member"></td>
+                        <td ng-bind="list.recharge_money"></td>
+                        <td ng-bind="list.order"></td>
+                        <td ng-bind="list.merchant.shop_no"></td>
+                        <td ng-bind="list.merchant.merchant_name"></td>
+
+                        <td ng-bind="list.original_money"></td>
+                        <td ng-bind="list.discount"></td>
+                        <td ng-bind="list.money"></td>
+                        <td ng-bind="list.hand_charge"></td>
+                        <!--td ng-bind="list.created_at"></td-->
+                        <td>{{list.created_at}}(当地)<br/>{{list.created_at_edt}}(美东)</td>
+                        <td>
+                            <span ng-if="list.status==0" class="color-red">未处理</span>
+                            <span ng-if="list.status==1" class="color-green">已入款</span>
+                            <span ng-if="list.status==2">忽略</span>
+                        </td>
+                        <td>
+                            <a ng-if="list.status==0" ng-click="act(list,1,'merchant')">入款</a>
+                            <a class="ml-1" ng-if="list.status==0" ng-click="act(list,2,'merchant')">忽略</a>
+                            <span ng-if="list.status!=0">-</span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="table-num">共查询出
+                <span ng-bind="mtable.total"></span> 条记录，每页显示
+                <select class="input" ng-model="mtable.query.perPage" ng-change="mtable.getList(1)">
+                    <option value="10">10</option>
+                    <option value="20">20</option>
+                    <option value="50">50</option>
+                    <option value="100">100</option>
+                </select> 条
+            </div>
+            <div table-page="mtable"></div>
+        </div>
+
+        <div class="group-control" ng-if="setting.currentTable==='group'">
+            <table>
+                <thead class="table-thead">
+                    <tr>
+                        <td>流水号</td>
+                        <td>支付微信号</td>
+                        <td>支付金额</td>
+                        <td>会员名称</td>
+                        <td>收款微信号</td>
+                        <td>状态</td>
+                        <td>结果</td>
+                        <td>支付时间</td>
+                        <td>创建时间</td>
+                        <td>操作</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-if="!gtable.ready">
+                        <td colspan="10">正在加载。。。</td>
+                    </tr>
+                    <tr ng-if="gtable.error">
+                        <td colspan="10">获取列表错误，{{table.errorMsg}}
+                            <br/>请刷新页面</td>
+                    </tr>
+                    <tr ng-if="gtable.ready && !gtable.error && gtable.list==0">
+                        <td colspan="10">没有查询到记录</td>
+                    </tr>
+                    <tr ng-if="gtable.ready && !gtable.error" ng-repeat="list in gtable.list">
+                        <td width="300"><div class="code-txt" ng-bind="list.code" title="{{list.code}}"></div></td>
+                        <td ng-bind="list.sender"></td>
+                        <td ng-bind="list.money"></td>
+                        <td ng-bind="list.remark"></td>
+                        <td ng-bind="list.qrcode.wechat_id"></td>
+                        <td>
+                            <span ng-if="list.status==0" class="color-red">未处理</span>
+                            <span ng-if="list.status==1" class="color-blue">入款中</span>
+                            <span ng-if="list.status==2" class="color-green">已入款</span>
+                            <span ng-if="list.status==3" class="color-red">入款失败</span>
+                            <span ng-if="list.status==4" class="color-gray">已忽略</span>
+                        </td>
+                        <td width="220">
+                            <div title="{{list.result}}" class="remark" ng-bind="list.result"></div>
+                            <a ng-click="editRemark(list);" class="fl-r"><i class="icon-edit"></i> 备注</a>
+                        </td>
+                        <!--td ng-bind="list.createTime | date:'yyyy-MM-dd HH:mm:ss'"></td-->
+                        <td>{{list.createTime | date:'yyyy-MM-dd HH:mm:ss'}}(当地)<br/>{{list.createTime_edt}}(美东)</td>
+                        <td ng-bind="list.created_at"></td>
+                        <td>
+                            <span ng-if="list.status==2 || list.status==4">-</span>
+                            <a ng-if="list.status!=2 && list.status!=4" ng-click="act(list,2,'group')">入款</a>
+                            <a ng-if="list.status!=2 && list.status!=4" ng-click="act(list,4,'group')" class="ml-1">忽略</a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="table-num">共查询出
+                <span ng-bind="gtable.total"></span> 条记录，每页显示
+                <select class="input" ng-model="gtable.query.perPage" ng-change="gtable.getList(1)">
+                    <option value="10">10</option>
+                    <option value="20">20</option>
+                    <option value="50">50</option>
+                    <option value="100">100</option>
+                </select> 条
+            </div>
+            <div table-page="gtable"></div>
+        </div>
+    </div>
+</div>

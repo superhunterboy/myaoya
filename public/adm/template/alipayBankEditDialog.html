@@ -1,0 +1,56 @@
+<div class="table">
+    <div ng-if="!bankName" class="dialog-title">添加银行</div>
+    <div ng-if="bankName" class="dialog-title">编辑银行</div>
+    <div class="table-advanced-search">
+        <div class="advanced-search-box" style="width: 50%">
+            银行：
+            <select ng-if="!bankName" class="input" ng-model="bank.name">
+                <option value="招商银行">招商银行</option>
+                <option value="农业银行">农业银行</option>
+                <!--<option value="中信银行">中信银行</option>-->
+            </select>
+            <span ng-if="bankName" ng-bind="bank.name"></span>
+        </div>
+        <div class="advanced-search-box" style="width: 50%;text-align: right">
+            <button class="btn btn-green" ng-click="add()">添加银行卡</button>
+        </div>
+    </div>
+    <table>
+        <thead>
+        <tr>
+            <td>序号</td>
+            <td>ID</td>
+            <td>姓名</td>
+            <td>卡号</td>
+            <td>备注</td>
+            <td>操作</td>
+        </tr>
+        </thead>
+        <tbody>
+        <tr ng-if="bank.banks.length==0">
+            <td colspan="6">没有银行卡</td>
+        </tr>
+        <tr ng-repeat="list in bank.banks">
+            <td ng-bind="$index+1"></td>
+            <td ng-bind="list.id || '-'"></td>
+            <td>
+                <input type="text" class="input" ng-model="list.user_name" />
+            </td>
+            <td>
+                <input type="text" class="input" ng-model="list.bank_number" />
+            </td>
+            <td>
+                <input type="text" class="input" ng-model="list.address" />
+            </td>
+            <td>
+                <a ng-click="del(list,$index)"><i class="icon-delete"></i> 删除</a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+<div align="center" class="color-red" ng-show="error" ng-bind="errorMsg"></div>
+<div align="center">
+    <button class="btn btn-green" ng-click="sub()">保存</button>
+    <button class="btn btn-default" ng-click="closeThisDialog()">关闭</button>
+</div>

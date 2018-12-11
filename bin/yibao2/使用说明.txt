@@ -1,0 +1,19 @@
+此程序为部署的前置应用，请使用它来进行加密/解密操作
+
+部署方式：
+1）解压到磁盘
+2）确认自己安装了jre1.6并配置正确
+3）执行run.bat（Linux执行run.sh）
+4）观察确认控制台输出的日志直到启动成功
+
+后台运行：
+cd /home/website/bin/yibao2
+chmod ug+x run.sh
+nohup ./run.sh > yibao.log 2>&1 &
+
+加密：
+例子：http://127.0.0.1:8088/sign?req=（加密内容）
+
+验签：
+例子：http://127.0.0.1:8088/verify?req=(验签拼接字符串)&sign=（urlencode后的易宝返回签名）
+

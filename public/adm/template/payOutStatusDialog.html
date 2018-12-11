@@ -1,0 +1,15 @@
+<div class="user-dialog">
+    <div class="dialog-title">查询订单</div>
+    <label class="input-box" ng-repeat="(key,value) in origData" ng-if="keyName[key] && ['serialno_state','orderStatus','status','state','result_code','returnCode','result','Status','r1_Code'].indexOf(key)<0" >
+        <span ng-bind="keyName[key]+'：'"></span>
+        <div ng-if="value" class="content-box" ng-bind="value"></div>
+        <div ng-if="!value" class="content-box">-</div>
+    </label>
+    <label class="input-box" ng-repeat="(key,value) in origData" ng-if="keyName[key] && ['serialno_state','orderStatus','status','state','result_code','returnCode','result','Status','r1_Code'].indexOf(key)>-1" >
+        <span ng-bind="keyName[key]+'：'"></span>
+        <div class="content-box" ng-bind="keyName.statusList[value]"></div>
+    </label>
+    <div align="center">
+        <button class="btn btn-default" ng-click="closeThisDialog()">关闭</button>
+    </div>
+</div>

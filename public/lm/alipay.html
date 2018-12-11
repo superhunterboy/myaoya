@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>龙门支付宝支付</title>
+    <link rel="stylesheet" type="text/css" href="css/pay.css">
+    <script type="text/javascript" src="js/jquery.min.js"></script>
+    <script type="text/javascript" src="js/jQuery.browser.mobile.js"></script>
+    <script type="text/javascript" src="js/tc.min.js"></script>
+    <script src="js/input.js"></script>
+    <script type="text/javascript" src="js/pay.js"></script>
+    <script type="text/javascript">
+        if (jQuery.browser.mobile) {
+            window.location = "wap/alipay.html";
+        }
+    </script>
+</head>
+<body class="alipay">
+<div class="content">
+    <div class="head">
+        <a class="desc desc-1" href="http://lm696.com/" target="_blank"></a>
+        <a class="desc desc-2" href="http://au85.com/" target="_blank"></a>
+        <a class="desc desc-3" href="http://lm696.com/" target="_blank"></a>
+        <a class="desc desc-4" href="http://lm696.com/?aff=" target="_blank"></a>
+    </div>
+    <div class="content-inner">
+        <a class="service" href="https://chat7.livechatvalue.com/chat/chatClient/chatbox.jsp?companyID=864668&configID=59189&jid=6825762018&s=1" target="_blank"></a>
+        <img id="alipay" class="qrcode" src="img/qrcode.jpg">
+        <div class="change">
+            <a href="wechat.html" class="type-wechat">微信快捷支付</a>
+            <a href="alipay.html" class="type-alipay act">支付宝快捷支付</a>
+        </div>
+    </div>
+</div>
+<div class="footer">
+    Copyright © 龙门娱乐 Reserved
+</div>
+</body>
+</html>

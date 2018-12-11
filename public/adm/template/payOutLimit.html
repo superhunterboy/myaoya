@@ -1,0 +1,46 @@
+<div class="user-list">
+    <div class="page-title">
+        <span>出款次数设置</span>
+        <div class="page-btn">
+            <a ng-click="editLimit()" class="btn btn-green">添加</a>
+        </div>
+    </div>
+
+    <div class="table">
+        <table>
+            <thead>
+                <tr>
+                    <td>层级</td>
+                    <td>次数</td>
+                    <td>更新时间</td>
+                    <td ng-if="userInfo.type==1">操作</td>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-if="!table.ready">
+                    <td colspan="4">正在加载。。。</td>
+                </tr>
+                <tr ng-if="table.error">
+                    <td colspan="4">获取列表错误，{{table.errorMsg}}<br/>请刷新页面</td>
+                </tr>
+                <tr ng-if="table.ready && !table.error && table.list==0">
+                    <td colspan="4">没有查询到列表</td>
+                </tr>
+                <tr ng-if="table.ready && !table.error" ng-repeat="list in table.list">
+                    <td width="700">
+                        <div style="width: 700px">
+                            <span ng-repeat="(key,value) in list.level_names" class="mr-1" ng-bind="value"></span>
+                        </div>
+                    </td>
+                    <td ng-bind="list.count"></td>
+                    <td ng-bind="list.updated_at"></td>
+                    <td ng-if="userInfo.type==1">
+                        <a ng-click="editLimit(list)"><i class="icon-edit"></i> 编辑</a>
+                        <a class="ml-1" ng-click="delLimit(list)"><i class="icon-delete"></i> 删除</a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <div class="table-num">共查询出 <span ng-bind="table.list.length"></span> 条记录</div>
+    </div>
+</div>

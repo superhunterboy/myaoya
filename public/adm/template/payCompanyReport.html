@@ -1,0 +1,90 @@
+<div class="report-list">
+    <div class="page-title">公司入款统计</div>
+    <div class="table">
+        <table-float-header data-float-element="table-advanced-search" data-float-thead="table-thead"></table-float-header>
+        <div class="table-advanced-search">
+            <div class="advanced-search-box" style="width: 35%">
+                <span class="search-box-text">存入时间(美东)：</span>
+                <input style="width: 150px" onchange="" class="input" datepicker="yyyy-MM-dd HH:mm:ss" max="table.query.endtime"
+                       type="text" ng-model="table.query.startime" /> 至 <input style="width: 150px" onchange=""
+                                                                               class="input" type="text" datepicker="yyyy-MM-dd HH:mm:ss" min="table.query.startime" ng-model="table.query.endtime"
+            />
+            </div>
+            <label class="advanced-search-box">
+                <span class="search-box-text">存入账户：</span>
+                <select class="input" ng-model="table.query.items" ng-options="key as value for (key,value) in reportItems">
+                    <option value="">全部</option>
+                </select>
+            </label>
+            <label class="advanced-search-box">
+                <span class="search-box-text">会员账号/订单号：</span>
+                <input  class="input" type="text" maxlength="40" datatype="EN"
+                        ng-model="table.query.keyword" placeholder="请输入会员账号/订单号" />
+            </label>
+            <div class="advanced-search-box">
+                <span class="search-box-text"> </span>
+                <button class="btn btn-default" ng-click="table.ready=false;table.getList(1)">搜索</button>
+                <button class="btn btn-blue" ng-click="export()">导出报表</button>
+            </div>
+        </div>
+        <table>
+            <thead class="table-thead">
+            <tr>
+                <td>层级</td>
+                <td>订单号</td>
+                <td>大股东</td>
+                <td>会员账号</td>
+                <td>会员银行</td>
+                <td>存款人</td>
+                <td>存入金额</td>
+                <td>存款优惠</td>
+                <td>其他优惠</td>
+                <td>存入总金额</td>
+                <td>存入账号</td>
+                <td>会员填写时间(当地)</td>
+                <td>系统提交时间(美东)</td>
+                <td>存入操作时间(美东)</td>
+                <td>操作人</td>
+            </tr>
+            </thead>
+            <tbody>
+            <tr ng-if="!table.ready">
+                <td colspan="15">正在加载。。。</td>
+            </tr>
+            <tr ng-if="table.error">
+                <td colspan="15">获取列表错误，{{table.errorMsg}}<br/>请刷新页面</td>
+            </tr>
+            <tr ng-if="table.ready && !table.error && table.list==0">
+                <td colspan="15">没有查询到记录</td>
+            </tr>
+            <tr ng-if="table.ready && !table.error" ng-repeat="list in table.list">
+                <td ng-bind="list.level"></td>
+                <td ng-bind="list.order_no"></td>
+                <td ng-bind="list.shareholder"></td>
+                <td ng-bind="list.account"></td>
+                <td ng-bind="list.account_bank"></td>
+                <td ng-bind="list.depositor"></td>
+                <td ng-bind="list.amount"></td>
+                <td ng-bind="list.discount"></td>
+                <td ng-bind="list.other_discount1+'('+list.other_discount2+')'"></td>
+                <td ng-bind="list.total_amount"></td>
+                <td ng-bind="list.company_bank_user"></td>
+                <td ng-bind="list.member_datetime"></td>
+                <td ng-bind="list.system_datetime"></td>
+                <td ng-bind="list.operation_datetime"></td>
+                <td ng-bind="list.operator"></td>
+            </tr>
+            <tr>
+                <td colspan="15" align="right">小计：{{table.current_total_amount||'0.00'}} 总计：{{table.total_amount||'0.00'}}</td>
+            </tr>
+            </tbody>
+        </table>
+
+        <div class="table-num">共查询出 <span ng-bind="table.total"></span> 条记录，每页显示
+            <select class="input" ng-model="table.query.perPage" ng-change="table.getList(1)">
+                <option value="10">10</option><option value="20">20</option><option value="50">50</option><option value="100">100</option>
+            </select> 条
+        </div>
+        <div table-page="table"></div>
+    </div>
+</div>

@@ -1,0 +1,18 @@
+body,button, input, select, textarea,h1 ,h2, h3, h4, h5, h6,a {
+    font-family: Microsoft YaHei,'宋体' ,
+    Tahoma, Helvetica, Arial, "\5b8b\4f53", sans-serif;
+}
+body,html,div,p,img,ul,li,a,h1 ,h2, h3, h4, h5, h6{
+    margin:0;
+    padding:0;
+}
+img{
+    vertical-align: middle;
+    border:0;
+}
+a{
+    text-decoration: none;
+}
+ul li{
+    list-style:none;
+}

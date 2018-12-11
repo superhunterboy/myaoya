@@ -1,0 +1,14 @@
+<div class="user-dialog">
+    <div class="dialog-title">
+        切换银行卡
+    </div>
+    <label class="input-box"><span>使用银行卡：</span>
+        <select class="input" ng-model="list.actId">
+            <option ng-repeat="bank in list.banks" value="{{bank.id}}" ng-bind="bank.bank_number+'('+bank.user_name+')'"></option>
+        </select>
+    </label>
+    <div align="center">
+        <button class="btn btn-green" ng-click="sub()">确定</button>
+        <button ng-if="userInfo.lastlogin" class="btn btn-default" ng-click="closeThisDialog()">取消</button>
+    </div>
+</div>

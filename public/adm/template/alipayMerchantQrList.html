@@ -1,0 +1,61 @@
+<div class="merchant-pay-list">
+    <div class="page-title">商家扫码</div>
+
+    <div class="table">
+        <table-float-header data-float-element="table-advanced-search" data-float-thead="table-thead"></table-float-header>
+        <div class="table-advanced-search">
+            <label class="advanced-search-box"  style="float:right;">
+                <span class="search-box-text">筛选：</span>
+                <input class="input" type="text" style="width:200px;" maxlength="30" placeholder="商户编号/商户名称/招牌名" ng-model="table.query.keyWord"
+                />
+                <button type="button" class="btn btn-default" ng-click="table.ready=false;table.getList(1)">搜索</button>
+            </label>
+        </div>
+        <table>
+            <thead class="table-thead">
+                <tr>
+                    <td>商户编号</td>
+                    <td>商户名称</td>
+                    <td>招牌名</td>
+                    <td>所在地</td>
+                    <td>操作</td>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-if="!table.ready">
+                    <td colspan="12">正在加载。。。</td>
+                </tr>
+                <tr ng-if="table.error">
+                    <td colspan="12">获取列表错误，{{table.errorMsg}}
+                        <br/>请刷新页面</td>
+                </tr>
+                <tr ng-if="table.ready && !table.error && table.list==0">
+                    <td colspan="12">没有查询到付款记录</td>
+                </tr>
+                <tr ng-if="table.ready && !table.error" ng-repeat="list in table.list">
+                    <td ng-bind="list.shop_no"></td>
+                    <td ng-bind="list.merchant_name"></td>
+                    <td ng-bind="list.signboard_name"></td>
+                    <td ng-bind="list.address"></td>
+                    <td>
+                        <a ng-if="list.status==1" ng-click="edit(list,0)">
+                            <i class="icon"></i> 解锁</a>
+                        <a ng-if="list.status==0" ng-click="edit(list,1)">
+                            <i class="icon"></i> 锁定</a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="table-num">共查询出
+            <span ng-bind="table.total"></span> 条记录，每页显示
+            <select class="input" ng-model="table.query.perPage" ng-change="table.getList(1)">
+                <option value="10">10</option>
+                <option value="20">20</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+            </select> 条
+        </div>
+        <div table-page="table"></div>
+    </div>
+</div>

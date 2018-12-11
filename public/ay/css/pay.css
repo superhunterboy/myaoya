@@ -1,0 +1,236 @@
+*{
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+    font-family: "Microsoft Yahei",Helvetica,Arial,sans-serif;
+}
+body{
+    min-width: 1100px;
+    background-color:#000;
+    background-size: 100%;
+}
+a{
+    text-decoration: none;
+}
+.clearfix{
+    clear: both;
+}
+.top{
+    height:105px;
+    padding-top:35px;
+    line-height:103px;
+    border:1px solid #3a3a3a;
+}
+.logo{
+    width:401px;
+    height:58px;
+    background:url("../img/pay/logo-1.png") no-repeat;
+    margin:0 auto;
+}
+/*头部按钮部分*/
+.head{
+    width:1030px;
+    height:95px;
+    margin:0 auto;
+    cursor:pointer;
+}
+.desc{
+    float: left;
+    width:20%;
+    height:95px;
+    line-height:95px;
+}
+.desc-1{
+    background: url("../img/pay/btn-1.png") no-repeat center;
+}
+.desc-1:hover{
+    background: url("../img/pay/hbtn-1.png") no-repeat center;
+}
+.desc-2{
+    background: url("../img/pay/btn-2.png") no-repeat center;
+}
+.desc-2:hover{
+    background: url("../img/pay/hbtn-2.png") no-repeat center;
+}
+.desc-3{
+    background: url("../img/pay/btn-3.png") no-repeat center;
+}
+.desc-3:hover{
+    background: url("../img/pay/hbtn-3.png") no-repeat center;
+}
+.desc-4{
+    background: url("../img/pay/btn-4.png") no-repeat center;
+}
+.desc-4:hover{
+    background: url("../img/pay/hbtn-4.png") no-repeat center;
+}
+.desc-5{
+    background: url("../img/pay/btn-5.png") no-repeat center;
+}
+.desc-5:hover{
+    background: url("../img/pay/hbtn-5.png") no-repeat center;
+}
+
+/*中间内容部分*/
+.content{
+    width: 1000px;
+    margin: 0 auto;
+}
+.content-inner{
+    height: 555px;
+    background-color: #fff;
+    border-radius:5px;
+    box-shadow: 0 -1px 1px #5d5d5d;
+}
+.content-title{
+    height: 55px;
+    line-height: 55px;
+    font-size: 32px;
+    font-weight: bold;
+    color: #474747;
+    border-bottom: 1px solid #ccc;
+    margin: 0 5px;
+    text-align: center;
+}
+.content-top{
+    height: 330px;
+    overflow: hidden;
+}
+.top-left{
+    float: left;
+    width: 345px;
+}
+.top-right{
+    margin-left: 345px;
+}
+.top-tip{
+    background: url("../img/phone.png") left center no-repeat;
+    height: 240px;
+    padding: 20px 0 20px 175px;
+}
+.top-tip-alipay{
+    background: url("../img/zhifubao.png") left center no-repeat;
+}
+.tip-title{
+    font-size: 18px;
+    font-weight: bold;
+    color: #fa0000;
+    padding: 10px 0;
+}
+.tip-content{
+    padding: 5px;
+    font-size: 12px;
+    color: #4b4b4b;
+    line-height: 22px;
+}
+.steps{
+    width: 580px;
+    border:1px solid #a0a0a0;
+    border-radius: 5px;
+    padding: 10px;
+    color: #6c6c6c;
+    overflow: hidden;
+    margin-left: 50px;
+}
+.steps-title{
+    width: 160px;
+    font-size: 20px;
+    font-weight: bold;
+    float: left;
+    text-align: center;
+    height: 60px;
+    padding: 3px 0;
+}
+.steps-content{
+    float: left;
+    border-left: 1px solid #d5d5d5;
+    padding: 10px 15px;
+    height: 60px;
+    font-weight: bold;
+}
+.steps-no{
+    line-height: 40px;
+    font-size: 22px;
+    font-weight: bold;
+    float: left;
+    margin-right: 10px;
+}
+.content-bottom{
+    overflow: hidden;
+}
+.bottom-left{
+    width: 420px;
+    float: left;
+    line-height: 22px;
+    color: #797979;
+    font-size: 12px;
+    padding: 5px 0 0 25px;
+}
+.bottom-right{
+    margin-left: 420px;
+    text-align: center;
+    padding: 30px 60px 0 0;
+    font-size: 12px;
+}
+.confirm{
+    background: url("../img/confirm.png");
+    width: 189px;
+    height: 47px;
+    display: inline-block;
+    margin-bottom: 20px;
+    cursor: pointer;
+}
+.confirm:hover{
+    background: url("../img/confirm_hover.png");
+}
+.red{
+    color: #ff0000;
+}
+.footer{
+    text-align: center;
+    font-size: 18px;
+    color: #ffffff;
+    font-weight: 300;
+    padding: 15px 0;
+}
+.box{
+    width:290px;
+    height: 290px;
+    margin:10px 15px;
+    background: url("../img/qrcode_bg.jpg");
+    text-align: center;
+}
+.box-alipay{
+    background: url("../img/qrcode_bg_1.png");
+}
+.qrcode{
+    width: 208px;
+    height: 208px;
+    border: 1px solid #2f2f2f;
+    margin: 41px auto;
+}
+.confirm-box{
+    background: #fff;
+    border:2px solid #ff0000;
+    border-radius: 10px;
+    padding: 30px 20px;
+    width: 480px;
+    position: absolute;
+    text-align: center;
+}
+.confirm-content{
+    font-size: 20px;
+    line-height: 35px;
+    text-align: left;
+}
+.confirm-box a{
+    background: url("../img/confirm_close.png");
+    width: 189px;
+    height: 47px;
+    display: inline-block;
+    margin-top: 20px;
+    cursor: pointer;
+}
+.confirm-box a:hover{
+    background: url("../img/confirm_close_hover.png");
+}

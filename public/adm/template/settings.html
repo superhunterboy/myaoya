@@ -1,0 +1,15 @@
+<div class="setting-box">
+        <div class="page-title">
+            <span>出款设置</span>
+        </div>
+    
+        <div class="table">
+            <div ng-repeat="item in list">
+                <span ng-bind="map[item.key].name"></span>
+                <input type="{{map[item.key].type}}" class="input" ng-disabled="map[item.key].status=='default'" ng-model="item.val" datatype="{{map[item.key].dataType}}" maxlength="{{map[item.key].maxLength}}"/>
+                <button ng-if="map[item.key].status=='default'" ng-click="changeStatus('edit',item)" class="btn btn-default">修改</button>
+                <button ng-if="map[item.key].status=='edit'"  ng-click="changeStatus('default',item)" class="btn btn-default">取消</button>
+                <button ng-if="map[item.key].status=='edit'" ng-click="save(item)" class="btn btn-green">保存</button>
+            </div>
+        </div>
+    </div>

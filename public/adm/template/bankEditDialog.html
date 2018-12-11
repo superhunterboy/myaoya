@@ -1,0 +1,34 @@
+<div class="user-dialog">
+    <div ng-if="list.id" class="dialog-title">
+        修改银行卡
+    </div>
+    <div ng-if="!list.id" class="dialog-title">
+        添加银行卡
+    </div>
+    <label class="input-box"><span>银行名称：</span>
+        <input ng-if="list.count==0" class="input" type="text" maxlength="18" ng-model="list.bank_name" /><i ng-if="list.count==0" class="color-red ml-1">*</i>
+        <input ng-if="list.count>0" readonly class="input" type="text" ng-model="list.bank_name" />
+    </label>
+    <label class="input-box"><span>银行卡号：</span>
+        <input ng-if="list.count==0" class="input" type="text" maxlength="20" ng-model="list.bank_number" /><i ng-if="list.count==0" class="color-red ml-1">*</i>
+        <input ng-if="list.count>0" readonly class="input" type="text" ng-model="list.bank_number" />
+    </label>
+    <label class="input-box"><span>银行户名：</span>
+        <input ng-if="list.count==0" class="input" type="text" maxlength="20" ng-model="list.user_name" /><i ng-if="list.count==0" class="color-red ml-1">*</i>
+        <input ng-if="list.count>0" readonly class="input" type="text" ng-model="list.user_name" />
+    </label>
+    <label class="input-box"><span>备注：</span>
+        <input class="input" type="text" maxlength="20" ng-model="list.address" /></label>
+    <div class="input-box"><span>对应层级：</span>
+        <div class="content-box">
+            <label ng-repeat="level in levelList" ng-class="{true:'color-gray'}[level.status==1 && levels.indexOf(''+level.id)<0]">
+                <input ng-model="level.checked" ng-disabled="level.status==1 && levels.indexOf(''+level.id)<0" type="checkbox">{{level.name}}
+            </label>
+        </div>
+    </div>
+    <div align="center" class="color-red" ng-show="error" ng-bind="errorMsg"></div>
+    <div align="center">
+        <button class="btn btn-green" ng-click="sub()">确定</button>
+        <button ng-if="userInfo.lastlogin" class="btn btn-default" ng-click="closeThisDialog()">取消</button>
+    </div>
+</div>

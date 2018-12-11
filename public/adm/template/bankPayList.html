@@ -1,0 +1,90 @@
+<div class="pay-list">
+    <div class="page-title">转账汇款记录</div>
+    <div class="table">
+        <table-float-header data-float-element="table-advanced-search" data-float-thead="table-thead"></table-float-header>
+        <div class="table-advanced-search">
+            <label class="advanced-search-box">
+                <span class="search-box-text">关键字：</span>
+                <input class="input" type="text" maxlength="20" ng-model="table.query.key_word" placeholder="会员账户/转账人" />
+            </label>
+            <div class="advanced-search-box">
+                <span class="search-box-text"> </span>
+                <button type="button" class="btn btn-default" ng-click="table.ready=false;table.getList(1)">搜索</button>
+            </div>
+            <div class="advanced-search-box" style="width: 100%">
+                <span class="search-box-text">入款状态：</span>
+                <div class="table-tab">
+                    <a ng-class="{active:table.query.status==''}" ng-click="search('')">全部</a
+                    ><a ng-class="{active:table.query.status=='0'}" ng-click="search('0')">未入款</a
+                    ><a ng-class="{active:table.query.status=='1'}" ng-click="search('1')">已入款</a
+                    ><a ng-class="{active:table.query.status=='2'}" ng-click="search('2')">已忽略</a>
+                </div>
+            </div>
+        </div>
+        <table>
+            <thead class="table-thead">
+                <tr>
+                    <td>订单号</td>
+                    <td>会员名称</td>
+                    <td>金额</td>
+                    <td>转款人</td>
+                    <td>入款银行</td>
+                    <td>入款卡号</td>
+                    <td>入款户名</td>
+                    <td>充值时间</td>
+                    <td>结果</td>
+                    <td>状态</td>
+                    <td>操作</td>
+                    <td>操作人</td>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-if="!table.ready">
+                    <td colspan="12">正在加载。。。</td>
+                </tr>
+                <tr ng-if="table.error">
+                    <td colspan="12">获取列表错误，{{table.errorMsg}}
+                        <br/>请刷新页面</td>
+                </tr>
+                <tr ng-if="table.ready && !table.error && table.list==0">
+                    <td colspan="12">没有查询到支付记录</td>
+                </tr>
+                <tr ng-if="table.ready && !table.error" ng-repeat="list in table.list">
+                    <td ng-bind="list.order_no"></td>
+                    <td ng-bind="list.account"></td>
+                    <td ng-bind="list.amount"></td>
+                    <td ng-bind="list.depositor"></td>
+                    <td ng-bind="list.bank_name"></td>
+                    <td ng-bind="list.bank_card_no"></td>
+                    <td ng-bind="list.card_user"></td>
+                    <!--td ng-bind="list.created_at"></td-->
+                    <td>{{list.created_at}}(当地)<br/>{{list.created_at_edt}}(美东)</td>
+                    <td width="220">
+                        <div title="{{list.remark}}" class="remark" ng-bind="list.remark"></div>
+                    </td>
+                    <td>
+                        <span ng-if="list.status==0" class="color-red">未处理</span>
+                        <span ng-if="list.status==1" class="color-green">已入款</span>
+                        <span ng-if="list.status==2">已忽略</span>
+                    </td>
+                    <td>
+                        <a ng-if="list.status==0" ng-click="act(list,1)">入款</a>
+                        <a class="ml-1" ng-if="list.status==0" ng-click="act(list,2)">忽略</a>
+                    </td>
+                    <td ng-bind="list.user.username"></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="table-num">共查询出
+            <span ng-bind="table.total"></span> 条记录，每页显示
+            <select class="input" ng-model="table.query.perPage" ng-change="table.getList(1)">
+                <option value="10">10</option>
+                <option value="20">20</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+            </select> 条
+        </div>
+        <div table-page="table"></div>
+    </div>
+</div>

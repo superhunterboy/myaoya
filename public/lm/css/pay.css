@@ -1,0 +1,138 @@
+*{
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+    font-family: "Microsoft Yahei",Helvetica,Arial,sans-serif;
+}
+body{
+    min-width: 1000px;
+    min-height:800px;
+}
+body.alipay{
+    background: url('../img/alipay_bg.jpg') #000 center top no-repeat;
+}
+body.wechat{
+    background: url('../img/wechat_bg.jpg') #000 center top no-repeat;
+}
+a{
+    text-decoration: none;
+}
+img{
+    border:0;
+}
+.head{
+    padding-left: 255px;
+    overflow: hidden;
+}
+.desc{
+    float: left;
+    width: 180px;
+    height:60px;
+    cursor: pointer;
+    display: block;
+    background: url("../img/btn.png") no-repeat;
+}
+.desc-1{
+    background-position: 0 -60px;
+}
+.desc-1:hover{
+    background-position: 0 0;
+}
+.desc-2:hover{
+    background-position: -180px 0;
+}
+.desc-2{
+    background-position: -180px -60px;
+}
+.desc-3:hover{
+    background-position: -360px 0;
+}
+.desc-3{
+    background-position: -360px -60px
+}
+.desc-4:hover{
+    background-position: -540px 0;
+}
+.desc-4{
+    background-position: -540px -60px;
+}
+/*中间内容部分*/
+.content{
+    width: 1000px;
+    padding-top:158px;
+    margin:0 auto;
+    text-align: center;
+}
+.content-inner{
+    width: 850px;
+    margin: 100px auto 0;
+    text-align: left;
+    position: relative;
+    height: 525px;
+}
+.service{
+    display: block;
+    position: absolute;
+    right: -34px;
+    top: -74px;
+    width:105px;
+    height:107px;
+    background: url("../img/service.png") no-repeat;
+}
+
+.qrcode{
+    width: 208px;
+    height: 208px;
+    position: absolute;
+    right: 119px;
+    top: 8px;
+}
+.change{
+    width: 300px;
+    height: 30px;
+    font-size: 16px;
+    font-weight: bold;
+    text-align: center;
+    line-height: 30px;
+    border-radius: 4px;
+    overflow: hidden;
+    position: absolute;
+    bottom: 20px;
+    left: 290px;
+    box-shadow: 0 5px 5px rgba(0,0,0,.3);
+}
+.change a{
+    color: #fff;
+    width: 50%;
+    float: left;
+    display: block;
+    background: #a20001;
+    position: relative;
+}
+.change a.act{
+    background: #000;
+}
+.change a.act:after{
+    content: "";
+    position: absolute;
+    width: 7px;
+    height: 15px;
+    background: url("../img/change-act.png");
+}
+.change .type-alipay.act:after{
+    left: 138px;
+    top: 7px;
+    background-position: top left;
+}
+.change .type-wechat.act:after{
+    left: 7px;
+    top: 7px;
+    background-position: bottom left;
+}
+.footer{
+    text-align: center;
+    font-size: 14px;
+    color: #fff;
+    font-weight: 300;
+    padding-top: 60px;
+}

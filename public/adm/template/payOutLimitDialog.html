@@ -1,0 +1,25 @@
+<div class="user-dialog">
+    <div ng-if="limit.id" class="dialog-title">
+        修改层级
+    </div>
+    <div ng-if="!limit.id" class="dialog-title">
+        添加层级
+    </div>
+    <label class="input-box">
+        <span>出款次数：</span>
+        <input class="input" type="text" maxlength="5" datatype="INT" ng-model="limit.count" />
+    </label>
+    <div class="input-box">
+        <span>层级：</span>
+        <div class="content-box">
+            <label ng-repeat="level in levelList" ng-class="{true:'color-gray'}[level.status==1 && levels.indexOf(''+level.id)<0]">
+                <input ng-model="level.checked" ng-disabled="level.status==1 && levels.indexOf(''+level.id)<0" type="checkbox">{{level.name}}
+            </label>
+        </div>
+    </div>
+    <div align="center" class="color-red" ng-show="error" ng-bind="errorMsg"></div>
+    <div align="center">
+        <button class="btn btn-green" ng-click="sub()">确定</button>
+        <button ng-if="userInfo.lastlogin" class="btn btn-default" ng-click="closeThisDialog()">取消</button>
+    </div>
+</div>

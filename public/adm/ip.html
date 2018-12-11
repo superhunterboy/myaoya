@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="zh_cn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="renderer" content="webkit" />
+    <meta http-equiv="renderer" content="webkit" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta http-equiv="X-UA-Compatible" content="chrome=1" />
+    <title>IP白名单管理</title>
+    <style type="text/css">
+    body {
+        padding: 10px;
+        margin: 0;
+    }
+    a {
+        text-decoration: none;
+    }
+    div.app {
+        margin: 100px auto;
+        width: 185px;
+    }
+    table.gridtable {
+        width: 185px;
+        font-family: verdana,arial,sans-serif;
+        font-size: 11px;
+        color: #333333;
+        border-width: 1px;
+        border-color: #666666;
+        border-collapse: collapse;
+    }
+    table.gridtable th {
+        border-width: 1px;
+        padding: 8px;
+        border-style: solid;
+        border-color: #666666;
+        background-color: #dedede;
+    }
+    table.gridtable td {
+        border-width: 1px;
+        padding: 8px;
+        border-style: solid;
+        border-color: #666666;
+        background-color: #ffffff;
+    }
+    .opertion {
+        text-align: right;
+    }
+    .ip {
+        padding: 3px;
+        width: 105px;
+        border: 1px solid #666666;
+    }
+    button {
+        height: 28px;
+        line-height: 28px;
+        margin: 10px 0;
+        padding: 0 15px;
+        border: 1px solid #1E9FFF;
+        border-radius: 2px;
+        font-weight: 400;
+        cursor: pointer;
+        text-decoration: none;
+        background-color: #1E9FFF;
+        color: #fff;
+    }
+    #addIpAddress {
+        margin-right: 31px;
+    }
+    #updateBtn {
+        margin-left: 31px;
+    }
+    </style>
+</head>
+<body>
+<div id="app" class="app"></div>
+<script src="/adm/js/jquery.min.js"></script>
+<script src="/adm/js/layer/layer.js"></script>
+<script>
+$(document).ready(function(){
+    $(document).on('click', '#addIpAddress', function(event) {
+        event.preventDefault();
+        var html = '<tr>';
+        html += '<td><input class="ip" type="text" name="ips[]" value=""></td>';
+        html += '<td><a href="javascript:;" class="deleteIpAddress">[删除]</a></td>';
+        html += '</tr>';
+        $('table tbody').append(html);
+    });
+    $(document).on('click', '.deleteIpAddress', function(event) {
+        event.preventDefault();
+        var obj = $(this);
+        layer.confirm('确认要删除吗？', {icon: 3, title:'提示'}, function(index){
+            obj.parents("tr").remove();
+            layer.close(index);
+        });
+    });
+    $(document).on('click', '#updateBtn', function(event) {
+        event.preventDefault();
+        layer.confirm('确认更新吗？', {icon: 3, title:'提示'}, function(index){
+            $.ajax({
+                url: '/updateWhelloteList',
+                type: 'POST',
+                data: $('#updateForm').serialize(),
+                success: function (result) {
+                    if (result.status == 1) {
+                        layer.alert(result.msg);
+                    } else if (result.status == 0) {
+                        layer.alert(result.msg);
+                    }
+                }
+            });
+            layer.close(index);
+        });
+    });
+    layer.prompt({title: '请输入管理员用户名', formType: 0}, function(username, index, elem){
+        layer.close(index);
+        layer.prompt({title: '请输入管理员密码', formType: 1}, function(password, index, elem){
+            layer.close(index);
+            $.ajax({
+                url: '/getWhelloteList',
+                type: 'POST',
+                data: {"username": username, "password": password},
+                success: function (result) {
+                    if (result.status == 1) {
+                        layer.alert(result.msg, function(index) {
+                            layer.close(index);
+                            window.location.reload();
+                        });
+                    } else if (result.status == 0) {
+                        var html = '<form id="updateForm">';
+                        html += '<p>当前IP: ' + result.msg + '</p>';
+                        html += '<input type="hidden" name="username" value="' + username + '" /><input type="hidden" name="password" value="' + password + '" />';
+                        html += '<table class="gridtable"><thead><tr><td>IP</td><td class="opertion">操作</td></tr></thead><tbody>';
+                        $.each(result.data, function (i, v) {
+                            html += '<tr>';
+                            html += '<td><input class="ip" type="text" name="ips[]" value="' + v + '"></td>';
+                            html += '<td><a href="javascript:;" class="deleteIpAddress">[删除]</a></td>';
+                            html += '</tr>';
+                        });
+                        html += '</tbody></table><button id="addIpAddress">添加</button> <button id="updateBtn">更新</button></form>';
+                        $("#app").html(html);
+                    }
+                }
+            });
+        });
+    });
+});
+</script>
+</body>
+</html>

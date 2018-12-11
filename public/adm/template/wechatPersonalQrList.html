@@ -1,0 +1,80 @@
+<div ng-if="!smsCode" smscode></div>
+<div ng-if="smsCode"  class="personal-qr-list">
+    <div class="page-title">
+        <span>个人微信扫码</span>
+        <div class="page-btn">
+            <a ng-click="editQR()" class="btn btn-green">添加</a>
+            <a ng-click="deleteQR()" class="btn btn-red">删除</a>
+        </div>
+    </div>
+
+    <div class="table">
+        <table-float-header data-float-element="table-advanced-search" data-float-thead="table-thead"></table-float-header>
+        <table>
+            <thead class="table-thead">
+                <tr>
+                    <td>
+                        <label>
+                            <input check-all="checkItems" data-check-value="checkValue" type="checkbox" ng-checked="checkAll" ng-model="checkAll" /> 全选</label>
+                    </td>
+                    <td>编号</td>
+                    <td>二维码</td>
+                    <td>收款金额</td>
+                    <td>收款次数</td>
+                    <td>收款人</td>
+                    <td>备注</td>
+                    <td>操作</td>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-if="!table.ready">
+                    <td colspan="10">正在加载。。。</td>
+                </tr>
+                <tr ng-if="table.error">
+                    <td colspan="10">获取列表错误，{{table.errorMsg}}
+                        <br/>请刷新页面</td>
+                </tr>
+                <tr ng-if="table.ready && !table.error && table.list==0">
+                    <td colspan="10">没有查询到二维码列表</td>
+                </tr>
+                <tr ng-if="table.ready && !table.error" ng-repeat="list in table.list">
+                    <td width="80">
+                        <input class="checkItems" value="{{list.id}}" type="checkbox" />
+                    </td>
+                    <td ng-bind="list.id"></td>
+                    <td>
+                        <img style="width:48px;" class="qr-img" ng-src="{{(list.url)}}?x-oss-process=image/resize,w_48" />
+                    </td>
+                    <td ng-bind="list.money"></td>
+                    <td ng-bind="list.count"></td>
+                    <td ng-bind="list.qrcode_name"></td>
+                    <td ng-bind="list.msg"></td>
+                    <td>
+                        <a ng-click="editQR(list)">
+                            <i class="icon-edit"></i> 编辑</a>
+                        <a class="ml-1" ng-click="deleteQR(list)">
+                            <i class="icon-delete"></i> 删除</a>
+                        <a ng-if="list.status!=2" class="ml-1" ng-click="updateStatus(list,2)">
+                            <i class="icon-biaoxing"></i> 屏蔽</a>
+                        <a ng-if="list.status==2" class="ml-1" ng-click="updateStatus(list,3)">
+                            <i class="icon-biaoxingfill"></i> 启用</a>
+                        <a ng-if="list.status!=1" class="ml-1" ng-click="updateStatus(list,1)">
+                            <i class="icon-xuanze"></i> 锁定</a>
+                        <a ng-if="list.status==1" class="ml-1" ng-click="updateStatus(list,0)">
+                            <i class="icon-yuanxingweixuanzhong"></i> 解锁</a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <div class="table-num">共查询出
+            <span ng-bind="table.total"></span> 条记录，每页显示
+            <select class="input" ng-model="table.query.perPage" ng-change="table.getList(1)">
+                <option value="10">10</option>
+                <option value="20">20</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+            </select> 条
+        </div>
+        <div table-page="table"></div>
+    </div>
+</div>

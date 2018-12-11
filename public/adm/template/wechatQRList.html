@@ -1,0 +1,69 @@
+<div class="qr-list">
+    <div class="page-title">
+        <span>智能微信扫码</span>
+        <div class="page-btn">
+            <a ng-click="editQR()" class="btn btn-green">二维码上传</a>
+            <div class="qrcode-upload">
+                <input id="qf" type="file" name="file" pkg-upload accept="application/x-zip-compressed" />
+            </div>
+        </div>
+    </div>
+
+    <div class="table">
+        <table-float-header data-float-element="table-advanced-search" data-float-thead="table-thead"></table-float-header>
+        <table>
+            <thead class="table-thead">
+                <tr>
+                    <td>二维码</td>
+                    <td>业务平台</td>
+                    <td>微信号</td>
+                    <td>每日限额</td>
+                    <td>今日入款金额</td>
+                    <td>入款总金额</td>
+                    <td>入款总次数</td>
+                    <td>状态</td>
+                    <td>操作</td>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-if="!table.ready">
+                    <td colspan="10">正在加载。。。</td>
+                </tr>
+                <tr ng-if="table.error">
+                    <td colspan="10">获取列表错误，{{table.errorMsg}}
+                        <br/>请刷新页面</td>
+                </tr>
+                <tr ng-if="table.ready && !table.error && table.list==0">
+                    <td colspan="10">没有查询到二维码列表</td>
+                </tr>
+                <tr ng-if="table.ready && !table.error" ng-repeat="list in table.list">
+                    <td>
+                        <img class="qr-img" ng-src="{{(list.url)}}?x-oss-process=image/resize,w_120" />
+                    </td>
+                    <td ng-bind="companyInfo[list.company_id].name"></td>
+                    <td ng-bind="list.wechat_id"></td>
+                    <td ng-bind="list.limit"></td>
+                    <td ng-bind="list.day_money"></td>
+                    <td ng-bind="list.money"></td>
+                    <td ng-bind="list.count"></td>
+                    <td ng-bind="['启用','禁用'][list.disable]"></td>
+                    <td>
+                        <a ng-click="editQR(list)">
+                            <i class="icon-edit"></i> 修改</a>
+                        <a class="ml-1" ng-if="list.disable==1" ng-click="disable(list,0)"><i class="icon-start"></i> 启用</a>
+                        <a class="ml-1" ng-if="list.disable==0" ng-click="disable(list,1)"><i class="icon-pause"></i> 禁用</a>
+                        <a class="ml-1" ng-if="list.count==0" ng-click="deleteQR(list)">
+                            <i class="icon-delete"></i> 删除</a>
+
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <div class="table-num">共查询出 <span ng-bind="table.total"></span> 条记录，每页显示
+            <select class="input" ng-model="table.query.perPage" ng-change="table.getList(1)">
+                <option value="10">10</option><option value="20">20</option><option value="50">50</option><option value="100">100</option>
+            </select> 条
+        </div>
+        <div table-page="table"></div>
+    </div>
+</div>

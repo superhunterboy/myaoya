@@ -1,0 +1,3 @@
+<?php
+
+echo md5(md5('orderNo=201709091647365074836&account=asd1323123&fee=1.00&rechargeTime=2017-08-11 13:03:08') . '35a7102186059dr8a1557f1e9c90ca47075d7c4e');

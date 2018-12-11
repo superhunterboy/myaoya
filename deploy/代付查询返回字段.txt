@@ -1,0 +1,99 @@
+天付宝
+
+ckType=1
+
+retcode:"结果",
+retmsg:"结果描述",
+spid:"商户号",
+sp_serialno:"商户代付单号",
+tfb_serialno:"天付宝代付单号",
+serialno_state:"代付状态",		1-处理成功 2-处理中 3-处理失败 4-已退汇
+serialno_desc:"代付状态描述",
+tran_amt:"总金额(分)",
+//cur_type:"金额类型",
+acct_name:"收款人姓名",
+acct_id:"收款人账号",
+mobile:"收款人手机",
+bank_name:"开户行",
+bank_settle_no:"银联机构号",
+bank_branch_name:"支行名称",
+business_type:"业务类型",
+business_no:"业务号码",
+memo:"摘要",
+sp_batch_no:"商户批次号",
+tfb_rsptime:"响应时间",
+sign:"签名",
+
+
+
+===========================================
+雅付
+
+ckType=2
+
+code		返回编码
+msg		返回文本提示
+consumerNo	商户号
+orderStatus	代付结果		0：未处理；1:成功；2：已取消;3:提现失败;4:提现处理中;5:部分成功;
+casOrdNo	平台对应代付订单号
+merOrderNo	商户对应代付批次号
+transAmt	代付提交金额
+transTime	代付提交时间
+feeAmt		手续费
+settleAmt	结算金额
+sign		签名
+
+
+===========================================
+金海哲
+
+ckType=3
+
+retCode			结果
+retMsg			结果描述
+
+merchant_no		商户号
+request_no		商户代付单号
+sy_request_no		金海哲代付单号
+status			该笔代付状态    1-处理中 2-处理成功 3-处理失败 4-已退汇
+amount			总金额(分)
+cur_type		金额类型
+acct_name		收款人姓名
+acct_id			收款人账号
+mobile			收款人手机号码
+bank_name		开户行名称
+bank_settle_no		开户行银联机构号
+bank_branch_name	支行名称
+business_no		业务号码
+memo			摘要
+tfb_rsptime		响应时间
+sign			关键参数签名
+
+
+============================================
+泽圣
+
+ckType=4
+
+merchantCode	商户号
+outOrderId	商户订单号
+orderId		付款订单号
+state		付款状态    00-付款成功 01或者90-付款处理中 02-付款失败
+transTime	交易时间
+totalAmount	金额(分)
+fee		手续费(分)
+errorMsg	错误信息
+sign		签名
+
+
+===========================================
+传化
+
+ckType=5
+
+result		返回结果
+code		返回代码
+msg		返回信息
+count		返回数据数量
+status		状态		失败/处理中/成功/已退票
+businessrecordnumber 支付流水号

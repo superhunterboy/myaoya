@@ -1,0 +1,25 @@
+{
+    "require": {
+        "slim/slim": "^3.0",
+        "tuupola/slim-jwt-auth": "^2.3",
+        "illuminate/database": "~5.1",
+        "illuminate/events": "^5.4",
+        "illuminate/pagination": "~5.1",
+        "guzzlehttp/guzzle": "^6.2",
+        "monolog/monolog": "^1.22",
+        "bacon/bacon-qr-code": "^1.0",
+        "overtrue/validation": "^2.0",
+        "chrisboulton/php-resque": "dev-master",
+        "aliyuncs/oss-sdk-php": "^2.2",
+        "phpoffice/phpexcel": "^1.8",
+        "workerman/workerman": "^3.5",
+        "symfony/dom-crawler": "^3.3",
+        "predis/predis": "^1.1",
+        "sonata-project/google-authenticator": "dev-master"
+    },
+    "autoload": {
+        "psr-4": {
+            "Weiming\\": "src/"
+        }
+    }
+}

@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>元宝微信支付</title>
+    <link rel="stylesheet" type="text/css" href="css/pay.css">
+    <link rel="stylesheet" href="css/reset.css">
+    <link rel="shortcut icon" href="img/favicon.ico">
+    <script type="text/javascript" src="js/jquery.min.js"></script>
+    <script type="text/javascript" src="js/jQuery.browser.mobile.js"></script>
+    <script type="text/javascript" src="js/tc.min.js"></script>
+    <script src="js/input.js"></script>
+    <script type="text/javascript" src="js/pay.js"></script>
+    <script type="text/javascript">
+        if (jQuery.browser.mobile) {
+            window.location = "wap/wechat.html";
+        }
+    </script>
+    <!--图片预加载-->
+    <script>
+        function preloadimages(arr){
+            var newimages=[]
+            var arr=(typeof arr!="object")? [arr] : arr; //确保参数总是数组
+            for (var i=0; i<arr.length; i++){
+                newimages[i]=new Image();
+                newimages[i].src=arr[i]
+            }
+        }
+        preloadimages(["./img/confirm_hover.png",
+            "./img/confirm_close_hover.png"
+        ])
+    </script>
+    <title>支付</title>
+</head>
+<body>
+<div id="confirmBox" class="confirm-box" style="display: none">
+    <div class="confirm-content">
+        请在扫码添加好友之后，告诉专员妹妹您的会员账号并进行转账。并稍等她为您进行入款。
+    </div>
+    <div><a href="#" class="close"></a></div>
+</div>
+<div class="content">
+    <div class="head clearfix">
+        <a class="desc desc-1" href="http://yb1.com/" target="_blank"></a>
+        <a class="desc desc-2" href="http://one6688.com/" target="_blank"></a>
+        <a class="desc desc-3" href="http://yb1.com/Promotion" target="_blank"></a>
+        <a class="desc desc-4" href="http://yb1.com/Register" target="_blank"></a>
+    </div>
+    <div class="content-inner">
+        <a class="service" href="http://v88.live800.com/live800/chatClient/chatbox.jsp?companyID=701112&configID=1256&jid=5686297694&_=1493799640153" target="_blank"></a>
+        <div class="content-title">
+            官方微信支付页面
+        </div>
+        <div class="content-top">
+            <div class="top-left">
+                <div class="box">
+                    <img id="wechat" class="qrcode" src="img/qrcode.jpg">
+                </div>
+            </div>
+            <div class="top-right">
+                <div class="top-tip">
+                    <div class="tip-title">
+                        温馨提示：
+                    </div>
+                    <div class="tip-content">
+                        ※1. 打开微信首页，可以看见左上角的扫一扫。<br/>
+                        &#12288;&#12288;添加好友。<br/>
+                        ※2. 添加好友完成后进行转账。<br/>
+                        ※3. 转帐完成后请保留单据作为核对证明。<br/>
+                    </div>
+                </div>
+                <div class="steps">
+                    <div class="steps-title">官方微信<br />入款步骤</div>
+                    <div class="steps-content"><span class="steps-no">1</span>扫描左上方二维码<br />并<span class="red">进行转账</span></div>
+                    <div class="steps-content"><span class="steps-no">2</span>完成提交后，请稍等<br />系统将为您入款。</div>
+                </div>
+            </div>
+        </div>
+        <div class="content-bottom">
+            <div class="bottom-left">
+                <span class="red">温馨提示：</span><br />
+                1&#12288;.&#12288;请使用您本人的微信帐号进行存款。<br />
+                2&#12288;.&#12288;申请的存款金额与实际存款金额须一致。<br />
+                3&#12288;.&#12288;成功存款后，请点击【转账】，并告知专员妹妹您的【会员帐号】。<br />
+                4&#12288;.&#12288;支付遇到困难？请联系客服人员获得帮助。
+            </div>
+            <div class="bottom-right">
+                <a class="confirm"></a><br />
+                <span class="red">（请注意，您必须在添加微信好友，进行转账并提供会员帐号后，才算完成充值手续）</span>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="footer">
+    Copyright © 娱乐城 Reserved
+</div>
+</body>
+</html>

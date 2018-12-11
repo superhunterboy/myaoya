@@ -1,0 +1,76 @@
+<div class="vendor-list">
+    <div class="page-title">
+        <span>支付平台配置</span>
+        <div class="page-btn">
+            <a ng-click="editVendor()" ng-if="userInfo.type==1" class="btn btn-green">添加支付平台配置</a>
+        </div>
+    </div>
+
+    <div class="table">
+        <table-float-header data-float-element="table-advanced-search" data-float-thead="table-thead"></table-float-header>
+        <table>
+            <thead>
+                <tr>
+                    <td>所属业务平台</td>
+                    <td>支付平台</td>
+                    <td>商户编号</td>
+                    <td>支持支付方式</td>
+                    <td>创建时间</td>
+                    <td>更新时间</td>
+                    <td>接口出错次数</td>
+                    <td>操作</td>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-if="!table.ready">
+                    <td colspan="9">正在加载。。。</td>
+                </tr>
+                <tr ng-if="table.error">
+                    <td colspan="9">获取列表错误，{{table.errorMsg}}<br/>请刷新页面</td>
+                </tr>
+                <tr ng-if="table.ready && !table.error && table.list==0">
+                    <td colspan="9">没有查询到支付平台</td>
+                </tr>
+                <tr ng-if="table.ready && !table.error" ng-repeat="list in table.list">
+                    <td ng-bind="companyInfo[list.company_id].name"></td>
+                    <td ng-bind="vendorsType[list.pay_type]"></td>
+                    <td ng-bind="list.no"></td>
+                    <td>
+                        <div>
+                            WEB:
+                            <span ng-if="list.wechat==1">微信</span>
+                            <span class="ml-1" ng-if="list.alipay==1">支付宝</span>
+                            <span class="ml-1" ng-if="list.qq==1">QQ钱包</span>
+                            <span class="ml-1" ng-if="list.netpay==1">网银</span>
+                            <span class="ml-1" ng-if="list.jd==1">京东</span>
+                            <span class="ml-1" ng-if="list.baidu==1">百度</span>
+                            <span class="ml-1" ng-if="list.union==1">银联</span>
+                        </div>
+                        <div>
+                            APP:
+                            <span ng-if="list.wap_wechat==1">微信</span>
+                            <span class="ml-1" ng-if="list.wap_alipay==1">支付宝</span>
+                            <span class="ml-1" ng-if="list.wap_qq==1">QQ钱包</span>
+                            <span class="ml-1" ng-if="list.wap_jd==1">京东</span>
+                            <span class="ml-1" ng-if="list.wap_baidu==1">百度</span>
+                            <span class="ml-1" ng-if="list.wap_union==1">银联</span>
+                        </div>
+                    </td>
+                    <td ng-bind="list.created_at"></td>
+                    <td ng-bind="list.updated_at"></td>
+                    <td ng-bind="list.error_count"></td>
+                    <td>
+                        <a ng-click="editVendor(list)"><i class="icon-edit"></i> 修改</a>
+                        <a class="ml-1" ng-click="delVendor(list)"><i class="icon-delete"></i> 删除</a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <div class="table-num">共查询出 <span ng-bind="table.total"></span> 条记录，每页显示
+            <select class="input" ng-model="table.query.perPage" ng-change="table.getList(1)">
+                <option value="10">10</option><option value="20">20</option><option value="50">50</option><option value="100">100</option>
+            </select> 条
+        </div>
+        <div table-page="table"></div>
+    </div>
+</div>

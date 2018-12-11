@@ -1,0 +1,160 @@
+<div ng-if="!smsCode" smscode></div>
+<div ng-if="smsCode" class="company-list">
+    <div class="page-title">
+        <span>业务平台</span>
+        <div class="page-btn">
+            <a ng-click="editCompany()" ng-if="userInfo.type==1" class="btn btn-green">添加业务平台</a>
+        </div>
+    </div>
+
+    <div class="table">
+        <table-float-header data-float-element="table-advanced-search" data-float-thead="table-thead"></table-float-header>
+        <table>
+            <thead>
+                <tr>
+                    <td>平台编号</td>
+                    <td>平台名称</td>
+                    <td>平台地址</td>
+                    <td>微信支付平台</td>
+                    <td>支付宝支付平台</td>
+                    <td>QQ钱包支付平台</td>
+                    <td>京东支付平台</td>
+                    <td>百度支付平台</td>
+                    <td>银联支付平台</td>
+                    <td>网银支付平台</td>
+                    <td>自动入款</td>
+                    <td>操作</td>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-if="!table.ready">
+                    <td colspan="11">正在加载。。。</td>
+                </tr>
+                <tr ng-if="table.error">
+                    <td colspan="11">获取列表错误，{{table.errorMsg}}<br/>请刷新页面</td>
+                </tr>
+                <tr ng-if="table.ready && !table.error && table.list==0">
+                    <td colspan="11">没有查询到业务平台</td>
+                </tr>
+                <tr ng-if="table.ready && !table.error" ng-repeat="list in table.list">
+                    <td ng-bind="list.no"></td>
+                    <td ng-bind="list.name"></td>
+                    <td ng-bind="list.url"></td>
+                    <td style="line-height: 40px">
+                        <div>
+                            WEB:
+                            <span ng-if="!list.wechatChangeModel" ng-bind="vendorsType[vendorInfo[list.wechat_vendor_id].pay_type]"></span>
+                            <a ng-if="!list.wechatChangeModel" ng-click="changeVendor(list,1)">切换</a>
+                            <select style="width: 100px" ng-if="list.wechatChangeModel" class="input" ng-model="list.wechat_vendor_id"><option value="0">不可用</option><option ng-repeat="vendor in list.wechatVendorList" ng-bind="vendorsType[vendor.pay_type]+'('+vendor.no+')'" value="{{vendor.id}}"></option></select>
+                            <a ng-if="list.wechatChangeModel" ng-click="changeVendorConfirm(list,1)">确定</a>
+                        </div>
+                        <div>
+                            APP:
+                            <span ng-if="!list.wapWechatChangeModel" ng-bind="vendorsType[vendorInfo[list.wap_wechat_vendor_id].pay_type]"></span>
+                            <a ng-if="!list.wapWechatChangeModel" ng-click="changeVendor(list,8)">切换</a>
+                            <select style="width: 100px" ng-if="list.wapWechatChangeModel" class="input" ng-model="list.wap_wechat_vendor_id"><option value="0">不可用</option><option ng-repeat="vendor in list.wapWechatVendorList" ng-bind="vendorsType[vendor.pay_type]+'('+vendor.no+')'" value="{{vendor.id}}"></option></select>
+                            <a ng-if="list.wapWechatChangeModel" ng-click="changeVendorConfirm(list,8)">确定</a>
+                        </div>
+                    </td>
+                    <td style="line-height: 40px">
+                        <div>
+                            WEB:
+                            <span ng-if="!list.alipayChangeModel" ng-bind="vendorsType[vendorInfo[list.alipay_vendor_id].pay_type]"></span>
+                            <a ng-if="!list.alipayChangeModel" ng-click="changeVendor(list,2)">切换</a>
+                            <select style="width: 100px" ng-if="list.alipayChangeModel" class="input" ng-model="list.alipay_vendor_id"><option value="0">不可用</option><option ng-repeat="vendor in list.alipayVendorList" ng-bind="vendorsType[vendor.pay_type]+'('+vendor.no+')'" value="{{vendor.id}}"></option></select>
+                            <a ng-if="list.alipayChangeModel" ng-click="changeVendorConfirm(list,2)">确定</a>
+                        </div>
+                        <div>
+                            APP:
+                            <span ng-if="!list.wapAlipayChangeModel" ng-bind="vendorsType[vendorInfo[list.wap_alipay_vendor_id].pay_type]"></span>
+                            <a ng-if="!list.wapAlipayChangeModel" ng-click="changeVendor(list,9)">切换</a>
+                            <select style="width: 100px" ng-if="list.wapAlipayChangeModel" class="input" ng-model="list.wap_alipay_vendor_id"><option value="0">不可用</option><option ng-repeat="vendor in list.wapAlipayVendorList" ng-bind="vendorsType[vendor.pay_type]+'('+vendor.no+')'" value="{{vendor.id}}"></option></select>
+                            <a ng-if="list.wapAlipayChangeModel" ng-click="changeVendorConfirm(list,9)">确定</a>
+                        </div>
+                    </td>
+                    <td style="line-height: 40px">
+                        <div>
+                            WEB:
+                            <span ng-if="!list.qqChangeModel" ng-bind="vendorsType[vendorInfo[list.qq_vendor_id].pay_type]"></span>
+                            <a ng-if="!list.qqChangeModel" ng-click="changeVendor(list,4)">切换</a>
+                            <select style="width: 100px" ng-if="list.qqChangeModel" class="input" ng-model="list.qq_vendor_id"><option value="0">不可用</option><option ng-repeat="vendor in list.qqVendorList" ng-bind="vendorsType[vendor.pay_type]+'('+vendor.no+')'" value="{{vendor.id}}"></option></select>
+                            <a ng-if="list.qqChangeModel" ng-click="changeVendorConfirm(list,4)">确定</a>
+                        </div>
+                        <div>
+                            APP:
+                            <span ng-if="!list.wapQqChangeModel" ng-bind="vendorsType[vendorInfo[list.wap_qq_vendor_id].pay_type]"></span>
+                            <a ng-if="!list.wapQqChangeModel" ng-click="changeVendor(list,10)">切换</a>
+                            <select style="width: 100px" ng-if="list.wapQqChangeModel" class="input" ng-model="list.wap_qq_vendor_id"><option value="0">不可用</option><option ng-repeat="vendor in list.wapQqVendorList" ng-bind="vendorsType[vendor.pay_type]+'('+vendor.no+')'" value="{{vendor.id}}"></option></select>
+                            <a ng-if="list.wapQqChangeModel" ng-click="changeVendorConfirm(list,10)">确定</a>
+                        </div>
+                    </td>
+                    <td style="line-height: 40px">
+                        <div>
+                            WEB:
+                            <span ng-if="!list.jdChangeModel" ng-bind="vendorsType[vendorInfo[list.jd_vendor_id].pay_type]"></span>
+                            <a ng-if="!list.jdChangeModel" ng-click="changeVendor(list,5)">切换</a>
+                            <select style="width: 100px" ng-if="list.jdChangeModel" class="input" ng-model="list.jd_vendor_id"><option value="0">不可用</option><option ng-repeat="vendor in list.jdVendorList" ng-bind="vendorsType[vendor.pay_type]+'('+vendor.no+')'" value="{{vendor.id}}"></option></select>
+                            <a ng-if="list.jdChangeModel" ng-click="changeVendorConfirm(list,5)">确定</a>
+                        </div>
+                        <div>
+                            APP:
+                            <span ng-if="!list.wapJdChangeModel" ng-bind="vendorsType[vendorInfo[list.wap_jd_vendor_id].pay_type]"></span>
+                            <a ng-if="!list.wapJdChangeModel" ng-click="changeVendor(list,11)">切换</a>
+                            <select style="width: 100px" ng-if="list.wapJdChangeModel" class="input" ng-model="list.wap_jd_vendor_id"><option value="0">不可用</option><option ng-repeat="vendor in list.wapJdVendorList" ng-bind="vendorsType[vendor.pay_type]+'('+vendor.no+')'" value="{{vendor.id}}"></option></select>
+                            <a ng-if="list.wapJdChangeModel" ng-click="changeVendorConfirm(list,11)">确定</a>
+                        </div>
+                    </td>
+                    <td style="line-height: 40px">
+                        <div>
+                            WEB:
+                            <span ng-if="!list.baiduChangeModel" ng-bind="vendorsType[vendorInfo[list.baidu_vendor_id].pay_type]"></span>
+                            <a ng-if="!list.baiduChangeModel" ng-click="changeVendor(list,6)">切换</a>
+                            <select style="width: 100px" ng-if="list.baiduChangeModel" class="input" ng-model="list.baidu_vendor_id"><option value="0">不可用</option><option ng-repeat="vendor in list.baiduVendorList" ng-bind="vendorsType[vendor.pay_type]+'('+vendor.no+')'" value="{{vendor.id}}"></option></select>
+                            <a ng-if="list.baiduChangeModel" ng-click="changeVendorConfirm(list,6)">确定</a>
+                        </div>
+                        <div>
+                            APP:
+                            <span ng-if="!list.wapBaiduChangeModel" ng-bind="vendorsType[vendorInfo[list.wap_baidu_vendor_id].pay_type]"></span>
+                            <a ng-if="!list.wapBaiduChangeModel" ng-click="changeVendor(list,12)">切换</a>
+                            <select style="width: 100px" ng-if="list.wapBaiduChangeModel" class="input" ng-model="list.wap_baidu_vendor_id"><option value="0">不可用</option><option ng-repeat="vendor in list.wapBaiduVendorList" ng-bind="vendorsType[vendor.pay_type]+'('+vendor.no+')'" value="{{vendor.id}}"></option></select>
+                            <a ng-if="list.wapBaiduChangeModel" ng-click="changeVendorConfirm(list,12)">确定</a>
+                        </div>
+                    </td>
+                    <td style="line-height: 40px">
+                        <div>
+                            WEB:
+                            <span ng-if="!list.unionChangeModel" ng-bind="vendorsType[vendorInfo[list.union_vendor_id].pay_type]"></span>
+                            <a ng-if="!list.unionChangeModel" ng-click="changeVendor(list,7)">切换</a>
+                            <select style="width: 100px" ng-if="list.unionChangeModel" class="input" ng-model="list.union_vendor_id"><option value="0">不可用</option><option ng-repeat="vendor in list.unionVendorList" ng-bind="vendorsType[vendor.pay_type]+'('+vendor.no+')'" value="{{vendor.id}}"></option></select>
+                            <a ng-if="list.unionChangeModel" ng-click="changeVendorConfirm(list,7)">确定</a>
+                        </div>
+                        <div>
+                            APP:
+                            <span ng-if="!list.wapUnionChangeModel" ng-bind="vendorsType[vendorInfo[list.wap_union_vendor_id].pay_type]"></span>
+                            <a ng-if="!list.wapUnionChangeModel" ng-click="changeVendor(list,13)">切换</a>
+                            <select style="width: 100px" ng-if="list.wapUnionChangeModel" class="input" ng-model="list.wap_union_vendor_id"><option value="0">不可用</option><option ng-repeat="vendor in list.wapUnionVendorList" ng-bind="vendorsType[vendor.pay_type]+'('+vendor.no+')'" value="{{vendor.id}}"></option></select>
+                            <a ng-if="list.wapUnionChangeModel" ng-click="changeVendorConfirm(list,13)">确定</a>
+                        </div>
+                    </td>
+                    <td style="line-height: 40px">
+                        <span ng-if="!list.netbankChangeModel" ng-bind="vendorsType[vendorInfo[list.netbank_vendor_id].pay_type]"></span>
+                        <a ng-if="!list.netbankChangeModel" ng-click="changeVendor(list,3)">切换</a>
+                        <select style="width: 100px" ng-if="list.netbankChangeModel" class="input" ng-model="list.netbank_vendor_id"><option value="0">不可用</option><option ng-repeat="vendor in list.netbankVendorList" ng-bind="vendorsType[vendor.pay_type]+'('+vendor.no+')'" value="{{vendor.id}}"></option></select>
+                        <a ng-if="list.netbankChangeModel" ng-click="changeVendorConfirm(list,3)">确定</a>
+                    </td>
+                    <td ng-if="list.is_autorecharge==1">
+                        <span class="color-green">已开启</span>
+                    </td>
+                    <td ng-if="list.is_autorecharge!=1">
+                        <span class="color-red">未开启</span>
+                    </td>
+                    <td>
+                        <a ng-click="editCompany(list)"><i class="icon-edit"></i> 修改</a>
+                        <a class="ml-1" ng-click="delCompany(list)"><i class="icon-delete"></i> 删除</a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <div table-page="table"></div>
+    </div>
+</div>

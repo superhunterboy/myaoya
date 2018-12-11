@@ -1,0 +1,100 @@
+<div style="min-width:1440px;">
+    <div class="page-title">
+        <span>出款平台列表</span>
+        <div class="page-btn">
+            <a ng-click="editPlatform()" ng-if="userInfo.type==1" class="btn btn-green">添加出款平台配置</a>
+            <a ng-click="rechargeLinks()" ng-if="userInfo.type==1 || userInfo.type==3" class="btn btn-blue">充值外链</a>
+        </div>
+    </div>
+
+    <div class="table">
+        <table-float-header data-float-element="table-advanced-search" data-float-thead="table-thead"></table-float-header>
+        <div class="table-advanced-search">
+            <label class="advanced-search-box">
+                <span class="search-box-text">出款平台：</span>
+                <select class="input" ng-model="table.query.type"  ng-options="key as value for (key , value) in payOutType">
+                    <option value="">全部</option>
+                </select>
+            </label>
+            <label class="advanced-search-box">
+                <span class="search-box-text">商户号：</span>
+                <input  class="input" type="text" maxlength="50"
+                        ng-model="table.query.no" />
+            </label>
+            <div class="advanced-search-box">
+                <span class="search-box-text"> </span>
+                <button type="button" class="btn btn-default" ng-click="table.ready=false;table.getList(1)">搜索</button>
+            </div>
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <td>所属业务平台</td>
+                    <td>出款平台</td>
+                    <td>商户号</td>
+                    <td>创建时间</td>
+                    <td>更新时间</td>
+                    <td>余额</td>
+                    <td>自动出款额度</td>
+                    <td>自动出款状态</td>
+                    <td>手动出款状态</td>
+                    <td>操作</td>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-if="!table.ready">
+                    <td colspan="13">正在加载。。。</td>
+                </tr>
+                <tr ng-if="table.error">
+                    <td colspan="13">获取列表错误，{{table.errorMsg}}<br/>请刷新页面</td>
+                </tr>
+                <tr ng-if="table.ready && !table.error && table.list==0">
+                    <td colspan="13">没有查询到列表</td>
+                </tr>
+                <tr ng-if="table.ready && !table.error" ng-repeat="list in table.list">
+                    <td ng-bind="companyInfo[list.company_id].name"></td>
+                    <td ng-bind="payOutType[list.pay_out_type]"></td>
+                    <td ng-bind="list.no"></td>
+                    <td ng-bind="list.created_at"></td>
+                    <td ng-bind="list.updated_at"></td>
+                    <td width="180">
+                        <div style="width: 50px;display: inline-block" ng-bind="list.balance"></div>
+
+                        <a class="fl-r ml-1" ng-click="charge(list)"><i class="icon-money"></i> 充值</a>
+                        <a class="fl-r ml-1" ng-click="refresh(list)"><i class="icon-shuaxin"></i>更新</a>
+                    </td>
+                    <td width="260">
+                        <div ng-show="!list.outLimitStatus" style="width: 180px;display: inline-block">{{list.start_amount_limit}}-{{list.end_amount_limit}}</div>
+                        <span ng-show="list.outLimitStatus">
+                            <input class="input" style="width: 70px" ng-model="list.startOutLimitTemp" maxlength="10" type="text" datatype="DOUBLE2"  />
+                            -
+                            <input class="input" style="width:70px" ng-model="list.endOutLimitTemp" maxlength="10" type="text" datatype="DOUBLE2"  />
+                        </span>
+
+                        <a ng-if="!list.outLimitStatus" ng-click="list.outLimitStatus=1;list.startOutLimitTemp=list.start_amount_limit;list.endOutLimitTemp=list.end_amount_limit">修改</a>
+                        <a ng-if="list.outLimitStatus" ng-click="saveOutLimit(list)">保存</a>
+                        <a ng-if="list.outLimitStatus" ng-click="list.outLimitStatus=0">取消</a>
+                    </td>
+                    <td>
+                        <span ng-if="list.enabled==1" class="color-green">启用中</span>
+                        <span ng-if="list.enabled==0" class="color-red">已禁用</span>
+                        <a class="ml-1" ng-if="list.enabled==0" ng-click="changePlatform(list,0)"><i class="icon-start"></i> 启用</a>
+                        <a class="ml-1" ng-if="list.enabled==1" ng-click="changePlatform(list,0)"><i class="icon-pause"></i> 禁用</a>
+                    </td>
+                    <td>
+                        <span ng-if="list.type==1" class="color-green">启用中</span>
+                        <span ng-if="list.type==0" class="color-red">已禁用</span>
+                        <a class="ml-1" ng-if="list.type==0" ng-click="changePlatform(list,1)"><i class="icon-start"></i> 启用</a>
+                        <a class="ml-1" ng-if="list.type==1" ng-click="changePlatform(list,1)"><i class="icon-pause"></i> 禁用</a>
+                    </td>
+                    <td>
+                        <a class="ml-1" ng-click="editPlatform(list)"><i class="icon-edit"></i> 修改</a>
+                        <a class="ml-1" ng-click="delPlatform(list)"><i class="icon-delete"></i> 删除</a>
+                        <a class="ml-1" ng-click="chargeList(list)"><i class="icon-detail"></i> 充值记录</a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <div table-page="table"></div>
+    </div>
+</div>

@@ -1,0 +1,71 @@
+.upload-img{
+  background: #fff;
+  padding: 10px;
+  .img-setting{
+    margin: 10px;
+    text-align: center;
+    padding: 80px;
+    background: #fff;
+    .img-box{
+      width: 208px;
+      height: 208px;
+      border:1px solid #efefef;
+      position: relative;
+      margin: 0 auto;
+      img{
+        position: absolute;
+        width: 208px;
+        height: 208px;
+        left: 0;
+        top: 0;
+      }
+      input{
+        position: absolute;
+        width: 208px;
+        height: 208px;
+        left: 0;
+        top: 0;
+        opacity: 0;
+        z-index: 20;
+        cursor: pointer;
+      }
+      .img-mask{
+        position: absolute;
+        left: 0;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0,0,0,.5);
+        color: #fff;
+        text-align: center;
+        display: none;
+        z-index: 10;
+        line-height: 30px;
+        padding: 80px 0;
+      }
+      &:hover .img-mask{
+        display: block;
+      }
+    }
+    .img-remark{
+      font-size: 14px;
+      line-height: 40px;
+      color: #666;
+      padding: 10px;
+    }
+    .img-title{
+      font-size: 22px;
+      line-height: 90px;
+    }
+    .img-btn{
+      margin-top: 20px;
+    }
+    .setting-left{
+      float: left;
+      width: 30%;
+    }
+    .setting-right{
+      margin-left: 60%;
+    }
+  }
+}

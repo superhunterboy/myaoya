@@ -1,0 +1,25 @@
+<div class="account">
+    <ul class="account-info">
+        <li>
+            <div class="account-key">用户名：</div>
+            <div class="account-value" ng-bind="userInfo.username"></div>
+        </li>
+        <li>
+            <div class="account-key">备注：</div>
+            <div class="account-value" ng-bind="userInfo.realname"></div>
+        </li>
+        <li>
+            <div class="account-key">最后登录时间：</div>
+            <div class="account-value" ng-if="userInfo.lastlogin" ng-bind="userInfo.lastlogin"></div>
+            <div class="account-value" ng-if="!userInfo.lastlogin">-</div>
+        </li>
+        <li>
+            <div class="account-key">最后登录IP：</div>
+            <div class="account-value" ng-bind="userInfo.ip"></div>
+        </li>
+        <li>
+            <div class="account-key"></div>
+            <div class="account-value"><a ng-click="changePassword()" class="btn btn-green">修改密码</a></div>
+        </li>
+    </ul>
+</div>

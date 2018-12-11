@@ -1,0 +1,32 @@
+php版本：php-7.0.12-nts x86
+
+新建数据库wmpay
+
+svn拉下代码之后，进入项目根目录，执行命令：composer install
+服务器根目录在public下，index.php是入口文件
+
+Nginx配置：
+
+server {
+    listen       80 default_server;
+    server_name  localhost;
+    root         "E:/phpStudy/WWW/pay/public";
+    index  index.php index.html;
+
+    location / {
+        try_files $uri $uri/ /index.php$is_args$args;
+    }
+
+    location ~ \.php {
+        try_files $uri =404;
+        fastcgi_split_path_info ^(.+\.php)(/.+)$;
+        include fastcgi_params;
+        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+        fastcgi_param SCRIPT_NAME $fastcgi_script_name;
+        fastcgi_index index.php;
+        fastcgi_pass 127.0.0.1:9000;
+    }
+}
+
+注：数据库配置在config/settings.php中修改。
+

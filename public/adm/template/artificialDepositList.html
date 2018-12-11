@@ -1,0 +1,112 @@
+<div class="pay-list">
+    <div class="page-title">人工存入支付列表</div>
+    <div class="table">
+        <table-float-header data-float-element="table-advanced-search" data-float-thead="table-thead"></table-float-header>
+        <div class="table-advanced-search">
+            <div class="advanced-search-box" style="width: 35%">
+                <span class="search-box-text">支付时间(美东)：</span>
+                <input style="width: 150px" onchange="" class="input" datepicker="yyyy-MM-dd HH:mm:ss" max="table.query.endtime" type="text"
+                    ng-model="table.query.startime" /> 至
+                <input style="width: 150px" onchange="" class="input" type="text" datepicker="yyyy-MM-dd HH:mm:ss" min="table.query.startime"
+                    ng-model="table.query.endtime" />
+            </div>
+            <label class="advanced-search-box">
+                <span class="search-box-text">关键字：</span>
+                <input class="input" type="text" maxlength="20" ng-model="table.query.key_word" placeholder="会员账户" style="width:220px;" />
+            </label>
+            <div class="advanced-search-box">
+                <span class="search-box-text"> </span>
+                <button type="button" class="btn btn-default" ng-click="table.ready=false;table.getList(1)">搜索</button>
+                <button type="button" class="btn btn-green" ng-click="export()">导出EXCEL</button>
+            </div>
+            <div class="advanced-search-box" style="width: 100%">
+                <span class="search-box-text">入款状态：</span>
+                <div class="table-tab">
+                    <a ng-class="{active:table.query.status==''}" ng-click="search('')">全部</a
+                    ><a ng-class="{active:table.query.status=='0'}" ng-click="search('0')">未入款</a
+                    ><a ng-class="{active:table.query.status=='1'}" ng-click="search('1')">已入款</a
+                    ><a ng-class="{active:table.query.status=='2'}" ng-click="search('2')">已忽略</a>
+                </div>
+            </div>
+        </div>
+        <table>
+            <thead class="table-thead">
+                <tr>
+                    <td>会员账户</td>
+                    <td>充值金额</td>
+                    <td>存款人/昵称</td>
+                    <td>入款信息</td>
+                    <td>支付时间</td>
+                    <td>结果</td>
+                    <td>状态</td>
+                    <td>操作</td>
+                    <td>操作人</td>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-if="!table.ready">
+                    <td colspan="9">正在加载。。。</td>
+                </tr>
+                <tr ng-if="table.error">
+                    <td colspan="9">获取列表错误，{{table.errorMsg}}
+                        <br/>请刷新页面</td>
+                </tr>
+                <tr ng-if="table.ready && !table.error && table.list==0">
+                    <td colspan="9">没有查询到支付记录</td>
+                </tr>
+                <tr ng-if="table.ready && !table.error" ng-repeat="list in table.list">
+                    <td>
+                        <div ng-if="list.order_no" ng-bind="list.account"></div>
+                        <div ng-if="!list.order_no" ng-bind="list.member"></div>
+                    </td>
+                    <td>
+                        <div ng-if="list.order_no" ng-bind="list.amount"></div>
+                        <div ng-if="!list.order_no" ng-bind="list.money"></div>
+                    </td>
+                    <td>
+                        <div ng-if="list.order_no" ng-bind="list.depositor"></div>
+                        <div ng-if="!list.order_no" ng-bind="list.drawee"></div>
+                    </td>
+                    <td>
+                        <div ng-if="list.order_no">
+                            <div ng-if="list.type==1"><div>线下银行转账：{{list.bank_name}}/{{list.card_user}}</div></div>
+                            <div ng-if="list.type==2"><div>支付宝银行转账：{{list.bank_card.bank_name}}/{{list.bank_card.user_name}}</div></div>
+                        </div>
+                        <div ng-if="!list.order_no">
+                            <div ng-if="list.type==1"><div>微信({{list.qrcode.qrcode_name}})</div></div>
+                            <div ng-if="list.type==2"><div>支付宝({{list.qrcode.qrcode_name}})</div></div>
+                            <div ng-if="list.type==3"><div>QQ({{list.qrcode.qrcode_name}})</div></div>
+                        </div>
+                    </td>
+                    <!--td ng-bind="list.created_at"></td-->
+                    <td>{{list.created_at}}(当地)<br/>{{list.created_at_edt}}(美东)</td>
+                    <td>
+                        <div ng-if="list.remark" class="remark" ng-bind="list.remark"></div>
+                        <div ng-if="!list.remark" class="remark" ng-bind="list.msg"></div>
+                    </td>
+                    <td>
+                        <span ng-if="list.status==0" class="color-red">未处理</span>
+                        <span ng-if="list.status==1" class="color-green">已入款</span>
+                        <span ng-if="list.status==2">已忽略</span>
+                    </td>
+                    <td>
+                        <a ng-if="list.status==0" ng-click="act(list,1)">入款</a>
+                        <a class="ml-1" ng-if="list.status==0" ng-click="act(list,2)">忽略</a>
+                    </td>
+                    <td ng-bind="list.user.username"></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="table-num">共查询出
+            <span ng-bind="table.total"></span> 条记录，每页显示
+            <select class="input" ng-model="table.query.perPage" ng-change="table.getList(1)">
+                <option value="10">10</option>
+                <option value="20">20</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+            </select> 条
+        </div>
+        <div table-page="table"></div>
+    </div>
+</div>

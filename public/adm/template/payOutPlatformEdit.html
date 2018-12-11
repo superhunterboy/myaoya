@@ -1,0 +1,28 @@
+<div class="user-dialog">
+    <div ng-if="!id" class="dialog-title">添加出款平台</div>
+    <div ng-if="id" class="dialog-title">修改出款平台</div>
+    <label class="input-box"><span>所属业务平台：</span>
+            <select class="input" ng-model="platform.company_id">
+                <option ng-repeat="(id,company) in companyInfo" ng-bind="company.name" value="{{id}}"></option>
+            </select>
+        </label>
+    <label class="input-box"><span>支付平台：</span>
+            <select class="input" ng-model="platform.pay_out_type">
+                <option ng-repeat="(id,name) in payOutType" value="{{id}}" ng-bind="name"></option>
+            </select>
+        </label>
+    <label class="input-box"><span>商户编号：</span>
+            <input class="input" type="text" ng-model="platform.no" /></label>
+    <label class="input-box"><span>商户Key：</span>
+            <textarea class="input" rows="3" ng-model="platform.key"></textarea></label>
+    <label class="input-box"><span>回调地址：</span>
+        <input class="input" type="text" ng-model="platform.callback_url" /></label>
+    <label class="input-box"><span>通知地址：</span>
+        <input class="input" type="text" ng-model="platform.notify_url" /></label>
+    <div align="center" class="color-red" ng-show="error" ng-bind="errorMsg"></div>
+    <div align="center">
+        <button ng-if="!id" class="btn btn-green" ng-click="save()">确定</button>
+        <button ng-if="id" class="btn btn-green" ng-click="update()">确定</button>
+        <button class="btn btn-default" ng-click="closeThisDialog()">取消</button>
+    </div>
+</div>

@@ -1,0 +1,58 @@
+<div ng-if="!smsCode" smscode></div>
+<div ng-if="smsCode" class="bank-setting">
+    <div class="page-title">转账银行卡设置
+        <div class="page-btn">
+            <a ng-click="edit()" class="btn btn-green">添加银行卡</a>
+        </div>
+    </div>
+    <div class="table">
+        <table-float-header data-float-element="table-advanced-search" data-float-thead="table-thead"></table-float-header>
+        <table>
+            <thead class="table-thead">
+            <tr>
+                <td>银行名称</td>
+                <td>银行卡号</td>
+                <td>银行户名</td>
+                <td>备注</td>
+                <td>对应层级</td>
+                <td>收款次数</td>
+                <td>收款金额</td>
+                <td>状态</td>
+                <td>操作</td>
+            </tr>
+            </thead>
+            <tbody>
+            <tr ng-if="!table.ready">
+                <td colspan="11">正在加载。。。</td>
+            </tr>
+            <tr ng-if="table.error">
+                <td colspan="11">获取列表错误，{{table.errorMsg}}<br/>请刷新页面</td>
+            </tr>
+            <tr ng-if="table.ready && !table.error && table.list==0">
+                <td colspan="11">没有查询到银行卡记录</td>
+            </tr>
+            <tr ng-if="table.ready && !table.error" ng-repeat="list in table.list">
+                <td ng-bind="list.bank_name"></td>
+                <td ng-bind="list.bank_number"></td>
+                <td ng-bind="list.user_name"></td>
+                <td ng-bind="list.address"></td>
+                <td width="500">
+                    <div style="width: 500px">
+                        <span ng-repeat="id in list.level_ids.split(',')" class="mr-1" ng-bind="levelObj[id]"></span>
+                    </div>
+                </td>
+                <td ng-bind="list.count"></td>
+                <td ng-bind="list.money"></td>
+                <td ng-class="{0:'color-red',1:'color-green'}[list.status]" ng-bind="['禁用','启用'][list.status]"></td>
+                <td>
+                    <a ng-if="list.status==1" ng-click="edit(list)"><i class="icon-edit"></i> 编辑</a>
+                    <a class="ml-1" ng-if="list.status==0" ng-click="act(list,1)"><i class="icon-start"></i> 启用</a>
+                    <a class="ml-1" ng-if="list.status==1" ng-click="act(list,0)"><i class="icon-pause"></i> 禁用</a>
+                    <a ng-if="list.count==0" class="ml-1" ng-click="del(list)"><i class="icon-delete"></i> 删除</a>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+        <div class="table-num">共查询出 <span ng-bind="table.total"></span> 条记录</div>
+    </div>
+</div>

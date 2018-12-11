@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+
+<head lang="en">
+    <meta charset="utf-8">
+    <meta content="width=device-width,initial-scale=1.0, user-scalable=no" name="viewport" />
+    <meta content="yes" name=" apple-mobile-web-app-capable" />
+    <meta content="no" name="apple-touch-fullscreen" />
+    <meta content="black" name=" apple-mobile-web-app-status-bar-style" />
+    <meta content="telephone=no" name="format-detection" />
+    <title>支付</title>
+    <link rel="stylesheet" href="./css/pay.css?v=5" />
+    <script type="text/javascript" src="js/jquery.min.js"></script>
+    <script type="text/javascript" src="js/tc.min.js"></script>
+    <script type="text/javascript">
+        var iWidth = document.documentElement.clientWidth,
+            iHeight = document.documentElement.clientHeight;
+        if (isFirefox = navigator.userAgent.indexOf("Firefox") > 0) {
+            iWidth = window.outerWidth;
+            iHeight = window.outerHeight;
+        }
+        document.getElementsByTagName("html")[0].style.fontSize = iWidth / 10 + "px";
+    </script>
+    <script type="text/javascript" src="./js/pay.js"></script>
+</head>
+
+<body>
+    <div id="confirmBox" class="confirm-box" style="display: none">
+        <div class="confirm-content">
+            如果您已完成官方支付宝二维码的扫码转账，请稍等一下。您不需再去填写公司入款的资料，专员妹妹会立即为您处理。
+        </div>
+        <div>
+            <a href="#" class="close"></a>
+        </div>
+    </div>
+    <div class="top">
+        <div class="logo"></div>
+    </div>
+    <div class="head clearfix">
+        <div class="desc desc-1" onclick=window.location="https://static.meiqia.com/dist/standalone.html?_=t&eid=93887"></div>
+        <div class="desc desc-2" onclick=window.location='https://9661v.com/'></div>
+        <div class="desc desc-3" onclick=window.location='https://xingmim.com/'></div>
+    </div>
+    <div class="content">
+        <div class="content-inner">
+            <div class="content-title">
+                官方支付宝支付页面
+            </div>
+            <div class="box box-alipay">
+                <img id="alipay" class="qrcode" src="">
+            </div>
+        </div>
+        <div class="top-right">
+            <div class="top-tip top-tip-alipay">
+                <div class="tip-title">
+                    温馨提示：
+                </div>
+                <div class="tip-content">
+                    <span class="blue">※1.点击上方二维码并保存图片。</span><br/> ※2.打开支付宝首页，可以看见左上角的【扫一扫】按钮。
+                    <br/> ※3. 在扫一扫画面左上角，点击相册按钮来选择二维码。<br/> ※4.转帐完成后请保留单据作为核对证明。
+                    <br/>
+                </div>
+            </div>
+        </div>
+        <div class="content-bottom">
+            <div class="bottom-left">
+                <span class="tip-title">温馨提示：</span><br /> 1.请使用您本人的支付宝帐号进行存款。
+                <br /> 2.申请的存款金额与实际存款金额须一致。
+                <br /> 3.成功存款后，请点击本页下方的【确认转账】按钮，专员妹妹才能立即为您入款。
+                <br /> 4.支付遇到困难？请联系客服人员获得帮助。
+            </div>
+            <div class="bottom-right">
+                <a class="confirm" href="#"></a><br />
+                <span class="red">（转账完成后，请点击【确认转账】按钮来提交您的订单资料。）</span>
+            </div>
+        </div>
+    </div>
+    <div class="footer">
+        Copyright © 澳亚国际 Reserved
+    </div>
+    <script>
+        !(function(win, doc) {
+            function setFontSize() {
+                // 获取window 宽度
+                // zepto实现 $(window).width()就是这么干的
+                var winWidth = window.innerWidth;
+                // doc.documentElement.style.fontSize = (winWidth / 640) * 100 + 'px' ;
+                // 2016-01-13 订正
+                // 640宽度以上进行限制 需要css进行配合
+                var size = (winWidth / 640) * 100;
+                doc.documentElement.style.fontSize = (size < 100 ? size : 100) + 'px';
+            }
+            var evt = 'onorientationchange' in win ? 'orientationchange' : 'resize';
+            var timer = null;
+            win.addEventListener(evt, function() {
+                clearTimeout(timer);
+                timer = setTimeout(setFontSize, 300);
+            }, false);
+
+            win.addEventListener("pageshow", function(e) {
+                if (e.persisted) {
+                    clearTimeout(timer);
+                    timer = setTimeout(setFontSize, 300);
+                }
+            }, false);
+            // 初始化
+            setFontSize();
+        }(window, document));
+    </script>
+</body>
+
+</html>

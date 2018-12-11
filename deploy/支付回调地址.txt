@@ -1,0 +1,157 @@
+注: 1、jsmw672.com 修改为对应的域名；2、是http的就写http，如果是https的就写https
+
+
+雅付：
+回调地址：http://jsmw672.com/payment/yafu/callback （jsmw672.com后台域名）
+通知地址：http://jsmw672.com/payment/yafu/notify
+
+闪付：
+回调地址：http://jsmw672.com/payment/callback （jsmw672.com后台域名）
+通知地址：http://jsmw672.com/payment/notify
+
+乐盈：
+回调地址：http://jsmw672.com/payment/notify （jsmw672.com后台域名）
+通知地址：http://jsmw672.com/payment/callback
+
+沃雷特：
+key格式：{"priKey":"","pubKey":""}
+回调地址：http://jsmw672.com/payment/wallet/callback （jsmw672.com后台域名）
+通知地址：http://jsmw672.com/payment/wallet/notify
+
+华仁：
+key格式：{"pubKey":"","priKey":"","saltKey":""}
+回调地址：http://jsmw672.com/payment/huaren/callback （jsmw672.com后台域名）
+通知地址：http://jsmw672.com/payment/huaren/notify
+
+多多：
+回调地址：http://jsmw672.com/payment/duoduo/callback （jsmw672.com后台域名）
+通知地址：http://jsmw672.com/payment/duoduo/notify
+
+讯宝：
+回调地址：http://jsmw672.com/payment/callback （jsmw672.com后台域名）
+通知地址：http://jsmw672.com/payment/notify
+
+仁信：
+回调地址：http://jsmw672.com/payment/renxin/callback （jsmw672.com后台域名）
+通知地址：http://jsmw672.com/payment/renxin/notify
+
+天付宝：
+key格式：{"pubkey":"","prikey":"","md5key":""}
+回调地址：http://jsmw672.com/payment/tianfubao/callback （jsmw672.com后台域名）
+通知地址：http://jsmw672.com/payment/tianfubao/notify
+
+高通：
+回调地址：http://jsmw672.com/payment/gaotong/callback （jsmw672.com后台域名）
+通知地址：http://jsmw672.com/payment/gaotong/notify
+
+新雅付：
+回调地址：http://jsmw672.com/payment/yafuNew/callback （jsmw672.com后台域名）
+通知地址：http://jsmw672.com/payment/yafuNew/notify
+
+先行付：
+回调地址：http://jsmw672.com/payment/xianxingfu/callback （jsmw672.com后台域名）
+通知地址：http://jsmw672.com/payment/xianxingfu/notify
+
+金海哲(新)：
+key格式：{"priKey":"","pubKey":""}
+回调地址：http://jsmw672.com/payment/jinhaizheNew/callback （jsmw672.com后台域名）
+通知地址：http://jsmw672.com/payment/jinhaizheNew/notify
+
+汇达：
+商户号格式：{"code":,"bank":}
+key格式：{"code":"","bank":""}
+回调地址：http://jsmw672.com/payment/huida/callback （jsmw672.com后台域名）
+通知地址：http://jsmw672.com/payment/huida/notify
+
+泽圣：
+回调地址：http://jsmw672.com/payment/zesheng/callback （jsmw672.com后台域名）
+通知地址：http://jsmw672.com/payment/zesheng/notify
+
+
+钱袋支付：
+回调地址：http://jsmw672.com/payment/qiandai/callback （jsmw672.com后台域名）
+通知地址：http://jsmw672.com/payment/qiandai/notify
+
+金阳：
+回调地址：http://jsmw672.com/payment/jinyang/callback （jsmw672.com后台域名）
+通知地址：http://jsmw672.com/payment/jinyang/notify
+
+旺富通：
+回调地址：http://jsmw672.com/payment/wangfutong/callback （jsmw672.com后台域名）
+通知地址：http://jsmw672.com/payment/wangfutong/notify
+
+个人支付宝：
+回调地址：http://jsmw672.com/payment/singleqr/callback （jsmw672.com后台域名）
+通知地址：http://jsmw672.com
+
+千应：
+回调地址：http://jsmw672.com/payment/qianying/callback （jsmw672.com后台域名）
+通知地址：https://7001.com/success/index.html （7001.com为前台充值表单域名）
+
+优付：
+回调地址：http://jsmw672.com/payment/youfu/callback （jsmw672.com后台域名）
+通知地址：http://jsmw672.com/payment/youfu/notify
+
+成沃：
+回调地址：http://jsmw672.com/payment/chengwo/callback （jsmw672.com后台域名）
+通知地址：http://jsmw672.com/payment/chengwo/notify
+
+恒辰：
+回调地址：http://jsmw672.com/payment/hengchen/callback （jsmw672.com后台域名）
+通知地址：http://jsmw672.com/payment/hengchen/notify
+
+点付云:
+回调地址: http://jsmw672.com/payment/dianfuyun/callback (jsmw672.com后台域名)
+通知地址: http://jsmw672.com/payment/dianfuyun/notify
+
+滕坤
+回调地址: http://jsmw672.com/payment/tengkun/callback (jsmw672.com后台域名)
+通知地址: 无
+
+天吉
+回调地址: http://jsmw672.com/payment/tianji/callback (jsmw672.com后台域名)
+通知地址: 无
+
+智能云支付
+回调地址: http://jsmw672.com/payment/yunzhifu/callback (jsmw672.com后台域名)
+通知地址: http://jsmw672.com/payment/yunzhifu/notify (jsmw672.com后台域名)
+
+智能云支付2.0
+回调地址: http://jsmw672.com/payment/yunzhifu2/callback (jsmw672.com后台域名)
+通知地址: http://jsmw672.com/payment/yunzhifu2/notify (jsmw672.com后台域名)
+
+喜付
+回调地址: http://jsmw672.com/payment/xifu/callback (jsmw672.com后台域名)
+通知地址: http://jsmw672.com/payment/xifu/notify (jsmw672.com后台域名)
+
+
+艾付
+回调：http://jsmw672.com/payment/aifu/callback
+通知：http://jsmw672.com/payment/aifu/notify
+
+Nong付
+回调：http://jsmw672.com/payment/nongfu/callback
+通知：http://jsmw672.com/payment/nongfu/notify
+
+顺心付
+回调：http://jsmw672.com/payment/shunxin/callback
+
+米达付
+回调：http://jsmw672.com/payment/mida/callback
+通知：http://jsmw672.com/payment/midafu/notify
+
+wpay
+回调:http://jsmw672.com/payment/wpay/callback
+通知:http://jsmw672.com/payment/wpay/notify
+
+恒星闪付
+回调:http://jsmw672.com/payment/hengxing/callback
+通知:无
+
+众信支付
+回调:http://jsmw672.com/payment/zhongxin/callback
+通知:http://jsmw672.com/payment/zhongxin/notify
+
+星捷支付
+回调:http://jsmw672.com/payment/xingjie/callback
+通知:http://jsmw672.com/payment/xingjie/notify

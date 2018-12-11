@@ -1,0 +1,1041 @@
+<!DOCTYPE html>
+<html lang="zh_cn">
+<head>
+    <meta charset="UTF-8">
+    <title>人工代付通道</title>
+    <style>
+        body{
+            background: #ececec;
+        }
+        .content{
+            margin: 150px auto;
+            width: 600px;
+            /*height: 450px;*/
+            background: #fff;
+            padding: 10px;
+            box-shadow: 0 2px 2px 0 rgba(0,0,0,.14), 0 1px 5px 0 rgba(0,0,0,.12), 0 3px 1px -2px rgba(0,0,0,.2);
+        }
+        form{
+            margin: 60px 0 30px;
+            text-align: right;
+        }
+        input[type=text],select{
+            width: 168px;
+            border: 1px solid #ddd;
+            -webkit-border-radius: 5px;
+            -moz-border-radius: 5px;
+            border-radius: 5px;
+            height: 30px;
+            color: #666;
+            padding: 0 5px;
+        }
+        label{
+            display: block;
+            line-height: 40px;
+            margin-bottom: 10px;
+            text-align: right;
+            padding-right: 180px;
+        }
+        .btn {
+            display: inline-block;
+            padding: 6px 12px;
+            margin-bottom: 0;
+            font-size: 14px;
+            font-weight: 400;
+            line-height: 1.42857143;
+            text-align: center;
+            white-space: nowrap;
+            vertical-align: middle;
+            -ms-touch-action: manipulation;
+            touch-action: manipulation;
+            cursor: pointer;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            background-image: none;
+            border: 1px solid transparent;
+            border-radius: 4px;
+            box-shadow: 0 2px 2px 0 rgba(0,0,0,0.14), 0 1px 5px 0 rgba(0,0,0,0.12), 0 3px 1px -2px rgba(0,0,0,0.2);
+            margin-left: 240px;
+        }
+        .btn.active.focus,.btn.active:focus,.btn.focus,.btn:active.focus,.btn:active:focus,.btn:focus {
+            outline: thin dotted;
+            outline: 5px auto -webkit-focus-ring-color;
+            outline-offset: -2px
+        }
+        .btn.focus,.btn:focus,.btn:hover {
+            color: #333;
+            text-decoration: none;
+            box-shadow: 0 3px 3px 0 rgba(0,0,0,0.14),0 1px 7px 0 rgba(0,0,0,0.12),0 3px 1px -1px rgba(0,0,0,0.2)
+        }
+        .btn.active,.btn:active {
+            background-image: none;
+            outline: 0;
+            -webkit-box-shadow: inset 0 3px 5px rgba(0,0,0,.125);
+            box-shadow: inset 0 3px 5px rgba(0,0,0,.125)
+        }
+        .btn.disabled,.btn[disabled],fieldset[disabled] .btn {
+            pointer-events: none;
+            cursor: not-allowed;
+            filter: alpha(opacity=65);
+            -webkit-box-shadow: none;
+            box-shadow: none;
+            opacity: .65
+        }
+        .btn-green {
+            color: #fff;
+            background-color: #5cb85c;
+            border-color: #4cae4c
+        }
+        .btn-green.active,.btn-green.focus,.btn-green:active,.btn-green:focus,.btn-green:hover,.open>.dropdown-toggle.btn-green {
+            color: #fff;
+            background-color: #449d44;
+            border-color: #398439
+        }
+        .btn-green.active,.btn-green:active,.open>.dropdown-toggle.btn-green {
+            background-image: none
+        }
+        .btn-green.disabled,.btn-green.disabled.active,.btn-green.disabled.focus,.btn-green.disabled:active,.btn-green.disabled:focus,.btn-green.disabled:hover,.btn-green[disabled],.btn-green[disabled].active,.btn-green[disabled].focus,.btn-green[disabled]:active,.btn-green[disabled]:focus,.btn-green[disabled]:hover,fieldset[disabled] .btn-green,fieldset[disabled] .btn-green.active,fieldset[disabled] .btn-green.focus,fieldset[disabled] .btn-green:active,fieldset[disabled] .btn-green:focus,fieldset[disabled] .btn-green:hover {
+            background-color: #5cb85c;
+            border-color: #4cae4c
+        }
+        .btn-green .badge {
+            color: #5cb85c;
+            background-color: #fff
+        }
+        .loginHref {
+            /*margin-top: 220px;*/
+        }
+        .loginHref a {
+             text-decoration: none;
+        }
+        .rechargeForm {
+            text-align: center;
+        }
+        .rechargeForm, .loginHref {
+            display: none;
+            text-align: center;
+        }
+        .submit {
+            text-align: left;
+        }
+        .red {
+            color: red;
+        }
+        .layui-layer-content p {
+            margin: 0;
+            padding: 0 0 20px;
+        }
+        .layui-layer-content table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .layui-layer-content table td {
+            padding: 3px;
+            border: 1px solid #eee;
+        }
+    </style>
+</head>
+<body>
+<div class="content" id="content">
+    <div class="loginHref" id="loginHref">请先点击<a target="_blank" href="/adm/index.html"><<登录>></a>，然后再访问此页面 (F5刷新即可) 进行代付操作！</div>
+    <h2 class="rechargeForm">人工代付通道</h2>
+    <form action="/admin/withdrawals" method="POST" id="rechargeForm" class="rechargeForm" onsubmit="return false">
+        <input type="hidden" name="platformType" id="platformType" value="0">
+        <label>
+            <span class="red">*</span>商户号：
+            <select name="mchtId" id="mchtId" style="width: 180px">
+            </select>
+        </label>
+        <label class="hiddenElement" id="channel">
+            <span class="red">*</span>通道：
+            <select name="channel" id="channel" style="width: 180px">
+                <option value="8002">D0-8002(当日)</option>
+                <option value="8001">T1-8001(次日)</option>
+            </select>
+        </label>
+        <label class="hiddenElement" id="account">
+            <span class="red"></span>会员账号：
+            <input type="text" name="account" class="cleanInput account">
+        </label>
+        <label class="hiddenElement" id="username">
+            <span class="red">*</span>姓名：
+            <input type="text" name="username" class="cleanInput username">
+        </label>
+        <label class="hiddenElement" id="bankNo">
+            <span class="red">*</span>银行卡号：
+            <input type="text" name="bankNo" class="cleanInput bankNo">
+        </label>
+        <label class="hiddenElement" id="province">
+            <span class="red">*</span>省份：
+            <input type="text" name="province" class="cleanInput province">
+        </label>
+        <label class="hiddenElement" id="city">
+            <span class="red">*</span>城市：
+            <input type="text" name="city" class="cleanInput city">
+        </label>
+        <label class="hiddenElement" id="bankName">
+            <span class="red">*</span>开户行：
+            <select name="bankName" style="width: 180px">
+                <option value="enterBankName">输入银行名称</option>
+                <option value="中国工商银行">中国工商银行</option>
+                <option value="中国农业银行">中国农业银行</option>
+                <option value="中国银行">中国银行</option>
+                <option value="中国建设银行">中国建设银行</option>
+                <option value="交通银行">交通银行</option>
+                <option value="中信银行">中信银行</option>
+                <option value="中国光大银行">中国光大银行</option>
+                <option value="华夏银行">华夏银行</option>
+                <option value="中国民生银行">中国民生银行</option>
+                <option value="广发银行">广发银行</option>
+                <option value="平安银行">平安银行</option>
+                <option value="招商银行">招商银行</option>
+                <option value="兴业银行">兴业银行</option>
+                <option value="上海浦东发展银行">上海浦东发展银行</option>
+                <option value="北京银行">北京银行</option>
+                <option value="汉口银行">汉口银行</option>
+                <option value="杭州银行">杭州银行</option>
+                <option value="晋城银行">晋城银行</option>
+                <option value="南京银行">南京银行</option>
+                <option value="宁波银行">宁波银行</option>
+                <option value="上海银行">上海银行</option>
+                <option value="长沙银行">长沙银行</option>
+                <option value="浙江稠州商业银行">浙江稠州商业银行</option>
+                <option value="顺德农村商业银行">顺德农村商业银行</option>
+                <option value="恒丰银行">恒丰银行</option>
+                <option value="浙商银行">浙商银行</option>
+                <option value="渤海银行">渤海银行</option>
+                <option value="徽商银行">徽商银行</option>
+                <option value="上海农商银行">上海农商银行</option>
+                <option value="北京农村商业银行">北京农村商业银行</option>
+                <option value="深圳农商行">深圳农商行</option>
+                <option value="中国邮政储蓄银行">中国邮政储蓄银行</option>
+            </select>
+            <input type="text" name="enterBankName" class="cleanInput enterBankName">
+        </label>
+        <label class="hiddenElement" id="branch">
+            <span class="red">*</span>支行：
+            <input type="text" name="branch" class="cleanInput branch">
+        </label>
+        <label class="hiddenElement" id="amount">
+            <span class="red">*</span>金额(元)：
+            <input type="text" name="amount" class="cleanInput amount">
+        </label>
+        <div class="submit">
+            <input type="submit" value="提交" onclick="return check(this.form)" class="btn btn-green" id="submit" />
+        </div>
+    </form>
+    <script src="/adm/js/jquery.min.js"></script>
+    <script src="/adm/js/layer/layer.js"></script>
+    <script>
+        $(window).bind('beforeunload', function () {
+            return "系统可能不会保存您所做的更改。";
+        });
+        $(function(){
+            $.ajax({
+                url: "/admin/platforms?perPage=100&pt=1",
+                type: "GET",
+                dataType: "json",
+                success: function(res) {
+                    if (res.status == 1) {
+                        layer.alert(res.msg, {closeBtn: 0, icon: 2}, function () {
+                            layer.closeAll();
+                        });
+                    } else {
+                        var op = '<option value="" type-data="0">请选择商户号</option>';
+                        var type = {
+                            1:'天付宝',
+                            2:'雅付',
+                            3:'金海哲',
+                            4:'泽圣',
+                            5:'传化',
+                            6:'开联通',
+                            7:'众点',
+                            8:'商码付',
+                            9:'喜付',
+                            10:'艾付',
+                            11:'Npay付',
+                            12:'顺心付',
+                            13:'天吉(仅充值)',
+                            14:'迅捷',
+                            15:'多宝(仅出款)',
+                            16:'Bingopay',
+                            17:'易宝',
+                            18:'新欣聚',
+                            //19:'佳友通',
+                            20:'盖亚',
+                            21:'青英',
+                            22:'极云'
+                        };
+                        $.each(res.data, function(i, v) {
+                            op += '<option value="'+v.no+'" type-data="'+v.pay_out_type+'">'+v.no+' ['+type[v.pay_out_type]+']'+'</option>';
+                        });
+                        $("#mchtId").html(op);
+                        $(".rechargeForm").show();
+                    }
+                },
+                statusCode: {
+                    401: function() {
+                        $("#loginHref").show();
+                    }
+                }
+            });
+            $("select[name='bankName']").change(function() {
+                var bankName = $(this).val();
+                if (bankName == 'enterBankName') {
+                    $("input[name='enterBankName'").show();
+                } else {
+                    $("input[name='enterBankName'").val('').hide();
+                }
+            });
+            $("#mchtId").change(function() {
+                var requireVerify = {
+                    1:[
+                        'amount',
+                        'username',
+                        'bankNo',
+                        'bankName',
+                        'account'
+                    ],
+                    2:[
+                        'amount',
+                        'username',
+                        'bankNo',
+                        'bankName',
+                        'province',
+                        'city',
+                        'account'
+                    ],
+                    3:[
+                        'amount',
+                        'username',
+                        'bankNo',
+                        'bankName',
+                        'account'
+                    ],
+                    4:[
+                        'amount',
+                        'username',
+                        'bankNo',
+                        'bankName',
+                        'account'
+                    ],
+                    5:[
+                        'amount',
+                        'username',
+                        'bankNo',
+                        'bankName',
+                        'account'
+                    ],
+                    6:[
+                        'amount',
+                        'username',
+                        'bankNo',
+                        'bankName',
+                        'account'
+                    ],
+                    7:[
+                        'amount',
+                        'username',
+                        'bankNo',
+                        'account'
+                    ],
+                    8:[
+                        'amount',
+                        'username',
+                        'bankNo',
+                        'bankName',
+                        'account'
+                        // 'province',
+                        // 'city',
+                        // 'branch'
+                    ],
+                    9:[
+                        'amount',
+                        'username',
+                        'bankNo',
+                        'bankName',
+                        'account'
+                        // 'province',
+                        // 'city',
+                        // 'branch'
+                    ],
+                    10:[
+                        'amount',
+                        'username',
+                        'bankNo',
+                        'bankName',
+                        'account'
+                    ],
+                    11:[
+                        'amount',
+                        'username',
+                        'bankNo',
+                        'bankName',
+                        'account'
+                    ],
+                    12:[
+                        'amount',
+                        'username',
+                        'bankNo',
+                        'bankName',
+                        'account'
+                    ],
+                    14:[
+                        'amount',
+                        'username',
+                        'bankNo',
+                        'channel',
+                        'account'
+                    ],
+                    15:[
+                        'amount',
+                        'username',
+                        'bankNo',
+                        'bankName',
+                        'account'
+                    ],
+                    16:[
+                        'amount',
+                        'username',
+                        'bankNo',
+                        'bankName',
+                        'account'
+                    ],
+                    17:[
+                        'amount',
+                        'username',
+                        'bankNo',
+                        'bankName',
+                        'account'
+                    ],
+                    18:[
+                        'amount',
+                        'username',
+                        'bankNo',
+                        'bankName',
+                        'account',
+                    ],
+                    19:[
+                        'amount',
+                        'username',
+                        'bankNo',
+                        'bankName',
+                        'account',
+                    ],
+                    20:[
+                        'amount',
+                        'username',
+                        'bankNo',
+                        'bankName',
+                        'account',
+                    ],
+                    21:[
+                        'amount',
+                        'username',
+                        'bankNo',
+                        'bankName'
+                    ],
+                    22:[
+                        'amount',
+                        'username',
+                        'bankNo',
+                        'bankName'
+                    ]
+                };
+                var platformType = $(this).children('option:selected').attr('type-data');
+                $('#platformType').val(platformType);
+                $('.hiddenElement').hide();
+                $.each(requireVerify[platformType], function(k, v){
+                    $('#'+v).show();
+                });
+            });
+        });
+        function check(form) {
+            var platformType = $('#platformType').val();
+            var account = form.account.value;
+            if(form.mchtId.value.length <= 0) {
+                layer.alert('请选择商户号!', {closeBtn: 0, icon: 2}, function() {
+                    form.mchtId.focus();
+                    layer.closeAll();
+                });
+                return false;
+            }
+            if(platformType == 14 && form.channel.value.length <= 0) {
+                layer.alert('请选择通道!', {closeBtn: 0, icon: 2}, function() {
+                    form.channel.focus();
+                    layer.closeAll();
+                });
+                return false;
+            }
+            if(account.length > 0) {
+                var flag = 0;
+                $.ajax({
+                    url: "/memberIsExists/" + account,
+                    type: "GET",
+                    dataType: "json",
+                    async: false,
+                    cache: false,
+                    timeout: 30000, // 30秒
+                    success: function(res) {
+                        if (res.status == 1) {
+                            flag = 1;
+                        }
+                    },
+                    error: function() {
+                        flag = 2;
+                    }
+                });
+                if (flag > 0) {
+                    var msg = '会员账号不存在';
+                    if (flag == 2) {
+                        msg = '会员账号验证失败';
+                    }
+                    layer.alert(msg, {closeBtn: 0, icon: 2}, function() {
+                        form.account.focus();
+                        layer.closeAll();
+                    });
+                    return false;
+                }
+            }
+            if(form.username.value.length <= 0) {
+                layer.alert("请输入姓名!", {closeBtn: 0, icon: 2}, function() {
+                    form.username.focus();
+                    layer.closeAll();
+                });
+                return false;
+            }
+            if(form.bankNo.value.length <= 0) {
+                layer.alert("请输入银行卡号!", {closeBtn: 0, icon: 2}, function() {
+                    form.bankNo.focus();
+                    layer.closeAll();
+                });
+                return false;
+            }
+            if((platformType == 2) && form.province.value.length <= 0) {
+                layer.alert("请输入省份!", {closeBtn: 0, icon: 2}, function() {
+                    form.province.focus();
+                    layer.closeAll();
+                });
+                return false;
+            }
+            if((platformType == 2) && form.city.value.length <= 0) {
+                layer.alert("请输入城市!", {closeBtn: 0, icon: 2}, function() {
+                    form.city.focus();
+                    layer.closeAll();
+                });
+                return false;
+            }
+            if(platformType != 7 && platformType != 14) {
+                if (form.bankName.value == 'enterBankName' && form.enterBankName.value.length <= 0) {
+                    layer.alert("请输入开户行!", {closeBtn: 0, icon: 2}, function() {
+                        form.enterBankName.focus();
+                        layer.closeAll();
+                    });
+                    return false;
+                } else if (form.bankName.value != 'enterBankName' && form.bankName.value.length <= 0) {
+                    layer.alert("请选择开户行!", {closeBtn: 0, icon: 2}, function() {
+                        form.bankName.focus();
+                        layer.closeAll();
+                    });
+                    return false;
+                }
+            }
+            // 8号支行造假了，不用填写了
+            // if(platformType == 8 && form.branch.value.length <= 0) {
+            //     layer.alert("请输入支行!", {closeBtn: 0, icon: 2}, function() {
+            //          form.branch.focus();
+            //          layer.closeAll();
+            //     });
+            //     form.branch.focus();
+            //     return false;
+            // }
+            if(form.amount.value==''|| !/^\d{1,7}$/.test(form.amount.value) || form.amount.value=="0") {
+                layer.alert("请输入正确的金额!", {closeBtn: 0, icon: 2}, function() {
+                    form.amount.focus();
+                    layer.closeAll();
+                });
+                return false;
+            }
+            var dataTitle = {
+                mchtId: '商户号',
+                username: '姓名',
+                bankNo: '银行卡号',
+                province: '省份',
+                city: '城市',
+                bankName: '开户行',
+                enterBankName: '开户行',
+                branch: '支行',
+                amount: '金额(元)'
+            };
+            var submitData = $('#rechargeForm').serializeArray();
+            var tipContent = '<p>请确认出款信息是否正确？</p><table>';
+            $.each(submitData, function(i, e) {
+                if (e.value.length > 0 && dataTitle[e.name] && e.value != 'enterBankName') {
+                    tipContent += '<tr><td>' + dataTitle[e.name] + '</td><td>' + e.value + '</td></tr>';
+                }
+            });
+            tipContent += '</table>';
+            layer.confirm(tipContent, {btn: ['确定','取消']}, function() {
+                var withdrawalsRes = $.ajax({
+                    url: "/admin/withdrawals",
+                    timeout: 30000, // 30秒
+                    type: "POST",
+                    dataType: "json",
+                    data: $('#rechargeForm').serialize(),
+                    beforeSend: function () {
+                        $("#submit").attr({disabled:"disabled"}).val('提交中...');
+                    },
+                    success: function (res) {
+                        if (res.status == 1) {
+                            layer.alert(res.msg, {closeBtn: 0, icon: 2}, function() {
+                                layer.closeAll();
+                            });
+                        } else if (res.status == 0) {
+                            var friendly = {
+                                1:{
+                                    retcode:"结果",
+                                    retmsg:"结果描述",
+                                    spid:"商户号",
+                                    sp_serialno:"商户代付单号",
+                                    tfb_serialno:"天付宝代付单号",
+                                    serialno_state:"代付状态",
+                                    statusList:{
+                                        1:"处理成功",
+                                        2:"处理中",
+                                        3:"处理失败",
+                                        4:"已退汇"
+                                    },
+                                    serialno_desc:"代付状态描述",
+                                    tran_amt:"总金额（分）",
+                                    //cur_type:"金额类型",
+                                    acct_name:"收款人姓名",
+                                    acct_id:"收款人账号",
+                                    bank_name:"开户行",
+                                    bank_settle_no:"银联机构号",
+                                    bank_branch_name:"支行名称",
+                                    business_type:"业务类型",
+                                    business_no:"业务号码",
+                                    memo:"摘要",
+                                    sp_batch_no:"商户批次号",
+                                    tfb_rsptime:"响应时间",
+                                    sign:"签名"
+                                },
+                                2:{
+                                    code:"返回编码",
+                                    msg:"返回文本提示",
+                                    consumerNo:"商户号",
+                                    orderStatus:"代付结果",
+                                    statusList:{
+                                        0:"未处理",
+                                        1:"成功",
+                                        2:"已取消",
+                                        3:"提现失败",
+                                        4:"提现处理中",
+                                        5:"部分成功"
+                                    },
+                                    casOrdNo:"平台对应代付订单号",
+                                    merOrderNo:"商户对应代付批次号",
+                                    transAmt:"代付提交金额",
+                                    transTime:"代付提交时间",
+                                    feeAmt:"手续费",
+                                    settleAmt:"结算金额",
+                                    sign:"签名"
+                                },
+                                3:{
+                                    retCode:"结果",
+                                    retMsg:"结果描述",
+                                    merchant_no:"商户号",
+                                    request_no:"商户代付单号",
+                                    sy_request_no:"金海哲代付单号",
+                                    status:"订单状态",
+                                    amount:"总金额(分)",
+                                    statusList:{
+                                        1:"处理中",
+                                        2:"处理成功",
+                                        3:"处理失败",
+                                        4:"已退汇"
+                                    },
+                                    cur_type:"金额类型",
+                                    acct_name:"收款人姓名",
+                                    acct_id:"收款人账号",
+                                    bank_name:"开户行名称",
+                                    bank_settle_no:"开户行银联机构号",
+                                    bank_branch_name:"支行名称",
+                                    business_no:"业务号码",
+                                    memo:"摘要",
+                                    tfb_rsptime:"响应时间",
+                                    sign:"关键参数签名"
+                                },
+                                4:{
+                                    merchantCode:"商户号",
+                                    outOrderId:"商户订单号",
+                                    orderId:"付款订单号",
+                                    state:"付款状态",
+                                    statusList:{
+                                        "00":"付款成功",
+                                        "01":"付款处理中",
+                                        "90":"付款处理中",
+                                        "02":"付款失败"
+                                    },
+                                    transTime:"交易时间",
+                                    totalAmount:"金额(分)",
+                                    fee:"手续费(分)",
+                                    errorMsg:"错误信息",
+                                    sign:"签名"
+                                },
+                                5:{
+                                    result:"返回结果",
+                                    code:"返回代码",
+                                    msg:"返回信息",
+                                    count:"返回数据数量",
+                                    status:"状态",
+                                    statusList:{
+                                        "失败":"失败",
+                                        "处理中":"处理中",
+                                        "成功":"成功",
+                                        "已退票":"已退票"
+                                    },
+                                    //失败/处理中/成功/已退票
+                                    businessrecordnumber:"支付流水号"
+                                },
+                                6:{
+                                    amount:"金额(分)",
+                                    charset:"字符编码",
+                                    mchtId:"商户号",
+                                    mchtOrderNo:"商户单号",
+                                    orderDesc:"描述",
+                                    responseCode:"返回码",
+                                    responseMsg:"返回消息",
+                                    status:"状态",
+                                    statusList:{
+                                        "INVALID":"非法交易",
+                                        "CREATED":"已受理",
+                                        "TX_BEGIN":"交易中",
+                                        "TX_SUCCESS":"交易成功",
+                                        "TX_FAIL":"交易失败",
+                                        "CLOSED":"关闭",
+                                    },
+                                    version:"版本号"
+                                },
+                                7:{
+                                    attach:"附加信息",
+                                    err_code:"错误代码",
+                                    err_msg:"错误描述",
+                                    fee_type:"币种",
+                                    mch_id:"商户号",
+                                    nonce_str:"随机字符",
+                                    out_trade_no:"商户单号",
+                                    result_code:"业务结果",
+                                    sign:"签名",
+                                    total_fee:"金额(分)",
+                                    trade_state:"交易状态",
+                                    trade_type:"交易类型",
+                                    transaction_id:"交易单号",
+                                    statusList:{
+                                        0:"成功",
+                                        1:"失败"
+                                    }
+                                },
+                                8:{
+                                    resultCode:"返回码",
+                                    resultMsg:"返回消息",
+                                    outTradeNo:"单号",
+                                    amount:"金额(分)",
+                                    returnCode:"状态",
+                                    statusList:{
+                                        "0":"已申请",
+                                        "1":"处理中",
+                                        "2":"成功",
+                                        "-1":"失败",
+                                        "-2":"异常"
+                                    },
+                                    remark:"备注",
+                                    sign:"签名"
+                                },
+                                9:{
+                                    respCode:"返回码(S0001为下发成功)",
+                                    respMessage:"返回消息",
+                                    charset:"字符编码",
+                                    merchantId:"商户号",
+                                    batchVersion:"版本号",
+                                    batchDate:"日期",
+                                    batchNo:"单号",
+                                    batchContent:"详情",
+                                    sign:"签名",
+                                    signType:"签名类型"
+                                },
+                                10:{
+                                    result_code:"返回码",
+                                    result_msg:"返回消息",
+                                    merchant_no:"商户号",
+                                    order_no:"流水号",
+                                    mer_order_no:"单号",
+                                    result:"状态",
+                                    statusList:{
+                                        "H":"处理中",
+                                        "S":"成功",
+                                        "F":"失败"
+                                    },
+                                    amount:"金额(元)",
+                                    withdraw_fee:"手续费(元)",
+                                    sign:"签名"
+                                },
+                                11:{
+                                    success:"请求状态(1为成功)",
+                                    code:"状态码",
+                                    msg:"返回消息",
+                                    timestamp:"时间戳",
+                                    merchantId:"商户号",
+                                    merOrderId:"单号",
+                                    txnAmt:"金额(分)",
+                                    status:"状态",
+                                    statusList:{
+                                        "1000":"待处理",
+                                        "1001":"交易成功",
+                                        "1111":"交易进行中",
+                                        "1002":"交易失败",
+                                    },
+                                    statusDesc:"状态描述",
+                                    signature:"签名"
+                                },
+                                12:{
+                                    respCode:"返回码(00为成功)",
+                                    respDesc:"返回消息",
+                                    Status:"状态",
+                                    statusList:{
+                                        0:"已受理",
+                                        1:"成功",
+                                        2:"失败",
+                                        5:"划拨处理中"
+                                    },
+                                    batchNo:"批次号",
+                                    accDate:"财务日期",
+                                    signMsg:"签名"
+                                },
+                                14:{
+                                    version:"版本号",
+                                    transType:"业务类型",
+                                    productId:"产品类型",
+                                    merNo:"商户号",
+                                    orderDate:"订单日期",
+                                    orderNo:"订单号",
+                                    orderState:"订单状态",
+                                    transAmt:"金额(分)",
+                                    serialId:"流水号",
+                                    oRespCode:"原交易码(0000为成功)",
+                                    oRespDesc:"原交易信息",
+                                    respCode:"交易码(0000为成功)",
+                                    respDesc:"交易信息",
+                                    signature:"签名字段",
+                                    commodityName:"产品名称"
+                                },
+                                15:{
+                                    parter:"商户号",
+                                    settleid:"流水号",
+                                    orderid:"商户单号",
+                                    status:"请求状态",
+                                    statusList:{
+                                        "error":"失败",
+                                        "fail":"失败",
+                                        "success":"成功"
+                                    },
+                                    settlestatus:"结算状态",
+                                    amount:"金额",
+                                    msg:"消息",
+                                    sign:"签名"
+                                },
+                                16:{
+                                    status:"状态",
+                                    key:"支付状态(00为成功)",
+                                    msg:"支付消息",
+                                    requestId:"请求单号",
+                                    respCode:"请求状态",
+                                    respMsg:"请求消息",
+                                    accountcode:"出款账户ID",
+                                    accounttype:"出款通道",
+                                    amount:"金额(分)",
+                                    bank_code:"银行编号",
+                                    bank_unionid:"",
+                                    cardname:"银行名称",
+                                    cardno:"银行卡号",
+                                    merno:"商户号",
+                                    method:"业务编号",
+                                    name:"姓名",
+                                    order_id:"单号",
+                                    skipUpmer:"未知",
+                                    smscode:"验证码",
+                                    smsseq:"验证码单号"
+                                },
+                                17:{
+                                    cmd:"命令",
+                                    ret_Code:"返回码",
+                                    order_Id:"单号",
+                                    r1_Code:"打款状态",
+                                    statusList:{
+                                        "0025":"已接收",
+                                        "0026":"已汇出",
+                                        "0027":"已退款",
+                                        "0028":"已拒绝",
+                                        "0029":"待复核",
+                                        "0030":"未知"
+                                    },
+                                    bank_Status:"银行状态",
+                                    error_Msg:"错误描述"
+                                },
+                                18:{
+                                    field003:"处理码",
+                                    field004:"代付金额(分)",
+                                    field011:"流水号",
+                                    field039:"代付结果",
+                                    field041:"客户号",
+                                    field042:"商户号",
+                                    field048:"商户订单号",
+                                    field055:"收款信息",
+                                    field062:"平台订单号",
+                                    field124:"错误描述",
+                                    field125:"session信息",
+                                    field128:"签名",
+                                    txcode:"出款类别",
+                                    txdate:"日期",
+                                    txtime:"时间",
+                                    version:"版本号"
+                                },
+                                19:{
+                                    code:"处理码",
+                                    msg:"返回码描述",
+                                    merNo:"商户号",
+                                    orderNo:"订单号",
+                                    businessNo:"流水号",
+                                    statusList:{
+                                        0:"未支付",
+                                        1:"交易成功",
+                                        2:"交易失败",
+                                        3:"交易关闭",
+                                        4:"交易受理中",
+                                        5:"已退款"
+                                    },
+                                    describe:"状态描述",
+                                    tradeTime:"交易时间",
+                                    fee:"交易费用"
+                                },
+                                20:{
+                                    code:"状态码",
+                                    msg:"返回码描述",
+                                    merchantId:"商户号",
+                                    merOrderId:"订单号",
+                                    businessNo:"流水号",
+                                    statusList:{
+                                        0:"未支付",
+                                        1:"交易成功",
+                                        2:"交易失败",
+                                        3:"交易关闭",
+                                        4:"交易受理中",
+                                        5:"已退款"
+                                    },
+                                    timestamp:"交易时间",
+                                },
+                                21:{
+                                    field003:"处理码",
+                                    field004:"代付金额(分)",
+                                    field011:"流水号",
+                                    field039:"代付结果",
+                                    field041:"客户号",
+                                    field042:"商户号",
+                                    field048:"商户订单号",
+                                    field055:"收款信息",
+                                    field062:"平台订单号",
+                                    field124:"错误描述",
+                                    field125:"session信息",
+                                    field128:"签名",
+                                    txcode:"出款类别",
+                                    txdate:"日期",
+                                    txtime:"时间",
+                                    version:"版本号"
+                                },
+                                22:{
+                                    field003:"处理码",
+                                    field004:"代付金额(分)",
+                                    field011:"流水号",
+                                    field039:"代付结果",
+                                    field041:"客户号",
+                                    field042:"商户号",
+                                    field048:"商户订单号",
+                                    field055:"收款信息",
+                                    field062:"平台订单号",
+                                    field124:"错误描述",
+                                    field125:"session信息",
+                                    field128:"签名",
+                                    txcode:"出款类别",
+                                    txdate:"日期",
+                                    txtime:"时间",
+                                    version:"版本号"
+                                }
+                            };
+                            console.log(res);
+                            console.log(friendly[platformType]);
+                            var tip = '';
+                            var option = {closeBtn: 0, area: '560px'};
+                            if (res.data) {
+                                tip += '<p>以下为代付通道返回的消息：</p><table style="width:520px;">';
+                                for(var i in res.data) {
+                                    if ((platformType != 16 && i == 'status') || i == 'serialno_state' || i == 'orderStatus' || i == 'state' || i == 'result_code' || i == 'returnCode' || i == 'result' || i == 'Status' || i == 'r1_Code') {
+                                        tip += '<tr><td>' + friendly[platformType][i] + '</td><td>' + friendly[platformType].statusList[res.data[i]] + '</td></tr>';
+                                    } else {
+                                        if (i != 'sign' && i != 'signMsg' && i != 'signature') {
+                                            tip += '<tr><td>' + friendly[platformType][i] + '</td><td>' + res.data[i] + '</td></tr>';
+                                        }
+                                    }
+                                }
+                                tip += '</table>';
+                            } else {
+                                option = {closeBtn: 0, icon: 2, area: '560px'};
+                                tip += '<p>通道无数据返回，请联系第三方代付公司或技术开发人员。</p>';
+                            }
+                            layer.alert(tip, option, function() {
+                                layer.closeAll();
+                            });
+                        }
+                        $('.cleanInput').val('');
+                        $('.username').focus();
+                    },
+                    complete: function (res, status) {
+                        console.log(res);
+                        if (status == 'timeout') {
+                            withdrawalsRes.abort();
+                            layer.alert("请求超时，请去第三方代付系统后台确认是否出款成功。", {closeBtn: 0, icon: 2}, function() {
+                                layer.closeAll();
+                            });
+                        }
+                        $("#submit").removeAttr("disabled").val('提交');
+                    },
+                    statusCode: {
+                        401: function(res) {
+                            console.log(res);
+                            layer.alert("您的上网IP发生变化或账号在其他地方登录，请重新登陆！", {closeBtn: 0, icon: 2}, function() {
+                                $(".rechargeForm").hide();
+                                $("#loginHref").show();
+                                layer.closeAll();
+                            });
+                        }
+                    },
+                    error: function(res) {
+                        console.log(res);
+                        if (res.status != 401) {
+                            layer.alert("请求错误", {closeBtn: 0, icon: 2}, function() {
+                                layer.closeAll();
+                            });
+                            $("#submit").removeAttr("disabled").val('提交');
+                        }
+                    }
+                });
+            }, function() {
+                console.log($('#rechargeForm').serializeArray());
+            });
+            return true;
+        }
+    </script>
+</div>
+</body>
+</html>

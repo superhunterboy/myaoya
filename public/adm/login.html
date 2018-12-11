@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="zh_cn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="renderer" content="webkit" />
+    <meta http-equiv="renderer" content="webkit" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta http-equiv="X-UA-Compatible" content="chrome=1" />
+    <title>支付管理平台-登陆</title>
+    <link rel="shortcut icon" href="favicon.ico"/>
+    <link rel="bookmark" href="/favicon.ico"/>
+    <link rel="stylesheet" href="css/icon.css" />
+    <link rel="stylesheet" href="css/login.css" />
+    <script src="js/jquery.min.js"></script>
+</head>
+<body>
+    <div class="login">
+        <div class="login-title">支付管理平台登陆</div>
+        <div class="login-form">
+            <div class="login-form-input">
+                <label><i class="icon-user"></i><input id="u_name" maxlength="18" type="text" placeholder="用户名" autofocus /></label>
+                <label><i class="icon-password"></i><input id="u_pwd" maxlength="18" type="password" placeholder="密码" /></label>
+                <label class="OTP" style="display: none"><i class="icon-danger"></i><input id="u_code" maxlength="6" type="text"  placeholder="安全令" /></label>
+            </div>
+            <div class="login-error">帐号名或密码错误</div>
+            <button class="login-btn">登 陆</button>
+        </div>
+    </div>
+    <script>
+        var t=+new Date();
+        $(function(){
+            $.ajax({
+                url: "/isEnableOtp?t="+t,
+                type: "GET",
+                dataType: "json",
+                cache:false,
+                success: function (res) {
+                    if(res.status==0 && res.data.isBind==1){
+                        $(".OTP").show();
+                    }
+                }
+            });
+            var loading,data={};
+            var check=function(){
+                if(!$("#u_name").val()){
+                    $(".login-error").html("请填写用户名").slideDown();
+                    setTimeout(function(){$(".login-error").slideUp()},3000);
+                    return false
+                }
+                if(!$("#u_pwd").val()){
+                    $(".login-error").html("请填写密码").slideDown();
+                    setTimeout(function(){$(".login-error").slideUp()},3000);
+                    return false
+                }
+                return true
+            };
+            var login=function(){
+                if(!loading && check()){
+                    loading=true;
+                    $(this).addClass("active").html("登陆中...");
+                    $.ajax({
+                        url:"/admin/auth/login",
+                        type:"POST",
+                        dataType:"json",
+                        data:{
+                            username:$("#u_name").val(),
+                            password:$("#u_pwd").val(),
+                            code:$("#u_code").val()
+                        },
+                        success:function(res){
+                            loading=false;
+                            if(res.status==0){
+                                location.href="index.html";
+                            }else{
+                                $(".login-error").html(res.msg).slideDown();
+                                setTimeout(function(){$(".login-error").slideUp()},3000)
+                            }
+                            $(".login-btn").removeClass("active").html("登 陆");
+                        },
+                        error:function(){
+                            $(".login-error").html("网络错误，请刷新后重试").slideDown();
+                            $(".login-btn").html("登陆失败");
+                        }
+                    });
+                }
+            };
+            $(".login-btn").click(function(){login();});
+            $("#u_pwd").keydown(function(e){
+                if(e.keyCode == 13){
+                    login();
+                }
+            })
+        })
+    </script>
+</body>
+</html>

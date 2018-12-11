@@ -1,0 +1,114 @@
+<div class="pay-out-list">
+    <div class="page-title">自动出款记录</div>
+    <div class="table">
+        <table-float-header data-float-element="table-advanced-search" data-float-thead="table-thead"></table-float-header>
+        <div class="table-advanced-search">
+            <div class="advanced-search-box" style="width: 35%">
+                <span class="search-box-text">出款时间：</span>
+                <input style="width: 150px" onchange="" class="input" datepicker="yyyy-MM-dd HH:mm:ss" max="table.query.endtime"
+                    type="text" ng-model="table.query.startime" /> 至 <input style="width: 150px" onchange=""
+                    class="input" type="text" datepicker="yyyy-MM-dd HH:mm:ss" min="table.query.startime" ng-model="table.query.endtime"
+                />
+            </div>
+            <label class="advanced-search-box">
+                <span class="search-box-text">会员账号：</span>
+                <input  class="input" type="text" maxlength="30" datatype="EN"
+                        ng-model="table.query.account" />
+            </label>
+            <label class="advanced-search-box">
+                <span class="search-box-text">出款流水号：</span>
+                <input  class="input" type="text" maxlength="50" datatype="EN"
+                        ng-model="table.query.serial_number" />
+            </label>
+            <div class="advanced-search-box">
+                <span class="search-box-text"> </span>
+                <button type="button" class="btn btn-default" ng-click="table.ready=false;table.getList(1)">搜索</button>
+            </div>
+            <div class="advanced-search-box" style="width: 100%">
+                <span class="search-box-text">出款状态：</span>
+                <div class="table-tab">
+                    <a ng-class="{active:table.query.status==''}" ng-click="search('')">全部</a
+                    ><a ng-class="{active:table.query.status=='1'}" ng-click="search('1')">处理成功</a
+                    ><a ng-class="{active:table.query.status=='2'}" ng-click="search('2')">处理中</a
+                    ><a ng-class="{active:table.query.status=='3'}" ng-click="search('3')">处理失败</a
+                    ><a ng-class="{active:table.query.status=='4'}" ng-click="search('4')">已退汇</a
+                    ><a ng-class="{active:table.query.status=='0'}" ng-click="search('0')">未处理</a
+                    ><a ng-class="{active:table.query.status=='5'}" ng-click="search('5')">其他</a>
+                </div>
+            </div>
+        </div>
+        <table>
+            <thead class="table-thead">
+                <tr>
+                    <td>会员账号</td>
+                    <td>真实姓名</td>
+                    <td>银行卡号</td>
+                    <td>开户银行</td>
+                    <td>出款金额(元)</td>
+                    <td>出款平台</td>
+                    <td>出款时间(美东时间)</td>
+                    <td>订单号</td>
+                    <td>出款流水号</td>
+                    <td>状态</td>
+                    <td>原因</td>
+                    <td>操作</td>
+                    <td>操作人</td>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-if="!table.ready">
+                    <td colspan="13">正在加载。。。</td>
+                </tr>
+                <tr ng-if="table.error">
+                    <td colspan="13">获取列表错误，{{table.errorMsg}}<br/>请刷新页面</td>
+                </tr>
+                <tr ng-if="table.ready && !table.error && table.list==0">
+                    <td colspan="13">没有查询到记录</td>
+                </tr>
+                <tr ng-if="table.ready && !table.error" ng-repeat="list in table.list">
+                    <td ng-bind="list.account"></td>
+                    <td ng-bind="list.realname"></td>
+                    <td ng-bind="list.bank_card"></td>
+                    <td ng-bind="list.bank_name"></td>
+                    <td ng-bind="list.amount"></td>
+                    <td ng-bind="payOutType[list.platform_type]"></td>
+                    <td ng-bind="list.pay_out_time"></td>
+                    <td ng-bind="list.order_no"></td>
+                    <td ng-bind="list.platform_order_no"></td>
+                    <td ng-switch="list.platform_status">
+                        <span class="color-warning" ng-switch-when="0">未处理</span>
+                        <span class="color-green" ng-switch-when="1">处理成功</span>
+                        <span class="color-warning" ng-switch-when="2">处理中</span>
+                        <span class="color-red" ng-switch-when="3">处理失败</span>
+                        <span class="color-red" ng-switch-when="4">已退汇</span>
+                        <span class="color-warning" ng-switch-when="5">其它</span>
+                    </td>
+                    <td width="220">
+                        <div title="{{list.remark}}" class="pay-out-remark" ng-bind="list.remark"></div>
+                        <a ng-click="editRemark(list);" class="fl-r"><i class="icon-edit"></i> 备注</a>
+                    </td>
+                    <td>
+                        <span ng-if="list.status==1">已确定</span>
+                        <span ng-if="list.status==2">已取消</span>
+                        <span ng-if="list.status==3">已拒绝</span>
+                        <span ng-if="list.status==0 && list.platform_status==1">已解锁</span>
+                        <a class="ml-1" ng-if="list.status==0 && list.platform_status!=1" ng-click="updateStatus(list,4)">锁定</a>
+                        <a class="ml-1" ng-if="list.status==4 && list.platform_status!=1" ng-click="updateStatus(list,0)">解锁</a>
+                        <a class="ml-1" ng-if="(list.status==0 || list.status==4) && list.platform_status!=1" ng-click="updateStatus(list,1)">确定</a>
+                        <a class="ml-1" ng-if="(list.status==0 || list.status==4) && list.platform_status!=1" ng-click="updateStatus(list,2)">取消</a>
+                        <a class="ml-1" ng-if="(list.status==0 || list.status==4) && list.platform_status!=1" ng-click="updateStatus(list,3)">拒绝</a>
+                        <a class="ml-1" ng-click="queryPayOutStatus(list)">查询</a>
+                    </td>
+                    <td ng-bind="list.user"></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="table-num">共查询出 <span ng-bind="table.total"></span> 条记录，每页显示
+            <select class="input" ng-model="table.query.perPage" ng-change="table.getList(1)">
+                <option value="10">10</option><option value="20">20</option><option value="50">50</option><option value="100">100</option>
+            </select> 条
+        </div>
+        <div table-page="table"></div>
+    </div>
+</div>

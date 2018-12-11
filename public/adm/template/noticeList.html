@@ -1,0 +1,49 @@
+<div class="user-list">
+    <div class="page-title">
+        <span>公告管理</span>
+        <div class="page-btn">
+            <a ng-click="editNotice()" ng-if="userInfo.type==1" class="btn btn-green">新建公告</a>
+        </div>
+    </div>
+
+    <div class="table">
+        <table>
+            <thead>
+                <tr>
+                    <td>标题</td>
+                    <td>内容</td>
+                    <td>创建时间</td>
+                    <td>状态</td>
+                    <td ng-if="userInfo.type==1">操作</td>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-if="!table.ready">
+                    <td colspan="7">正在加载。。。</td>
+                </tr>
+                <tr ng-if="table.error">
+                    <td colspan="7">获取列表错误，{{table.errorMsg}}<br/>请刷新页面</td>
+                </tr>
+                <tr ng-if="table.ready && !table.error && table.list==0">
+                    <td colspan="7">没有查询到内容</td>
+                </tr>
+                <tr ng-if="table.ready && !table.error" ng-repeat="list in table.list">
+                    <td ng-bind="list.title"></td>
+                    <td width="800"> 
+                        <div style="width:800px;overflow: hidden;text-overflow: ellipsis;text-align: left;" ng-bind="list.content"></div>
+                    </td>
+                    <td ng-bind="list.created_at"></td>
+                    <td ng-if="list.status==1" class="color-green">发布中</td>
+                    <td ng-if="list.status==0" class="color-red">已禁用</td>
+                    <td ng-if="userInfo.type==1">
+                        <a ng-click="editNotice(list)"><i class="icon-edit"></i> 修改</a>
+                        <a ng-if="list.status==1 && list.type!=1" ng-click="updateNotice(list,0)"><i class="icon-pause"></i> 禁用</a>
+                        <a ng-if="list.status==0 && list.type!=1" ng-click="updateNotice(list,1)"><i class="icon-start"></i> 发布</a>
+                        <a ng-click="delNotice(list)"><i class="icon-delete"></i> 删除</a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <div table-page="table"></div>
+    </div>
+</div>

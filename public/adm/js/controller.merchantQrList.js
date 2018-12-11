@@ -1,0 +1,1 @@
+app.controller("merchantQrList",["$scope","$rootScope","Table","http","ngDialog","Tip",function(t,e,i,n,a,o){t.table=i.init({link:"/admin/merchants"}),t.table.getList()}]);

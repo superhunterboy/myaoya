@@ -1,0 +1,14 @@
+<div class="user-dialog">
+    <div class="dialog-title">修改备注</div>
+
+    <label class="input-box"><span>备注：</span>
+        <input class="input" type="text" ng-model="list.result" maxlength="50" placeholder="请将备注内容控制在50个字符以内"></input>
+        <br/>
+    </label>
+
+    <div align="center" class="color-red" ng-show="error" ng-bind="errorMsg"></div>
+    <div align="center">
+        <button class="btn btn-green" ng-click="sub()">确定</button>
+        <button class="btn btn-default" ng-click="closeThisDialog()">取消</button>
+    </div>
+</div>

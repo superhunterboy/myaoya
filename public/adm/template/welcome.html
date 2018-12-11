@@ -1,0 +1,95 @@
+<div class="welcome">
+    <div class="page-title">
+        <span>欢迎您 {{userInfo.realname||userInfo.username}}</span>
+    </div>
+    <div ng-if="userInfo.type==1 || userInfo.type==0 || userInfo.type==3" class="link-box">
+        <div class="link-title">在线支付</div>
+        <a ng-repeat="menu in onlinePay" href="#!/{{menu.memo}}">
+            <div class="link waves-effect waves-dark">
+                <div class="link-icon" ng-style="menu.css">
+                    <i ng-class="menu.icon"></i>
+                </div>
+                <div class="link-name" ng-bind="menu.name"></div>
+            </div>
+        </a>
+    </div>
+    <div ng-if="userInfo.type==1 || userInfo.type==0 || userInfo.type==3" class="link-box">
+        <div class="link-title">转账汇款</div>
+        <a ng-repeat="menu in transferPay" href="#!/{{menu.memo}}">
+            <div class="link waves-effect waves-dark">
+                <div class="link-icon" ng-style="menu.css">
+                    <i ng-class="menu.icon"></i>
+                </div>
+                <div class="link-name" ng-bind="menu.name"></div>
+            </div>
+        </a>
+    </div>
+    <div ng-if="userInfo.type==1 || userInfo.type==0 || userInfo.type==3" class="link-box">
+        <div class="link-title">支付宝支付</div>
+        <a ng-repeat="menu in aliPay" href="#!/{{menu.memo}}">
+            <div class="link waves-effect waves-dark">
+                <div class="link-icon" ng-style="menu.css">
+                    <i ng-class="menu.icon"></i>
+                </div>
+                <div class="link-name" ng-bind="menu.name"></div>
+            </div>
+        </a>
+    </div>
+    <div ng-if="userInfo.type==1 || userInfo.type==0 || userInfo.type==3" class="link-box">
+        <div class="link-title">微信支付</div>
+        <a ng-repeat="menu in wechatPay" href="#!/{{menu.memo}}">
+            <div class="link waves-effect waves-dark">
+                <div class="link-icon" ng-style="menu.css">
+                    <i ng-class="menu.icon"></i>
+                </div>
+                <div class="link-name" ng-bind="menu.name"></div>
+            </div>
+        </a>
+    </div>
+
+    <div ng-if="userInfo.type==1 || userInfo.type==2 || userInfo.type==3" class="link-box">
+        <div class="link-title">人工存入列表</div>
+        <a ng-repeat="menu in artificialDeposit" href="#!/{{menu.memo}}">
+            <div class="link waves-effect waves-dark">
+                <div class="link-icon" ng-style="menu.css">
+                    <i ng-class="menu.icon"></i>
+                </div>
+                <div class="link-name" ng-bind="menu.name"></div>
+            </div>
+        </a>
+    </div>
+
+    <div ng-if="userInfo.type==1 || userInfo.type==2 || userInfo.type==3" class="link-box">
+        <div class="link-title">出款管理</div>
+        <a ng-repeat="menu in payOutMenu" href="#!/{{menu.memo}}">
+            <div class="link waves-effect waves-dark">
+                <div class="link-icon" ng-style="menu.css">
+                    <i ng-class="menu.icon"></i>
+                </div>
+                <div class="link-name" ng-bind="menu.name"></div>
+            </div>
+        </a>
+    </div>
+    <div ng-if="userInfo.type==1 || userInfo.type==3" class="link-box">
+        <div class="link-title">入款数据统计</div>
+        <a ng-repeat="menu in reportMenu" href="#!/{{menu.memo}}">
+            <div class="link waves-effect waves-dark">
+                <div class="link-icon" ng-style="menu.css">
+                    <i ng-class="menu.icon"></i>
+                </div>
+                <div class="link-name" ng-bind="menu.name"></div>
+            </div>
+        </a>
+    </div>
+    <div ng-if="userInfo.type==1" class="link-box">
+        <div class="link-title">后台账号</div>
+        <a ng-repeat="menu in userMenu" href="#!/{{menu.memo}}">
+            <div class="link waves-effect waves-dark">
+                <div class="link-icon" ng-style="menu.css">
+                    <i ng-class="menu.icon"></i>
+                </div>
+                <div class="link-name" ng-bind="menu.name"></div>
+            </div>
+        </a>
+    </div>
+</div>

@@ -1,0 +1,105 @@
+<div class="user-dialog">
+    <div ng-if="!companyId" class="dialog-title">添加业务平台</div>
+    <div ng-if="companyId" class="dialog-title">修改业务平台</div>
+    <label class="input-box"><span>平台名称：</span>
+        <input class="input" type="text" maxlength="10" ng-model="company.name" ng-change="error=false" /><i class="color-red ml-1">*</i>
+    </label>
+    <label class="input-box"><span>平台地址：</span>
+        <input class="input" type="text" ng-model="company.url" /></label>
+    <div class="input-box" ng-if="companyId"><span>微信支付平台：</span>
+        WEB:
+        <select style="width: 80px" class="input" type="text" maxlength="10" ng-model="company.wechat_vendor_id">
+            <option value="0">不可用</option>
+            <option ng-repeat="vendor in wechatVendorList" ng-bind="vendorsType[vendor.pay_type]+'('+vendor.no+')'" value="{{vendor.id}}"></option>
+        </select>
+        APP:
+        <select style="width: 80px" class="input" type="text" maxlength="10" ng-model="company.wap_wechat_vendor_id">
+            <option value="0">不可用</option>
+            <option ng-repeat="vendor in wapWechatVendorList" ng-bind="vendorsType[vendor.pay_type]+'('+vendor.no+')'" value="{{vendor.id}}"></option>
+        </select>
+    </div>
+    <div class="input-box" ng-if="companyId"><span>支付宝支付平台：</span>
+        WEB:
+        <select style="width: 80px" class="input" type="text" maxlength="10" ng-model="company.alipay_vendor_id">
+            <option value="0">不可用</option>
+            <option ng-repeat="vendor in alipayVendorList" ng-bind="vendorsType[vendor.pay_type]+'('+vendor.no+')'" value="{{vendor.id}}"></option>
+        </select>
+        APP:
+        <select style="width: 80px" class="input" type="text" maxlength="10" ng-model="company.wap_alipay_vendor_id">
+            <option value="0">不可用</option>
+            <option ng-repeat="vendor in wapAlipayVendorList" ng-bind="vendorsType[vendor.pay_type]+'('+vendor.no+')'" value="{{vendor.id}}"></option>
+        </select>
+    </div>
+    <div class="input-box" ng-if="companyId"><span>QQ钱包支付平台：</span>
+        WEB:
+        <select style="width: 80px" class="input" type="text" maxlength="10" ng-model="company.qq_vendor_id">
+            <option value="0">不可用</option>
+            <option ng-repeat="vendor in qqVendorList" ng-bind="vendorsType[vendor.pay_type]+'('+vendor.no+')'" value="{{vendor.id}}"></option>
+        </select>
+        APP:
+        <select style="width: 80px" class="input" type="text" maxlength="10" ng-model="company.wap_qq_vendor_id">
+            <option value="0">不可用</option>
+            <option ng-repeat="vendor in wapQqVendorList" ng-bind="vendorsType[vendor.pay_type]+'('+vendor.no+')'" value="{{vendor.id}}"></option>
+        </select>
+    </div>
+    <div class="input-box" ng-if="companyId"><span>京东钱包支付平台：</span>
+        WEB:
+        <select style="width: 80px" class="input" type="text" maxlength="10" ng-model="company.jd_vendor_id">
+            <option value="0">不可用</option>
+            <option ng-repeat="vendor in jdVendorList" ng-bind="vendorsType[vendor.pay_type]+'('+vendor.no+')'" value="{{vendor.id}}"></option>
+        </select>
+        APP:
+        <select style="width: 80px" class="input" type="text" maxlength="10" ng-model="company.wap_jd_vendor_id">
+            <option value="0">不可用</option>
+            <option ng-repeat="vendor in wapJdVendorList" ng-bind="vendorsType[vendor.pay_type]+'('+vendor.no+')'" value="{{vendor.id}}"></option>
+        </select>
+    </div>
+    <div class="input-box" ng-if="companyId"><span>百度钱包支付平台：</span>
+        WEB:
+        <select style="width: 80px" class="input" type="text" maxlength="10" ng-model="company.baidu_vendor_id">
+            <option value="0">不可用</option>
+            <option ng-repeat="vendor in baiduVendorList" ng-bind="vendorsType[vendor.pay_type]+'('+vendor.no+')'" value="{{vendor.id}}"></option>
+        </select>
+        APP:
+        <select style="width: 80px" class="input" type="text" maxlength="10" ng-model="company.wap_baidu_vendor_id">
+            <option value="0">不可用</option>
+            <option ng-repeat="vendor in wapBaiduVendorList" ng-bind="vendorsType[vendor.pay_type]+'('+vendor.no+')'" value="{{vendor.id}}"></option>
+        </select>
+    </div>
+    <div class="input-box" ng-if="companyId"><span>银联支付平台：</span>
+        WEB:
+        <select style="width: 80px" class="input" type="text" maxlength="10" ng-model="company.union_vendor_id">
+            <option value="0">不可用</option>
+            <option ng-repeat="vendor in unionVendorList" ng-bind="vendorsType[vendor.pay_type]+'('+vendor.no+')'" value="{{vendor.id}}"></option>
+        </select>
+        APP:
+        <select style="width: 80px" class="input" type="text" maxlength="10" ng-model="company.wap_union_vendor_id">
+            <option value="0">不可用</option>
+            <option ng-repeat="vendor in wapUnionVendorList" ng-bind="vendorsType[vendor.pay_type]+'('+vendor.no+')'" value="{{vendor.id}}"></option>
+        </select>
+    </div>
+    <label class="input-box" ng-if="companyId"><span>网银支付平台：</span>
+        <select class="input" type="text" maxlength="10" ng-model="company.netbank_vendor_id">
+            <option value="0">不可用</option>
+            <option ng-repeat="vendor in netbankVendorList" ng-bind="vendorsType[vendor.pay_type]+'('+vendor.no+')'" value="{{vendor.id}}"></option>
+        </select></label>
+    <label class="input-box" ng-if="companyId"><span>开启多码合一：</span>
+        <input type="radio" value="1" ng-model="company.is_5qrcode" name="is_5qrcode" />是
+        <input type="radio" value="0" ng-model="company.is_5qrcode" name="is_5qrcode" />否
+    </label>
+    <label class="input-box" ng-if="companyId"><span>开启自动入款：</span>
+        <input type="radio" value="1" ng-model="company.is_autorecharge" name="is_autorecharge" />是
+        <input type="radio" value="0" ng-model="company.is_autorecharge" name="is_autorecharge" />否
+    </label>
+    <label class="input-box" ng-if="companyId && company.is_autorecharge==1"><span>自动入款接口：</span>
+        <input class="input" type="text" ng-model="company.autorecharge_url" /><i class="color-red ml-1">*</i>
+        <p align="center" class="color-red">自动入款接口十分重要，请勿随意修改！<br />如遇问题，请咨询技术支持！</p>
+    </label>
+
+    <div align="center" class="color-red" ng-show="error" ng-bind="errorMsg"></div>
+    <div align="center">
+        <button ng-if="!companyId" class="btn btn-green" ng-click="save()">确定</button>
+        <button ng-if="companyId" class="btn btn-green" ng-click="update()">确定</button>
+        <button class="btn btn-default" ng-click="closeThisDialog()">取消</button>
+    </div>
+</div>

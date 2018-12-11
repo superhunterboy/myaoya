@@ -1,0 +1,15 @@
+<div class="user-dialog">
+    <div class="dialog-title">添加充值外链</div>
+    <label class="input-box"><span>出款平台：</span>
+        <select class="input" ng-model="link.platform_id">
+            <option ng-repeat="platform in platformsList" value="{{platform.id}}" ng-bind="payOutType[platform.pay_out_type]+'('+platform.no+')'"></option>
+        </select>
+    </label>
+    <label class="input-box"><span>备注：</span>
+        <input class="input" type="text" ng-model="link.remark" /><i class="color-red">*</i></label>
+    <div align="center" class="color-red" ng-show="error" ng-bind="errorMsg"></div>
+    <div align="center">
+        <button class="btn btn-green" ng-click="sub()">确定</button>
+        <button class="btn btn-default" ng-click="closeThisDialog()">取消</button>
+    </div>
+</div>

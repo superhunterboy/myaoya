@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="zh_cn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="renderer" content="webkit" />
+    <meta http-equiv="renderer" content="webkit" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta http-equiv="X-UA-Compatible" content="chrome=1" />
+    <title>支付管理平台</title>
+    <link rel="shortcut icon" href="favicon.ico"/>
+    <link rel="bookmark" href="/favicon.ico"/>
+    <link rel="stylesheet" href="css/main.css" />
+    <link href="js/waves/waves.min.css" rel="stylesheet">
+    <script src="js/waves/waves.min.js"></script>
+    <script src="js/store2.min.js"></script>
+    <script src="js/angular.min.js"></script>
+    <script src="js/angular-ui-router.min.js"></script>
+    <script src="js/ngDialog.min.js"></script>
+    <script src="js/ocLazyLoad.min.js"></script>
+    <script src="js/jquery.min.js"></script>
+    <script src="js/module.nav.js?v=1.0.2"></script>
+    <script src="js/module.user.js?v=1.0.2"></script>
+    <script src="js/module.app.js?v=1.0.2"></script>
+</head>
+<body ng-app="app">
+<div class="header">
+    <div class="title"><i class="icon-star"></i>管理平台</div>
+    <div nav-active></div>
+    <div user></div>
+</div>
+<nav></nav>
+<div class="view" ui-view></div>
+<script type="text/javascript">
+    Waves.displayEffect();
+</script>
+</body>
+</html>

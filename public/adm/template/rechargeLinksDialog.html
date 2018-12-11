@@ -1,0 +1,57 @@
+<div class="table">
+    <div class="dialog-title">充值外链</div>
+    <div class="table-advanced-search">
+        <div class="advanced-search-box" style="width: 30%">
+            出款平台：
+            <select class="input" ng-model="table.query.platformId">
+                <option value="">全部</option>
+                <option ng-repeat="platform in platformsList" value="{{platform.id}}" ng-bind="payOutType[platform.pay_out_type]+'('+platform.no+')'"></option>
+            </select>
+        </div>
+        <div class="advanced-search-box" style="width: 70%">
+            备注：<input class="input" ng-model="table.query.remark" />
+            <button class="btn btn-green fl-r ml-1" ng-click="addLink()">添加链接</button>
+            <button class="btn btn-default fl-r" ng-click="table.getList(1)">搜索</button>
+        </div>
+    </div>
+    <table>
+        <thead class="table-thead">
+        <tr>
+            <td>出款平台</td>
+            <td>链接</td>
+            <td>备注</td>
+            <td>状态</td>
+            <td>操作</td>
+        </tr>
+        </thead>
+        <tbody>
+        <tr ng-if="!table.ready">
+            <td colspan="5">正在加载。。。</td>
+        </tr>
+        <tr ng-if="table.error">
+            <td colspan="5">获取列表错误，{{table.errorMsg}}<br/>请刷新页面</td>
+        </tr>
+        <tr ng-if="table.ready && !table.error && table.list.length==0">
+            <td colspan="5">没有查询到记录</td>
+        </tr>
+        <tr ng-if="table.ready && !table.error" ng-repeat="list in table.list">
+            <td ng-bind='payOutType[list.platform.pay_out_type]+"("+list.platform.no+")"'></td>
+            <td>
+                <input class="input" id="{{list.token}}" style="width: 350px" readonly value="{{location.origin+'/platformRecharge/'+list.token}}" />
+                <a ng-click="copy(list.token)" class="ml-1">复制</a>
+                <!--<a class="ml-1" target="_blank" href="{{location.origin+'/platformRecharge/'+list.token}}">前往</a>-->
+            </td>
+            <td ng-bind="list.remark"></td>
+            <td ng-class="{0:'color-green',1:'color-red'}[list.status]" ng-bind="['启用中','已禁用'][list.status]"></td>
+            <td>
+                <a class="ml-1" ng-if="list.status==1" ng-click="changeStatus(list)"><i class="icon-start"></i> 启用</a>
+                <a class="ml-1" ng-if="list.status==0" ng-click="changeStatus(list)"><i class="icon-pause"></i> 禁用</a>
+                <a class="ml-1" ng-click="delLink(list)"><i class="icon-delete"></i> 删除</a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <div class="table-num">共查询出 <span ng-bind="table.total"></span> 条记录
+    </div>
+    <div table-page="table"></div>
+</div>

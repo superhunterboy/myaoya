@@ -1,0 +1,79 @@
+<div class="pay-list">
+    <div class="page-title">支付失败记录</div>
+    <div class="table">
+        <table-float-header data-float-element="table-advanced-search" data-float-thead="table-thead"></table-float-header>
+        <div class="table-advanced-search">
+            <label class="advanced-search-box">
+                        <span class="search-box-text">会员账号：</span>
+                        <input  class="input" type="text" maxlength="30" datatype="EN"
+                                ng-model="table.query.account" />
+                </label>
+            <div class="advanced-search-box">
+                <span class="search-box-text">订单号：</span>
+                <input class="input" style="width: 180px" ng-model="table.query.orderNo" />
+            </div>
+            <div class="advanced-search-box">
+                <span class="search-box-text">支付流水号：</span>
+                <input class="input" style="width: 180px" ng-model="table.query.vendorOrderNo" />
+            </div>
+
+        </div>
+        <div class="table-advanced-search">
+            <div class="advanced-search-box">
+                <span class="search-box-text">支付平台：</span>
+                <select class="input" style="width: 162px" ng-model="table.query.vendorType" ng-options="list.id as list.name for list in vendorsTypeList"></select>
+            </div>
+            <div class="advanced-search-box" style="width: 60%">
+                <span class="search-box-text">充值时间(美东)：</span>
+                <input style="width: 150px" onchange="" class="input" datepicker="yyyy-MM-dd HH:mm:ss" max="table.query.endtime"
+                       type="text" ng-model="table.query.startime" /> 至 <input style="width: 150px" onchange=""
+                                                                               class="input" type="text" datepicker="yyyy-MM-dd HH:mm:ss" min="table.query.startime" ng-model="table.query.endtime"/>
+                <button type="button" class="btn btn-default" ng-click="table.ready=false;table.getList(1)">搜索</button>
+            </div>
+        </div>
+        <table>
+            <thead class="table-thead">
+                <tr>
+                    <td>会员名称</td>
+                    <td>支付方式</td>
+                    <td>业务平台</td>
+                    <td>支付平台</td>
+                    <td>充值终端</td>
+                    <td>充值金额</td>
+                    <td>充值时间</td>
+                    <td>订单号</td>
+                    <td>支付流水号</td>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-if="!table.ready">
+                    <td colspan="9">正在加载。。。</td>
+                </tr>
+                <tr ng-if="table.error">
+                    <td colspan="9">获取列表错误，{{table.errorMsg}}<br/>请刷新页面</td>
+                </tr>
+                <tr ng-if="table.ready && !table.error && table.list==0">
+                    <td colspan="9">没有查询到支付记录</td>
+                </tr>
+                <tr ng-if="table.ready && !table.error" ng-repeat="list in table.list">
+                    <td ng-bind="list.user"></td>
+                    <td ng-bind="{'1':'网银','2':'微信','3':'支付宝','4':'QQ钱包','5':'京东','6':'百度','7':'银联','8':'微信APP','9':'支付宝APP','10':'QQ钱包APP','11':'京东APP','12':'百度钱包APP','13':'银联APP'}[list.pay_type]"></td>
+                    <td ng-bind="companyInfo[list.company_id].name"></td>
+                    <td ng-bind="vendorsType[list.vendor_type]"></td>
+                    <td ng-bind="{'0':'','1':'PC端','2':'移动端'}[list.device]"></td>
+                    <td ng-bind="list.money"></td>
+                    <!--td ng-bind="list.created_at"></td-->
+                    <td>{{list.created_at}}(当地)<br/>{{list.created_at_edt}}(美东)</td>
+                    <td ng-bind="list.order_no"></td>
+                    <td ng-bind="list.vendor_order_no"></td>
+                </tr>
+            </tbody>
+        </table>
+        <div class="table-num">共查询出 <span ng-bind="table.total"></span> 条记录，每页显示
+            <select class="input" ng-model="pageSet[payType]" ng-change="setPage()">
+                <option value="10">10</option><option value="20">20</option><option value="50">50</option><option value="100">100</option>
+            </select> 条
+        </div>
+        <div table-page="table"></div>
+    </div>
+</div>

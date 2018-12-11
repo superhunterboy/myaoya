@@ -1,0 +1,33 @@
+<div class="bank-list">
+    <div class="page-title">
+            <span>转到银行卡</span>
+            <div class="page-btn">
+                <a ng-click="editBank()" class="btn btn-green">添加银行</a>
+            </div>
+        </div>
+    <div class="table">
+        <table>
+            <thead class="table-thead">
+            <tr>
+                <td>银行</td>
+                <td>姓名</td>
+                <td>卡号</td>
+                <td>备注</td>
+                <td>操作</td>
+            </tr>
+            </thead>
+            <tbody>
+            <tr ng-repeat="(name,list) in bankList">
+                <td ng-bind="name"></td>
+                <td ng-bind="list.actBank.user_name"></td>
+                <td ng-bind="list.actBank.bank_number"></td>
+                <td ng-bind="list.actBank.address"></td>
+                <td>
+                    <a ng-click="editBank(list)"><i class="icon-edit"></i> 编辑</a>
+                    <a class="ml-1" ng-click="changeBank(list)"><i class="icon-shuaxin"></i> 切换</a>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

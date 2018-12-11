@@ -1,0 +1,29 @@
+<div class="qr-dialog">
+    <div ng-if="!id" class="dialog-title">添加二维码</div>
+    <div ng-if="id" class="dialog-title">修改二维码</div>
+    <label class="dialog-input" style="margin-top:10px;">
+        <span>微信号：</span>
+        <input ng-if="count==0" class="input" type="text" maxlength="20" ng-model="qrcode.wechat" ng-change="error=false" />
+        <input ng-if="count>0" class="input" type="text" ng-model="qrcode.wechat" readonly />
+        <i ng-if="count==0" class="color-red ml-1">*</i>
+    </label>
+    <label class="dialog-input">
+        <span>限额：</span>
+        <input class="input" type="text" ng-model="qrcode.limit"  onkeyup="this.value=this.value.replace(/[^\d{1,}\.\d{1,}|\d{1,}]/g,'')"
+        onafterpaste="this.value=this.value.replace(/[^\d{1,}\.\d{1,}|\d{1,}]/g,'')" />
+    </label>
+    <div class="dialog-input">
+        <span>二维码：</span>
+        <div class="input-box img-box">
+            <input ng-if="count==0" type="file" img-upload="qrcode.content" accept="image/gif,image/jpeg,image/jpg,image/png" />
+            <div ng-if="count==0" class="img-mask">点击上传二维码<br>建议尺寸：300x300</div>
+            <img class="qr-img" ng-src="{{qrcode.url}}" />
+        </div>
+    </div>
+    <div align="center" class="color-red" ng-show="error" ng-bind="errorMsg"></div>
+    <div align="center">
+        <button ng-if="!id" class="btn btn-green" ng-click="save()">确定</button>
+        <button ng-if="id" class="btn btn-green" ng-click="update()">确定</button>
+        <button class="btn" ng-click="closeThisDialog()">取消</button>
+    </div>
+</div>
