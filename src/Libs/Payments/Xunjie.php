@@ -13,10 +13,10 @@ class Xunjie implements WMPay
      */
     public $paymentType = [
         1  => [ //微信扫码
-            '0122' => '微信扫码',
+            '0101' => '微信扫码',
         ],
         2  => [ //支付宝扫码
-            '0103' => '支付宝扫码',
+            '0103' => '支付宝扫码',    //0103 支付宝扫码  0132 支付宝网关扫码（原）
         ],
         3  => [ //网银
             'PSBC' => '邮储银行',
@@ -42,8 +42,10 @@ class Xunjie implements WMPay
         7  => [ //银联扫码
         ],
         8  => [ //微信WAP
+          '0121' => '微信WAP',
         ],
         9  => [ //支付宝WAP
+          '0131' => '支付宝WAP',
         ],
         10 => [ //QQWAP
         ],
@@ -53,6 +55,24 @@ class Xunjie implements WMPay
         ],
         13 => [ //银联WAP
         ],
+    ];
+
+    /**
+     * 网银充值
+     */
+    public static $aNetbank = [
+        'PSBC' => 'psbc.png', //邮储银行
+        'ABC'  => 'abc.png', //农业银行
+        'ICBC' => 'icbc.png', //工商银行
+        'BOC'  => 'boc.png', //中国银行
+        'CCB'  => 'ccb.png', //建设银行
+        'BOCM' => 'bcm.png', //交通银行
+        'CEBB' => 'ceb.png', //光大银行
+        'CMBC' => 'cmbc.png', //民生银行
+        'GDB'  => 'gdb.png', //广发银行
+        'CMB'  => 'cmb.png', //招商银行
+        'BOS'  => 'bsh.png', //上海银行
+        'BOB'  => 'bccb.png', //北京银行
     ];
 
     /**
@@ -145,17 +165,10 @@ class Xunjie implements WMPay
      */
     public function signature($payType, $money, $orderId)
     {
+
         $this->orderNo = $orderId;
         $this->money   = $money * 100; // 分
-        if($payType=='0122')
-        {
-            $i = mt_rand(0,99);
-            if($i<10)
-            {
-                $i = '0'.$i;
-            }
-            $this->money   = intval($money.$i); // 分
-        }
+
         $this->params = [
             'version'         => '1.0.0',
             'transType'       => 'SALES',
@@ -170,14 +183,14 @@ class Xunjie implements WMPay
             'commodityDetail' => 'CZ', // 描述
         ];
 
-        if (in_array($payType, ['0122', '0102', '0103'])) {
+        if (in_array($payType, ['0101', '0102', '0131', '0121', '0103'])) {
             unset($this->params['returnUrl']);
             unset($this->params['bankCode']);
             $this->params['productId'] = $payType;
         } else {
             $this->params['productId'] = '0001';
         }
-        if($payType=='0122')
+        if($payType=='0101' || $payType=='0121' || $payType=='0131' || $payType=='0103')
         {
             $this->params['salesType'] = '0';
             $this->params['returnUrl'] = $this->notifyUrl;
@@ -185,7 +198,6 @@ class Xunjie implements WMPay
         $temp = $this->getSignStr($this->params);
 
         $this->params['signature'] = Utils::rsaSign_string($temp, $this->priKey);
-
         return $this;
     }
 
@@ -197,6 +209,7 @@ class Xunjie implements WMPay
          //print_r($this->params);die;
         $client = new Client();
         $res    = $client->request('POST', $this->getwayUrl, ['form_params' => $this->params]);
+
         if ($res->getStatusCode() == '200') {
             $resData = '';
             $body    = $res->getBody();
@@ -211,14 +224,13 @@ class Xunjie implements WMPay
                     $resArr = json_decode($resData, true);
                     if ($this->verifySign($resArr) && isset($resArr['respCode']) && $resArr['respCode'] == 'P000') {
                         $payQRCode    = $resArr['payQRCode'] ?? '';
-                        $payQRCodeUrl = $resArr['payQRCodeUrl'] ?? '';
                         $qrcodeUrl    = Utils::getQrcode($payQRCode);
                         return 'http://' . $_SERVER['HTTP_HOST'] . '/payment/scancode?trade_no=' . $this->orderNo . '&fee=' . sprintf("%.2f", $this->money / 100) . '&qrcode=' . urlencode($qrcodeUrl) . '&codeurl=' . urlencode($payQRCode);
                     } else {
-                        return json_encode(['order' => $this->orderNo]);
+                        return json_encode(['status' => 1,'msg' => $resArr['respDesc']]);
                     }
                 } else {
-                    return json_encode(['order' => $this->orderNo]);
+                    return json_encode(['status' => 1,'msg' => '充值返回信息异常']);
                 }
             }
         }

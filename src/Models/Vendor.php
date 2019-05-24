@@ -29,6 +29,8 @@ class Vendor extends Eloquent
         'wap_baidu',
         'union',
         'wap_union',
+        'yun',
+        'wap_yun',
     ];
 
     /**

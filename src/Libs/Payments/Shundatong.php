@@ -119,7 +119,6 @@ class Shundatong implements WMPay
         ksort($this->params, SORT_STRING);
         $this->params['signStr'] = $this->getSignStr($this->params);
         $this->params['sign']    = Utils::rsaSign_string($this->params['signStr'], $this->priKey);
-        file_put_contents("/var/www/html/aoya/logs/1.txt",var_export($this->params,true));
         unset($this->params['pubKey'], $this->params['signStr']);
 
         return $this;

@@ -1,0 +1,39 @@
+<div ng-if="userInfo.permissions.split(',').indexOf('8')>-1" class="user-list">
+    <div class="page-title">
+        <span>支付显示设置</span>
+    </div>
+
+    <div class="table">
+        <table>
+            <thead>
+                <tr>
+                    <td>支付方式</td>
+                    <td>英文标识</td>
+                    <td>状态</td>
+                    <td>操作</td>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-if="!table.ready">
+                    <td colspan="7">正在加载。。。</td>
+                </tr>
+                <tr ng-if="table.error">
+                    <td colspan="7">获取列表错误，{{table.errorMsg}}<br/>请刷新页面</td>
+                </tr>
+                <tr ng-if="table.ready && !table.error && table.list==0">
+                    <td colspan="7">没有查询到内容</td>
+                </tr>
+                <tr ng-if="table.ready && !table.error" ng-repeat="list in table.list">
+                    <td ng-bind="list.payname"></td>
+                    <td ng-bind="list.keys"></td>
+                    <td ng-bind="{'1':'禁用','2':'启用'}[list.status]"></td>
+                    <td >
+                        <a class="ml-1" ng-if="list.status==1" ng-click="act(list,2)"><i class="icon-start"></i> 启用</a>
+                        <a class="ml-1" ng-if="list.status==2" ng-click="act(list,1)"><i class="icon-pause"></i> 禁用</a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+<div ng-if="userInfo.permissions.split(',').indexOf('8')<0" style="margin-top: 30px;text-align: center">无访问权限</div>

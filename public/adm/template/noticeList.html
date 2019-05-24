@@ -1,4 +1,4 @@
-<div class="user-list">
+<div ng-if="userInfo.permissions.split(',').indexOf('31')>-1" class="user-list">
     <div class="page-title">
         <span>公告管理</span>
         <div class="page-btn">
@@ -47,3 +47,4 @@
         <div table-page="table"></div>
     </div>
 </div>
+<div ng-if="userInfo.permissions.split(',').indexOf('31')<0" style="margin-top: 30px;text-align: center">无访问权限</div>

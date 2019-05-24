@@ -1,9 +1,9 @@
-<div style="min-width:1440px;">
+<div ng-if="userInfo.permissions.split(',').indexOf('26')>-1" style="min-width:1440px;">
     <div class="page-title">
         <span>出款平台列表</span>
         <div class="page-btn">
-            <a ng-click="editPlatform()" ng-if="userInfo.type==1" class="btn btn-green">添加出款平台配置</a>
-            <a ng-click="rechargeLinks()" ng-if="userInfo.type==1 || userInfo.type==3" class="btn btn-blue">充值外链</a>
+            <a ng-click="editPlatform()" class="btn btn-green">添加出款平台配置</a>
+            <a ng-click="rechargeLinks()" class="btn btn-blue">充值外链</a>
         </div>
     </div>
 
@@ -98,3 +98,4 @@
         <div table-page="table"></div>
     </div>
 </div>
+<div ng-if="userInfo.permissions.split(',').indexOf('26')<0" style="margin-top: 30px;text-align: center">无访问权限</div>

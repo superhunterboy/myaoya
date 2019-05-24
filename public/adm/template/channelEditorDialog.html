@@ -1,0 +1,67 @@
+<div class="user-dialog">
+        <div ng-if="!paymentChannelId" class="dialog-title">添加支付渠道</div>
+        <div ng-if="paymentChannelId" class="dialog-title">修改支付渠道</div>
+        <label class="input-box">
+            <span>支付平台：</span>
+            <input class="input" type="text" ng-model="paymentChannelObject.platform" />
+        </label>
+        <label class="input-box"><span>平台标识：</span>
+            <input class="input" type="text" ng-model="paymentChannelObject.platform_identifer" />
+        </label>
+        <label class="input-box"><span>支付方式：</span>
+            <select class="input" ng-model="paymentChannelObject.channel">
+                <option ng-repeat="paymentMethod in paymentMethodList" value="{{paymentMethod.tag}}" ng-bind="paymentMethod.name"></option>
+            </select>
+        </label>
+        <label class="input-box"><span>支付代码：</span>
+            <input class="input" type="text" ng-model="paymentChannelObject.paycode" />
+        </label>
+        <label class="input-box"><span>前台显示名称：</span>
+            <input class="input" type="text" ng-model="paymentChannelObject.display_name" />
+        </label>
+        <label class="input-box"><span>运用场景：</span>
+            <input type="radio" name="paymentChannel_position" ng-model="paymentChannelObject.position" ng-value="1" ng-change="channelPosition()"/>线上
+            <input type="radio" name="paymentChannel_position" ng-model="paymentChannelObject.position" ng-value="2" ng-change="channelPosition()"/>线下
+        </label>
+        <div ng-if="paymentChannelObject.position === 1">
+            <label class="input-box"><span>商户编号：</span>
+                <input class="input" type="text" ng-model="paymentChannelObject.merchant_no" />
+            </label>
+            <label class="input-box">
+                <span>商户Key：</span>
+                <textarea class="input" rows="3" ng-model="paymentChannelObject.key"></textarea>
+            </label>
+            <label class="input-box"><span>异步通知地址：</span>
+                <input class="input" type="text" ng-model="paymentChannelObject.callback_url" />
+            </label>
+            <label class="input-box"><span>同步通知地址：</span>
+                <input class="input" type="text" ng-model="paymentChannelObject.notify_url" />
+            </label>
+            <label class="input-box"><span>金额范围：</span>
+                <input class="input" type="text" ng-model="paymentChannelObject.deposit_range" />
+            </label>
+        </div>
+        <div ng-if="paymentChannelObject.position === 2">
+            <label class="input-box"><span>线下场景：</span>
+                <input type="radio" name="paymentChannel_offLineCategory" ng-model="paymentChannelObject.offline_category" ng-value="'scanCode'"/>扫码支付
+                <input type="radio" name="paymentChannel_offLineCategory" ng-model="paymentChannelObject.offline_category" ng-value="'addFriend'"/>加好友
+                <input type="radio" name="paymentChannel_offLineCategory" ng-model="paymentChannelObject.offline_category" ng-value="'transfer'"/>银行转账
+            </label>
+        </div>
+        <label class="input-box"><span>状态：</span>
+            <input type="radio" name="paymentChannel_status" ng-model="paymentChannelObject.status" ng-value="0"/>禁用
+            <input type="radio" name="paymentChannel_status" ng-model="paymentChannelObject.status" ng-value="1"/>启用
+        </label>
+        <label class="input-box"><span>排序：</span>
+            <input class="input" type="number" ng-model="paymentChannelObject.sequence" />
+        </label>
+        <label class="input-box"><span>备注：</span>
+            <input class="input" type="text" ng-model="paymentChannelObject.remark" />
+        </label>
+        <div ng-class="{true: 'err-message_show', false: 'err-message_hide'}[error]" ng-bind="errorMsg"></div>
+        <div align="center">
+            <button ng-if="!paymentChannelId" class="btn btn-green" ng-click="save()">确定</button>
+            <button ng-if="paymentChannelId" class="btn btn-green" ng-click="update()">确定</button>
+            <button class="btn btn-default" ng-click="closeThisDialog()">取消</button>
+        </div>
+    </div>

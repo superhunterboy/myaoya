@@ -162,6 +162,39 @@ $app->put('/admin/vendors/{id:[0-9]+}', \Weiming\Controllers\VendorController::c
 // 查询支付平台
 $app->get('/admin/vendors', \Weiming\Controllers\VendorController::class . ':queryVendors');
 
+// 前台拉取支付渠道列表
+$app->get('/pullPaymentChannels/{account:[a-zA-Z0-9_@]+}/{position:[1-2]+}', \Weiming\Controllers\PaymentChannelController::class . ':pullPaymentChannels');
+
+// 前端支付接口--新版
+$app->post('/doPayment', \Weiming\Controllers\PaymentController::class . ':doPayment');
+
+// 支付渠道列表
+$app->get('/admin/getPaymentChannels', \Weiming\Controllers\PaymentChannelController::class . ':getPaymentChannels');
+
+// 新增支付渠道
+$app->post('/admin/addPaymentChannel', \Weiming\Controllers\PaymentChannelController::class . ':addPaymentChannel');
+
+// 删除支付渠道
+$app->delete('/admin/delPaymentChannel[/{id:.*}]', \Weiming\Controllers\PaymentChannelController::class . ':delPaymentChannel');
+
+// 更新支付渠道
+$app->put('/admin/updatePaymentChannel/{id:[0-9]+}', \Weiming\Controllers\PaymentChannelController::class . ':updatePaymentChannel');
+
+// 更新支付渠道状态
+$app->put('/admin/switchStatus/{id:[0-9]+}', \Weiming\Controllers\PaymentChannelController::class . ':switchStatus');
+
+// 支付方式列表
+$app->get('/admin/channels', \Weiming\Controllers\ChannelController::class . ':getChannels');
+
+// 新增支付方式
+$app->post('/admin/addChannel', \Weiming\Controllers\ChannelController::class . ':addChannel');
+
+// 删除支付方式
+$app->delete('/admin/delChannel[/{id:.*}]', \Weiming\Controllers\ChannelController::class . ':delChannel');
+
+// 更新支付方式
+$app->put('/admin/updateChannel/{id:[0-9]+}', \Weiming\Controllers\ChannelController::class . ':updateChannel');
+
 // 查询账单列表接口
 $app->get('/admin/pays', \Weiming\Controllers\PayController::class . ':queryPays');
 
@@ -175,6 +208,9 @@ $app->post('/admin/auth/login', \Weiming\Controllers\AuthController::class . ':l
 
 // 后台用户退出
 $app->get('/admin/auth/logout', \Weiming\Controllers\AuthController::class . ':logout');
+
+// 统一数据接口路由
+$app->get('/data/getChartData', \Weiming\Controllers\DataController::class . ':getChartData');
 
 // 前台充值页面数据渲染接口
 $app->get('/payment/getPayInfo/{id:[0-9]+}', \Weiming\Controllers\PaymentController::class . ':getPayInfo');
@@ -199,9 +235,15 @@ $app->get('/admin/deleteAffiche/{id:[0-9]+}', \Weiming\Controllers\AfficheContro
 
 // 后台获取公告信息
 $app->get('/admin/affiches', \Weiming\Controllers\AfficheController::class . ':affiches');
-
+// 支付开关
+$app->get('/admin/paymenu', \Weiming\Controllers\AfficheController::class . ':paymenu');
+//更新支付开关
+$app->post('/admin/paymenustatus/{id:[0-9]+}', \Weiming\Controllers\AfficheController::class . ':paymenustatus');
 // 前台获取公告信息
 $app->get('/affiche', \Weiming\Controllers\AfficheController::class . ':affiche');
+
+/* 爬虫服务器 通知接口改变订单状态 */
+$app->post('/Sprdercallback', \Weiming\Controllers\SprdercallbackController::class . ':updatestatus');
 
 // 支付后端回调接口
 $app->map(['GET', 'POST'], '/payment/callback', \Weiming\Controllers\PaymentController::class . ':callbackUrl');
@@ -322,6 +364,12 @@ $app->map(['GET', 'POST'], '/payment/wufu/callback', \Weiming\Controllers\WufuCo
 
 // 五福支付通知
 $app->map(['GET', 'POST'], '/payment/wufu/notify', \Weiming\Controllers\WufuController::class . ':notify');
+
+// 万德支付回掉
+$app->map(['GET', 'POST'], '/payment/wande/callback', \Weiming\Controllers\WandeController::class . ':callback');
+
+// 万德支付通知
+$app->map(['GET', 'POST'], '/payment/wande/notify', \Weiming\Controllers\WandeController::class . ':notify');
 
 // pppay支付回掉
 $app->map(['GET', 'POST'], '/payment/pppay/callback', \Weiming\Controllers\PppayController::class . ':callback');
@@ -468,10 +516,10 @@ $app->map(['GET', 'POST'], '/payment/wpay/notify', \Weiming\Controllers\WpayCont
 $app->map(['GET', 'POST'], '/payment/hengxing/callback', \Weiming\Controllers\HengxingController::class . ':callback');
 
 // 众信支付回调
-$app->map(['GET', 'POST'], '/payment/zhongxin/callback', \Weiming\Controllers\ZhongxinController::class . ':callback');
+$app->map(['GET', 'POST'], '/payment/zhongxin/callback', \Weiming\Controllers\ZhongxinnewController::class . ':callback');
 
 // 众信支付通知
-$app->map(['GET', 'POST'], '/payment/zhongxin/notify', \Weiming\Controllers\ZhongxinController::class . ':notify');
+$app->map(['GET', 'POST'], '/payment/zhongxin/notify', \Weiming\Controllers\ZhongxinnewController::class . ':notify');
 
 // 星捷支付回调
 $app->map(['GET', 'POST'], '/payment/xingjie/callback', \Weiming\Controllers\XingjieController::class . ':callback');
@@ -488,8 +536,41 @@ $app->map(['GET', 'POST'], '/payment/yuntong/notify', \Weiming\Controllers\Yunto
 // 迅捷付回调
 $app->map(['GET', 'POST'], '/payment/xunjie/callback', \Weiming\Controllers\XunjieController::class . ':callback');
 
+// 短信通知回调
+$app->post('/payment/vpay/notify', \Weiming\Controllers\VPayController::class . ':notify');
+
 // 迅捷付通知
 $app->map(['GET', 'POST'], '/payment/xunjie/notify', \Weiming\Controllers\XunjieController::class . ':notify');
+
+//豪富付回调
+$app->map(['GET', 'POST'], '/payment/fhpay/callback', \Weiming\Controllers\FhPayController::class . ':callback');
+
+// 豪富付通知
+$app->map(['GET', 'POST'], '/payment/fhpay/notify', \Weiming\Controllers\FhPayController::class . ':notify');
+
+// 个付回调
+$app->map(['GET', 'POST'], '/payment/gefu/callback', \Weiming\Controllers\GefuController::class . ':callback');
+
+// 个付通知
+$app->map(['GET', 'POST'], '/payment/gefu/notify', \Weiming\Controllers\GefuController::class . ':notify');
+
+// 善融回调
+$app->map(['GET', 'POST'], '/payment/shanrong/callback', \Weiming\Controllers\ShanrongController::class . ':callback');
+
+// 善融通知
+$app->map(['GET', 'POST'], '/payment/shanrong/notify', \Weiming\Controllers\ShanrongController::class . ':notify');
+
+// 酷呗回调
+$app->map(['GET', 'POST'], '/payment/jrsjpay/callback', \Weiming\Controllers\JrsjPayController::class . ':callback');
+
+// 酷呗通知
+$app->map(['GET', 'POST'], '/payment/jrsjpay/notify', \Weiming\Controllers\JrsjPayController::class . ':notify');
+
+// 百盛回调
+$app->map(['GET', 'POST'], '/payment/baisheng/callback', \Weiming\Controllers\BaishengController::class . ':callback');
+
+// 百盛通知
+$app->map(['GET', 'POST'], '/payment/baisheng/notify', \Weiming\Controllers\BaishengController::class . ':notify');
 
 // 盖亚付回调
 $app->map(['GET', 'POST'], '/payment/gaiya/callback', \Weiming\Controllers\GaiyaController::class . ':callback');
@@ -508,6 +589,65 @@ $app->map(['GET', 'POST'], '/payment/az/callback', \Weiming\Controllers\AzContro
 
 // AZ通知
 $app->map(['GET', 'POST'], '/payment/az/notify', \Weiming\Controllers\AzController::class . ':notify');
+
+$app->map(['GET', 'POST'], '/payment/haitu/callback', \Weiming\Controllers\HaituController::class . ':callback');
+
+// AZ通知
+$app->map(['GET', 'POST'], '/payment/haitu/notify', \Weiming\Controllers\HaituController::class . ':notify');
+
+// Yf回调
+$app->map(['GET', 'POST'], '/payment/yf/callback', \Weiming\Controllers\YfPayController::class . ':callback');
+
+// Yf通知
+$app->map(['GET', 'POST'], '/payment/yf/notify', \Weiming\Controllers\YfPayController::class . ':notify');
+
+// Aibide回调
+$app->map(['GET', 'POST'], '/payment/aibide/callback', \Weiming\Controllers\AibidePayController::class . ':callback');
+
+// Aibide通知
+$app->map(['GET', 'POST'], '/payment/aibide/notify', \Weiming\Controllers\AibidePayController::class . ':notify');
+
+// 广付通回调
+$app->map(['GET', 'POST'], '/payment/gft/callback', \Weiming\Controllers\GftController::class . ':callback');
+
+// 广付通通知
+$app->map(['GET', 'POST'], '/payment/gft/notify', \Weiming\Controllers\GftController::class . ':notify');
+
+// 联胜回调
+$app->map(['GET', 'POST'], '/payment/ls/callback', \Weiming\Controllers\LsController::class . ':callback');
+
+// 联胜通知
+$app->map(['GET', 'POST'], '/payment/ls/notify', \Weiming\Controllers\LsController::class . ':notify');
+
+// 百汇回调
+$app->map(['GET', 'POST'], '/payment/bh/callback', \Weiming\Controllers\BhController::class . ':callback');
+
+// 百汇通知
+$app->map(['GET', 'POST'], '/payment/bh/notify', \Weiming\Controllers\BhController::class . ':notify');
+
+// 创优回调
+$app->map(['GET', 'POST'], '/payment/cy/callback', \Weiming\Controllers\CyController::class . ':callback');
+
+// 创优通知
+$app->map(['GET', 'POST'], '/payment/cy/notify', \Weiming\Controllers\CyController::class . ':notify');
+
+// 众鑫回调
+$app->map(['GET', 'POST'], '/payment/zhongxinnew/callback', \Weiming\Controllers\ZhongxinnewController::class . ':callback');
+
+// 众鑫通知
+$app->map(['GET', 'POST'], '/payment/zhongxinnew/notify', \Weiming\Controllers\ZhongxinnewController::class . ':notify');
+
+// 大牛
+$app->map(['GET', 'POST'], '/payment/daniu/callback', \Weiming\Controllers\DaniuController::class . ':callback');
+
+// 大牛
+$app->map(['GET', 'POST'], '/payment/daniu/notify', \Weiming\Controllers\DaniuController::class . ':notify');
+
+// NNH回调
+$app->map(['GET', 'POST'], '/payment/nhh/callback', \Weiming\Controllers\NhhController::class . ':callback');
+
+// NNH通知
+$app->map(['GET', 'POST'], '/payment/nhh/notify', \Weiming\Controllers\NhhController::class . ':notify');
 
 // 闪亿回调
 $app->map(['GET', 'POST'], '/payment/shanyi/callback', \Weiming\Controllers\ShanyiController::class . ':callback');
@@ -550,6 +690,24 @@ $app->map(['GET', 'POST'], '/payment/ylsl/callback', \Weiming\Controllers\YlslCo
 
 // ylsl通知
 $app->map(['GET', 'POST'], '/payment/ylsl/notify', \Weiming\Controllers\YlslController::class . ':notify');
+
+// ly回调
+$app->map(['GET', 'POST'], '/payment/ly/callback', \Weiming\Controllers\LyController::class . ':callback');
+
+// ly通知
+$app->map(['GET', 'POST'], '/payment/ly/notify', \Weiming\Controllers\LyController::class . ':notify');
+
+// Wenpay回调
+$app->map(['GET', 'POST'], '/payment/wenpay/callback', \Weiming\Controllers\WenPayController::class . ':callback');
+
+// Wopay通知
+$app->map(['GET', 'POST'], '/payment/wopay/notify', \Weiming\Controllers\WoPayController::class . ':notify');
+
+// Wopay回调
+$app->map(['GET', 'POST'], '/payment/wopay/callback', \Weiming\Controllers\WoPayController::class . ':callback');
+
+// Wenpay通知
+$app->map(['GET', 'POST'], '/payment/wenpay/notify', \Weiming\Controllers\WenPayController::class . ':notify');
 
 // $app->get('/admin/testLogger', \Weiming\Controllers\TestController::class . ':testLogger');
 // $app->get('/testPayOut', \Weiming\Controllers\PayOutController::class . ':testPayOut');
@@ -627,6 +785,8 @@ $app->post('/admin/updateOfflinePayStatus/{id:[0-9]+}', \Weiming\Controllers\Off
 
 //获取QQ二维码
 $app->get('/getSingleQQ', \Weiming\Controllers\SingleQrcodeController::class . ':getSingleQQ');
+//获取云闪付二维码
+$app->get('/getSingleYUN', \Weiming\Controllers\SingleQrcodeController::class . ':getSingleYUN');
 //获取微信二维码
 $app->get('/getSingleWechat', \Weiming\Controllers\SingleQrcodeController::class . ':getSingleWechat');
 //获取支付宝收款二维码
@@ -636,7 +796,7 @@ $app->post('/admin/addSingleQrcode', \Weiming\Controllers\SingleQrcodeController
 //更新个人二维码
 $app->post('/admin/updateSingleQrcode/{id:[0-9]+}', \Weiming\Controllers\SingleQrcodeController::class . ':updateSingleQrcode');
 //个人二维码列表
-$app->get('/admin/singleQrcodes/{type:[1-2-3]}', \Weiming\Controllers\SingleQrcodeController::class . ':singleQrcodes');
+$app->get('/admin/singleQrcodes/{type:[1-2-3-4]}', \Weiming\Controllers\SingleQrcodeController::class . ':singleQrcodes');
 //删除个人二维码
 $app->get('/admin/deleteSingleQrcode/{id:[0-9,]+}', \Weiming\Controllers\SingleQrcodeController::class . ':deleteSingleQrcode');
 //添加商户
@@ -750,6 +910,12 @@ $app->map(['GET', 'POST'], '/recharge/zesheng/callback', \Weiming\Controllers\Re
 // 泽圣付充值通知
 $app->map(['GET', 'POST'], '/recharge/zesheng/notify', \Weiming\Controllers\Recharges\ZeshengController::class . ':notify');
 
+// 泽圣付充值回调
+$app->post('/recharge/gppay/callback', \Weiming\Controllers\Recharges\GppayController::class . ':callback');
+
+// 泽圣付充值通知
+$app->post('/recharge/gppay/notify', \Weiming\Controllers\Recharges\GppayController::class . ':notify');
+
 // 新金海哲充值回调
 $app->map(['GET', 'POST'], '/recharge/jinhaizhe/callback', \Weiming\Controllers\Recharges\JinhaizheNewController::class . ':callback');
 
@@ -804,6 +970,12 @@ $app->map(['GET', 'POST'], '/recharge/xunjie/callback', \Weiming\Controllers\Rec
 // 迅捷付通知
 $app->map(['GET', 'POST'], '/recharge/xunjie/notify', \Weiming\Controllers\Recharges\XunjieController::class . ':notify');
 
+// 百胜回调
+$app->map(['GET', 'POST'], '/recharge/baisheng/callback', \Weiming\Controllers\Recharges\BaishengController::class . ':callback');
+
+// 百胜付通知
+$app->map(['GET', 'POST'], '/recharge/baisheng/notify', \Weiming\Controllers\Recharges\BaishengController::class . ':notify');
+
 // 盖亚付回调
 $app->map(['GET', 'POST'], '/recharge/gaiya/callback', \Weiming\Controllers\Recharges\GaiyaController::class . ':callback');
 
@@ -831,13 +1003,13 @@ $app->get('/admin/deletePayOutLimit/{id:[0-9]+}', \Weiming\Controllers\PayOutLim
 // 全自动出款，Linux crontab定时扫描处理中的单子，加入队列中处理
 $app->get('/checkPayOutStatus', \Weiming\Controllers\PayOutController::class . ':checkPayOutStatus');
 
-$app->post('/getWhelloteList', \Weiming\Controllers\ConfigController::class . ':getWhelloteList');
+$app->post('/admin/getWhelloteList', \Weiming\Controllers\ConfigController::class . ':getWhelloteList');
 
-$app->post('/updateWhelloteList', \Weiming\Controllers\ConfigController::class . ':updateWhelloteList');
+$app->post('/admin/updateWhelloteList', \Weiming\Controllers\ConfigController::class . ':updateWhelloteList');
 
-$app->post('/getSms', \Weiming\Controllers\ConfigController::class . ':getSms');
+$app->post('/admin/getSms', \Weiming\Controllers\ConfigController::class . ':getSms');
 
-$app->post('/updateSms', \Weiming\Controllers\ConfigController::class . ':updateSms');
+$app->post('/admin/updateSms', \Weiming\Controllers\ConfigController::class . ':updateSms');
 
 $app->get('/admin/rechargeLinks', \Weiming\Controllers\RechargeLinkController::class . ':rechargeLinks');
 

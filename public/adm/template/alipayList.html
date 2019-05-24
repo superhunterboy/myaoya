@@ -1,4 +1,4 @@
-<div class="pay-list">
+<div ng-if="userInfo.permissions.split(',').indexOf('3')>-1" class="pay-list">
     <div class="page-title">支付宝加好友记录</div>
     <div class="table">
         <table-float-header data-float-element="table-advanced-search" data-float-thead="table-thead"></table-float-header>
@@ -69,3 +69,4 @@
         <div table-page="table"></div>
     </div>
 </div>
+<div ng-if="userInfo.permissions.split(',').indexOf('3')<0" style="margin-top: 30px;text-align: center">无访问权限</div>

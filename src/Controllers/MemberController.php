@@ -12,10 +12,11 @@ use \Weiming\Models\Member;
 use \Weiming\Models\ReportArtificialDeposit;
 use \Weiming\Models\ReportPayCompany;
 use \Weiming\Models\ReportPayOnline;
+use \Weiming\Models\Pay;
 
 class MemberController extends BaseController
 {
-    /**
+    /** `````````
      * @api {post} /getMemberRecharge 获取会员充值记录
      * @apiName GetMemberRecharge
      * @apiGroup Member
@@ -60,21 +61,74 @@ class MemberController extends BaseController
      */
     public function getMemberRecharge(Request $request, Response $response, $args)
     {
-        $result    = ['status' => 1, 'msg' => '', 'data' => []];
+
+        //$result    = ['status' => 1, 'msg' => '', 'data' => []];
         $postDatas = $request->getParsedBody();
+
+
         $account   = $postDatas['account'] ?? '';
-        $datetime  = $postDatas['datetime'] ?? ''; // 需要转换为美东时间
-        if ($account && $datetime) {
-            $datetime          = Utils::myGMDate('Y-m-d H:i:s', strtotime($datetime), -4);
-            $payOnline         = ReportPayOnline::select(['id', 'account', 'amount', 'order_no', 'time'])->whereRaw("`account` = '{$account}' AND `time` >= '{$datetime}'")->orderBy('time', 'ASC')->get();
-            $payCompany        = ReportPayCompany::selectRaw("`id`, `account`, `amount`, `order_no`, `operation_datetime` AS `time`")->whereRaw("`account` = '{$account}' AND `operation_datetime` >= '{$datetime}'")->orderBy('operation_datetime', 'ASC')->get();
-            $artificialDeposit = ReportArtificialDeposit::select(['id', 'account', 'amount', 'order_no', 'time'])->whereRaw("`account` = '{$account}' AND `time` >= '{$datetime}'")->orderBy('time', 'ASC')->get();
+        $start  = $postDatas['start'] ?? '';
+        $end  = $postDatas['end'] ?? '';
+
+        if ($account ) {
+            $starttime          = date('Y-m-d H:i:s',strtotime('-12 hours', strtotime(date('Y-m-d 00:00:00'))));
+            $endtime            = date('Y-m-d H:i:s',strtotime('-12 hours', strtotime(date('Y-m-d 23:59:59'))));
+            $start              = Utils::myGMDate('Y-m-d H:i:s', strtotime($start), -4);
+            $end                = Utils::myGMDate('Y-m-d H:i:s', strtotime($end), -4);
+
+            $payOnline         = ReportPayOnline::selectRaw('account AS user, amount AS money, order_no, time AS pay_datetime')->whereRaw("account = '{$account}' AND time >= '{$starttime}' AND time <= '{$endtime}' ")->orderBy('time', 'ASC')->get();
+            $payCompany        = ReportPayCompany::selectRaw("account AS user, amount AS money, order_no, operation_datetime AS pay_datetime")->whereRaw("account = '{$account}' AND operation_datetime >= '{$starttime}' AND operation_datetime <= '{$endtime}'")->orderBy('operation_datetime', 'ASC')->get();
+            $artificialDeposit = ReportArtificialDeposit::select('account AS user, amount AS money, order_no, time AS pay_datetime')->whereRaw("account = '{$account}' AND time >= '{$starttime}' AND time <= '{$endtime}'")->orderBy('time', 'ASC')->get();
+            $payList=[];
+            if(count($payOnline))
+            {
+              $payList = array_merge($payList,$payOnline->toArray());
+            }
+            if(count($payCompany))
+            {
+              $payList = array_merge($payList,$payCompany->toArray());
+            }
+            if(count($artificialDeposit))
+            {
+              $payList = array_merge($payList,$artificialDeposit->toArray());
+            }
+
+            $payOnlineTotalAmount         = ReportPayOnline::whereRaw("account = '{$account}' AND time >= '{$starttime}' AND time <= '{$endtime}' ")->sum('amount');
+            $payCompanyTotalAmount        = ReportPayCompany::whereRaw("account = '{$account}' AND operation_datetime >= '{$starttime}' AND operation_datetime <= '{$endtime}'")->sum('amount');
+            $artificialDepositTotalAmount = ReportArtificialDeposit::whereRaw("account = '{$account}' AND time >= '{$starttime}' AND time <= '{$endtime}'")->sum('amount');
+            $paysum = $payOnlineTotalAmount+$payCompanyTotalAmount+$artificialDepositTotalAmount;
+            $sqlss="account = '{$account}' AND time >= '{$starttime}' AND time <= '{$endtime}' ";
+
+                        $payOnlineTotal         = ReportPayOnline::selectRaw('account AS user, amount AS money, order_no, time AS pay_datetime')->whereRaw("account = '{$account}' AND time >= '{$start}' AND time <= '{$end}' ")->orderBy('time', 'ASC')->get();
+                        $payCompanyTotal        = ReportPayCompany::selectRaw("account AS user, amount AS money, order_no, operation_datetime AS pay_datetime")->whereRaw("account = '{$account}' AND operation_datetime >= '{$start}' AND operation_datetime <= '{$end}'")->orderBy('operation_datetime', 'ASC')->get();
+                        $artificialDepositTotal = ReportArtificialDeposit::select('account AS user, amount AS money, order_no, time AS pay_datetime')->whereRaw("account = '{$account}' AND time >= '{$start}' AND time <= '{$end}'")->orderBy('time', 'ASC')->get();
+                        $payListTotal = [];
+                        if(count($payOnlineTotal))
+                        {
+                          $payListTotal = array_merge($payListTotal,$payOnlineTotal->toArray());
+                        }
+                        if(count($payCompanyTotal))
+                        {
+                          $payListTotal = array_merge($payListTotal,$payCompanyTotal->toArray());
+                        }
+                        if(count($artificialDepositTotal))
+                        {
+                          $payListTotal = array_merge($payListTotal,$artificialDepositTotal->toArray());
+                        }
+
+                        $payOnlineTotalSumAmount         = ReportPayOnline::whereRaw("account = '{$account}' AND time >= '{$start}' AND time <= '{$end}' ")->sum('amount');
+                        $payCompanyTotalSumAmount        = ReportPayCompany::whereRaw("account = '{$account}' AND operation_datetime >= '{$start}' AND operation_datetime <= '{$end}'")->sum('amount');
+                        $artificialDepositTotalSumAmount = ReportArtificialDeposit::whereRaw("account = '{$account}' AND time >= '{$start}' AND time <= '{$end}'")->sum('amount');
+                        $payTotalSumAmount = $payOnlineTotalSumAmount+$payCompanyTotalSumAmount+$artificialDepositTotalSumAmount;
+
             $result['status']  = 0;
             $result['data']    = [
-                'online'     => $payOnline,
-                'company'    => $payCompany,
-                'artificial' => $artificialDeposit,
+                'money'     => $payList,    //当天充值记录
+                'sum'       => $paysum,   //当天充值金额
+                'chirtmoney'  => $payListTotal,
+                'chirtsum'  => $payTotalSumAmount,
             ];
+
         }
         return $response->withJson($result);
     }
@@ -114,7 +168,7 @@ class MemberController extends BaseController
      */
     public function memberIsExists(Request $request, Response $response, $args)
     {
-        $result  = ['status' => 1, 'msg' => '您的账户暂时无法使用快捷支付，建议您先使用其他方式进行存款，谢谢！', 'data' => []];
+        $result  = ['status' => 1, 'msg' => '账号不存在！', 'data' => []];
         $account = trim($args['account']);
         if ($account) {
             $member = Member::with(['level'])->where('account', '=', $account);
@@ -212,7 +266,7 @@ class MemberController extends BaseController
                 // if ($member && $member->wasRecentlyCreated) {
                 // }
             }
-            $response->getBody()->write("Ok, Members data has been submitted to the payment system.\n");
+            $response->getBody()->write("Ok, Members data => the payment system.\n");
         }
         return $response;
     }
@@ -230,7 +284,7 @@ class MemberController extends BaseController
                 }
                 Member::whereIn('uid', $userIds)->update(['level_id' => $levelId]);
             }
-            $response->getBody()->write("Ok, Update members level data has been submitted to the payment system.\n");
+            $response->getBody()->write("Ok, Update members level data => the payment system.\n");
         }
         return $response;
     }

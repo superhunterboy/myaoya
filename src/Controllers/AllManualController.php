@@ -247,13 +247,15 @@ class AllManualController extends BaseController
 
         if (empty($down_excel)) {
             $data['total'] = $total; //count($res);
-            $data['data']  = $res;
-            /*$range =range($offset, $perPage*$page-1);
+            /*$range =range($offset, $perPage*$page-1);*/
             foreach ($res as $key => $value) {
-            if (in_array($key, $range)) {
-            $data['data'][]  = $value;
+                if((time()-strtotime($value['created_at']))>24*3600){
+                    $res[$key]['ishftrue']=1;      //超过24小时
+                }else{
+                    $res[$key]['ishftrue']=2;      //24小时内
+                }
             }
-            }*/
+            $data['data']  = $res;
 
             return $response->withJson($data);
         } else {

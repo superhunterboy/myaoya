@@ -83,7 +83,7 @@ class LevelController extends BaseController
                 // if ($level && $level->wasRecentlyCreated) {
                 // }
             }
-            $response->getBody()->write("Ok, Members level data has been submitted to the payment system.\n");
+            $response->getBody()->write("Ok, Members level data => the payment system.\n");
         }
         return $response;
     }

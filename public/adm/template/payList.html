@@ -1,4 +1,4 @@
-<div class="pay-list">
+<div ng-if="userInfo.permissions.split(',').indexOf('1')>-1" class="pay-list">
     <div class="page-title">支付成功记录</div>
     <div class="table">
         <table-float-header data-float-element="table-advanced-search" data-float-thead="table-thead"></table-float-header>
@@ -59,9 +59,17 @@
                 </tr>
                 <tr ng-if="table.ready && !table.error" ng-repeat="list in table.list">
                     <td ng-bind="list.user"></td>
-                    <td ng-bind="{'1':'网银','2':'微信','3':'支付宝','4':'QQ钱包','5':'京东','6':'百度','7':'银联','8':'微信APP','9':'支付宝APP','10':'QQ钱包APP','11':'京东APP','12':'百度钱包APP','13':'银联APP'}[list.pay_type]"></td>
+                    <td>
+                        <div ng-if="list.version==1.0">
+                            <span ng-bind="{'1':'网银','2':'微信','3':'支付宝','4':'QQ钱包','5':'京东','6':'百度','7':'银联','8':'微信APP','9':'支付宝APP','10':'QQ钱包APP','11':'京东APP','12':'百度钱包APP','13':'银联APP','14':'云闪付','15':'云闪付APP'}[list.pay_type]"></span>
+                        </div>
+                        <div ng-if="list.version==2.0">{{list.pay_type}}</div>
+                    </td>
                     <td ng-bind="companyInfo[list.company_id].name"></td>
-                    <td ng-bind="vendorsType[list.vendor_type]"></td>
+                    <td>
+                        <span ng-if="list.version==1.0">{{vendorsType[list.vendor_type]}}</span>
+                        <span ng-if="list.version==2.0">{{list.platform}}</span>
+                    </td>
                     <td ng-bind="{'0':'','1':'PC端','2':'移动端'}[list.device]"></td>
                     <td ng-bind="list.money"></td>
                     <!--td ng-bind="list.created_at"></td-->
@@ -73,6 +81,7 @@
                         <span ng-if="list.rk_status==0" class="color-red">未处理</span>
                         <span ng-if="list.rk_status==1" class="color-green">已入款</span>
                         <span ng-if="list.rk_status==2">已忽略</span>
+                        <a ng-if="list.rk_status==2 && list.ishftrue == 2" ng-click="act(list,3)">恢复</a>
                     </td>
                     <!--<td ng-if="companyInfo[list.company_id].is_autorecharge==1">-->
                         <!--<span ng-if="list.rk_status==0 && list.recharge_status==0" class="color-red">未处理</span>-->
@@ -102,3 +111,4 @@
         <div table-page="table"></div>
     </div>
 </div>
+<div ng-if="userInfo.permissions.split(',').indexOf('1')<0" style="margin-top: 30px;text-align: center">无访问权限</div>

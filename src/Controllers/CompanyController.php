@@ -387,6 +387,10 @@ class CompanyController extends BaseController
                 $where = '`wap_baidu` = 1';
             } elseif ($payType == 13) {
                 $where = '`wap_union` = 1';
+            } elseif ($payType == 14) {
+                $where = '`yun` = 1';
+            } elseif ($payType == 15) {
+                $where = '`wap_yun` = 1';
             }
 
             $res = Vendor::where('company_id', '=', $companyId)->whereRaw($where)->get()->toArray();
@@ -453,12 +457,14 @@ class CompanyController extends BaseController
         $jdVendorId         = isset($putDatas['jd_vendor_id']) ? intval($putDatas['jd_vendor_id']) : -1;
         $baiduVendorId      = isset($putDatas['baidu_vendor_id']) ? intval($putDatas['baidu_vendor_id']) : -1;
         $unionVendorId      = isset($putDatas['union_vendor_id']) ? intval($putDatas['union_vendor_id']) : -1;
+        $yunVendorId      = isset($putDatas['yun_vendor_id']) ? intval($putDatas['yun_vendor_id']) : -1;
         $wapWechatVendorId  = isset($putDatas['wap_wechat_vendor_id']) ? intval($putDatas['wap_wechat_vendor_id']) : -1;
         $wapAlipayVendorId  = isset($putDatas['wap_alipay_vendor_id']) ? intval($putDatas['wap_alipay_vendor_id']) : -1;
         $wapQqVendorId      = isset($putDatas['wap_qq_vendor_id']) ? intval($putDatas['wap_qq_vendor_id']) : -1;
         $wapJdVendorId      = isset($putDatas['wap_jd_vendor_id']) ? intval($putDatas['wap_jd_vendor_id']) : -1;
         $wapBaiduVendorId   = isset($putDatas['wap_baidu_vendor_id']) ? intval($putDatas['wap_baidu_vendor_id']) : -1;
         $wapUnionVendorId   = isset($putDatas['wap_union_vendor_id']) ? intval($putDatas['wap_union_vendor_id']) : -1;
+        $wapYunVendorId   = isset($putDatas['wap_yun_vendor_id']) ? intval($putDatas['wap_yun_vendor_id']) : -1;
 
         if ($companyId > 0) {
 
@@ -506,6 +512,12 @@ class CompanyController extends BaseController
             } elseif ($wapUnionVendorId >= 0) {
                 $updateDataArr = ['wap_union_vendor_id' => $wapUnionVendorId];
                 $errorVendorId = $res->wap_union_vendor_id;
+            } elseif ($wapYunVendorId >= 0) {
+                $updateDataArr = ['wap_yun_vendor_id' => $wapYunVendorId];
+                $errorVendorId = $res->wap_yun_vendor_id;
+            } elseif ($yunVendorId >= 0) {
+                $updateDataArr = ['yun_vendor_id' => $yunVendorId];
+                $errorVendorId = $res->yun_vendor_id;
             }
 
             // 记录支付平台错误次数
@@ -514,10 +526,8 @@ class CompanyController extends BaseController
             if ($errorVendor) {
                 $errorVendor->update(['error_count' => $errorVendor->error_count + 1]);
             }
-
             // 切换支付平台
             $res = $res->update($updateDataArr);
-
             if ($res) {
 
                 $result['status'] = 0;

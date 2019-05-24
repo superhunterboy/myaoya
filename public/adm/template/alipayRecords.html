@@ -1,4 +1,4 @@
-<div class="wechat-pay-list">
+<div ng-if="userInfo.permissions.split(',').indexOf('11')>-1" class="wechat-pay-list">
     <div class="page-title">支付宝支付记录</div>
     <div class="table">
         <div class="wechat-setting-box">
@@ -85,6 +85,7 @@
                             <span ng-if="list.status==0" class="color-red">未处理</span>
                             <span ng-if="list.status==1" class="color-green">已入款</span>
                             <span ng-if="list.status==2">忽略</span>
+
                         </td>
                         <td>
                             <a ng-if="list.status==0" ng-click="act(list,1,'transfer')">入款</a>
@@ -144,6 +145,7 @@
                             <span ng-if="list.status==0" class="color-red">未处理</span>
                             <span ng-if="list.status==1" class="color-green">已入款</span>
                             <span ng-if="list.status==2">忽略</span>
+                            <a ng-if="list.status==2 && list.ishftrue == 2" ng-click="act(list,3,'personal')">恢复</a>
                         </td>
                         <td>
                             <a ng-if="list.status==0" ng-click="act(list,1,'personal')">入款</a>
@@ -235,3 +237,4 @@
         </div>
     </div>
 </div>
+<div ng-if="userInfo.permissions.split(',').indexOf('11')<0" style="margin-top: 30px;text-align: center">无访问权限</div>

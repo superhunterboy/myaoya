@@ -7,23 +7,27 @@ use Weiming\Libs\AgencyPayments\Aifu;
 use Weiming\Libs\AgencyPayments\Bingo;
 use Weiming\Libs\AgencyPayments\Chuanhua;
 use Weiming\Libs\AgencyPayments\Duobao;
+use Weiming\Libs\AgencyPayments\Gaiya;
+use Weiming\Libs\AgencyPayments\GPpay;
 use Weiming\Libs\AgencyPayments\Jiayoutong;
 use Weiming\Libs\AgencyPayments\Jinhaizhe;
+use Weiming\Libs\AgencyPayments\Jiyun;
 use Weiming\Libs\AgencyPayments\KaiLianTong;
 use Weiming\Libs\AgencyPayments\Nongfu;
+use Weiming\Libs\AgencyPayments\Qingying;
+use Weiming\Libs\AgencyPayments\RHPay;
 use Weiming\Libs\AgencyPayments\Shangma;
 use Weiming\Libs\AgencyPayments\Shunxin;
 use Weiming\Libs\AgencyPayments\Tianfubao;
+use Weiming\Libs\AgencyPayments\Xianfeng;
 use Weiming\Libs\AgencyPayments\Xifu;
+use Weiming\Libs\AgencyPayments\Xinxinju;
 use Weiming\Libs\AgencyPayments\Xunjie;
 use Weiming\Libs\AgencyPayments\Yafu;
 use Weiming\Libs\AgencyPayments\Yibao;
 use Weiming\Libs\AgencyPayments\Zesheng;
 use Weiming\Libs\AgencyPayments\Zhongdian;
-use Weiming\Libs\AgencyPayments\Xinxinju;
-use Weiming\Libs\AgencyPayments\Gaiya;
-use Weiming\Libs\AgencyPayments\Qingying;
-use Weiming\Libs\AgencyPayments\Jiyun;
+use Weiming\Libs\AgencyPayments\Zhongxin;
 use Weiming\Libs\Crawler;
 use Weiming\Models\PayOut;
 use Weiming\Models\Platform;
@@ -120,11 +124,80 @@ class AutoPayOutCheckJob extends BaseJob
             $this->doQingying();
         } elseif ($payOutType == 22) {
             $this->doJiyun();
+        } elseif ($payOutType == 23) {
+            $this->doRHPay();
+        } elseif ($payOutType == 24) {
+            $this->doGft();
+        } elseif ($payOutType == 25) {
+            $this->doZhongxin();
+        } elseif ($payOutType == 26) {
+            $this->doGPpay();
+        } elseif ($payOutType == 27) {
+            $this->doXianfeng();
         }
-        /*
-        elseif ($payOutType == 19) {
-            $this->doJiayoutong();
-        }*/
+    }
+
+    /**
+     * 先锋出款
+     */
+    private function doXianfeng()
+    {
+        // 处理中，反查一次代付结果
+
+        $result = Xianfeng::getInstance($this->config)->generateSignature([
+            'orderNo' => $this->args['orderNo'],
+        ], 'query')->sendRequest();
+
+        $queryStatus  = $result['RSPCOD'];
+        $resultFlag   = $result['STATE'] ?? ''; //结果代码
+        $platform_msg = $result['RSPMSG'] ?? ''; //结果消息
+
+        // 统一状态
+        if ($queryStatus == '000000') {
+            $platform_status = 2;
+            if ($resultFlag == '1') {
+                $platform_status = 1;
+            } elseif ($resultFlag == '2') {
+                $platform_status = 2;
+            } elseif ($resultFlag == '3') {
+                $platform_status = 3;
+            } else {
+                $platform_status = 5;
+            }
+        }
+
+        $this->payOut->platform_status = $platform_status; // 0 未处理、1 处理成功、2 处理中、3 处理失败、4 已退汇、5 其他
+        $this->payOut->remark          = $platform_msg;
+        $this->payOut->save();
+    }
+
+    /**
+     * GPpay出款
+     */
+    private function doGPpay()
+    {
+        // 处理中，反查一次代付结果
+        $payOutObj    = GPpay::getInstance($this->config);
+        $payOutStatus = $payOutObj->generateSignature([
+            'orderNo' => $this->args['orderNo'],
+        ], 'query')->sendRequest();
+
+        $resultFlag   = $result['result'] ?? ''; //结果代码
+        $platform_msg = $result['result_msg'] ?? ''; //结果消息
+
+        // 统一状态
+        $platform_status = 2;
+        if ($resultFlag == 'S') {
+            $platform_status = 1;
+        } elseif ($resultFlag == 'F') {
+            $platform_status = 3;
+        } else {
+            $platform_status = 5;
+        }
+
+        $this->payOut->status = $platform_status; // 0 未处理、1 处理成功、2 处理中、3 处理失败、4 已退汇、5 其他
+        $this->payOut->note   = $platform_msg;
+        $this->payOut->save();
     }
 
     /**
@@ -1047,9 +1120,9 @@ class AutoPayOutCheckJob extends BaseJob
         }
 
         // $this->payOut->platform_order_no = $orderId;
-        $this->payOut->platform_status   = $status; // 0 未处理、1 处理成功、2 处理中、3 处理失败、4 已退汇、5 其他
-        $this->payOut->remark            = $msg;
-        $this->payOut->platform_attach   = json_encode($payOutStatus);
+        $this->payOut->platform_status = $status; // 0 未处理、1 处理成功、2 处理中、3 处理失败、4 已退汇、5 其他
+        $this->payOut->remark          = $msg;
+        $this->payOut->platform_attach = json_encode($payOutStatus);
         if ($this->payOut->save()) {
             // 备注
             $crawlerRes = Crawler::getInstance()->updatePayOutData($this->crawlerUrl, [
@@ -1123,10 +1196,10 @@ class AutoPayOutCheckJob extends BaseJob
             'orderNo' => $this->args['orderNo'],
         ], 'query')->sendRequest();
         if ($result) {
-            $ret_Code           = $result['code'] ?? '';
-            $resStatus          = $result['status'] ?? '';
-            $platform_order_no  = $result['businessNo'] ?? '';
-            $msg                = $result['describe'] ?? '';
+            $ret_Code          = $result['code'] ?? '';
+            $resStatus         = $result['status'] ?? '';
+            $platform_order_no = $result['businessNo'] ?? '';
+            $msg               = $result['describe'] ?? '';
 
             if ($ret_Code == '00' && $resStatus == 1) {
                 // 交易成功，修改 BBIN 后台出款单状态为 1 确定
@@ -1182,9 +1255,8 @@ class AutoPayOutCheckJob extends BaseJob
             'orderNo' => $this->payOut->platform_order_no, // 这里要用流水号查询
         ], 'query')->sendRequest();
 
-
         $status  = $payOutStatus['success'] ?? 'fail';
-        $code  = $payOutStatus['code'] ?? 'fail';
+        $code    = $payOutStatus['code'] ?? 'fail';
         $msg     = $payOutStatus['respMsg'] ?? '';
         $state   = $payOutStatus['transStatus'] ?? '';
         $orderId = $payOutStatus['merOrderId'] ?? '';
@@ -1205,19 +1277,18 @@ class AutoPayOutCheckJob extends BaseJob
 
         // 统一状态
         $status = 3;
-        if($state == 1){
+        if ($state == 1) {
             $status = 1;
-        }elseif($state == 2){
+        } elseif ($state == 2) {
             $status = 3;
-        }elseif($state == 3){
+        } elseif ($state == 3) {
             $status = 2;
         }
 
-
         // $this->payOut->platform_order_no = $orderId;
-        $this->payOut->platform_status   = $status; // 0 未处理、1 处理成功、2 处理中、3 处理失败、4 已退汇、5 其他
-        $this->payOut->remark            = $msg;
-        $this->payOut->platform_attach   = json_encode($payOutStatus);
+        $this->payOut->platform_status = $status; // 0 未处理、1 处理成功、2 处理中、3 处理失败、4 已退汇、5 其他
+        $this->payOut->remark          = $msg;
+        $this->payOut->platform_attach = json_encode($payOutStatus);
         if ($this->payOut->save()) {
             // 备注
             $crawlerRes = Crawler::getInstance()->updatePayOutData($this->crawlerUrl, [
@@ -1285,7 +1356,7 @@ class AutoPayOutCheckJob extends BaseJob
      */
     private function doQingying()
     {
-        $payOutObj    = Gaiya::getInstance($this->config);
+        $payOutObj    = Qingying::getInstance($this->config);
         $payOutStatus = $payOutObj->generateSignature([
             'orderNo' => $this->args['orderNo'],
         ], 'query')->sendRequest();
@@ -1330,5 +1401,145 @@ class AutoPayOutCheckJob extends BaseJob
                 'content' => $msg,
             ]);
         }
+    }
+
+    /**
+     * RHPay
+     */
+    private function doRHPay()
+    {
+        $payOutObj    = RHPay::getInstance($this->config);
+        $payOutStatus = $payOutObj->generateSignature([
+            'orderNo'           => $this->args['orderNo'],
+            'platform_order_no' => $this->payOut->platform_order_no,
+        ], 'query')->sendRequest();
+        $respCode = $payOutStatus['status'] ?? '';
+        $msg      = $payOutStatus['msg'] ?? '';
+        $orderId  = $payOutStatus['orderCode'] ?? '';
+
+        if ($respCode == 'M0000') {
+            // 交易成功，修改 BBIN 后台出款单状态为 1 确定
+            $crawlerRes = Crawler::getInstance()->updatePayOutData($this->crawlerUrl, [
+                'act'     => 'updateStatus',
+                'id'      => $this->payOut->wid,
+                'status'  => 1, // 确定
+                'account' => $this->payOut->account,
+            ]);
+            if (strpos($crawlerRes, 'true') !== false) {
+                // 更新 确定 状态
+                $this->payOut->status = 1;
+            }
+        }
+
+        // 统一状态
+        $status = 2;
+        if ($respCode == 'M1000') {
+            $status = 1;
+        } elseif ($respCode == 'M1001') {
+            $status = 3;
+        }
+        $this->payOut->platform_order_no = $orderId;
+        $this->payOut->platform_status   = $status; // 0 未处理、1 处理成功、2 处理中、3 处理失败、4 已退汇、5 其他
+        $this->payOut->remark            = $msg;
+        $this->payOut->platform_attach   = json_encode($payOutStatus);
+        if ($this->payOut->save()) {
+            // 备注
+            $crawlerRes = Crawler::getInstance()->updatePayOutData($this->crawlerUrl, [
+                'act'     => 'updateRemark',
+                'id'      => $this->payOut->wid,
+                'content' => $msg,
+            ]);
+        }
+    }
+
+    /**
+     * RHPay
+     */
+    private function doGft()
+    {
+        $payOutObj    = Gft::getInstance($this->config);
+        $payOutStatus = $payOutObj->generateSignature([
+            'orderNo'           => $this->args['orderNo'],
+            'platform_order_no' => $this->payOut->platform_order_no,
+        ], 'query')->sendRequest();
+        $respCode = $payOutStatus['data']['status'] ?? '';
+        $msg      = $payOutStatus['msg'] ?? '';
+        $orderId  = $payOutStatus['data']['mchOrderNo'] ?? '';
+
+        if ($respCode == 2) {
+            // 交易成功，修改 BBIN 后台出款单状态为 1 确定
+            $crawlerRes = Crawler::getInstance()->updatePayOutData($this->crawlerUrl, [
+                'act'     => 'updateStatus',
+                'id'      => $this->payOut->wid,
+                'status'  => 1, // 确定
+                'account' => $this->payOut->account,
+            ]);
+            if (strpos($crawlerRes, 'true') !== false) {
+                // 更新 确定 状态
+                $this->payOut->status = 1;
+            }
+        }
+
+        // 统一状态
+        $status = 2;
+        if ($respCode == 2) {
+            $status = 1;
+        } elseif ($respCode == 'M1001') {
+            $status = 3;
+        }
+        $this->payOut->platform_order_no = $orderId;
+        $this->payOut->platform_status   = $status; // 0 未处理、1 处理成功、2 处理中、3 处理失败、4 已退汇、5 其他
+        $this->payOut->remark            = $msg;
+        $this->payOut->platform_attach   = json_encode($payOutStatus);
+        if ($this->payOut->save()) {
+            // 备注
+            $crawlerRes = Crawler::getInstance()->updatePayOutData($this->crawlerUrl, [
+                'act'     => 'updateRemark',
+                'id'      => $this->payOut->wid,
+                'content' => $msg,
+            ]);
+        }
+    }
+
+    /*
+     * 众鑫出款
+     */
+    private function doZhongxin()
+    {
+        $payOutObj    = Zhongxin::getInstance($this->config);
+        $payOutStatus = $payOutObj->generateSignature([
+            'orderNo'           => $this->args['orderNo'],
+            'platform_order_no' => $this->payOut->platform_order_no,
+        ], 'query')->sendRequest();
+
+        $respCode   = $payOutStatus['data']['code'] ?? '';
+        $respStatus = $payOutStatus['data']['status'] ?? '';
+        $msg        = $payOutStatus['data']['statusStr'] ?? '';
+        $orderId    = $payOutStatus['data']['mchOrderNo'] ?? '';
+
+        // 统一状态
+        $status = 2;
+        if ($respCode == 00) {
+            $status = 2;
+            if ($respStatus == 0) {
+                $status = 0;
+            } elseif ($respStatus == 1) {
+                $status = 5;
+            } elseif ($respStatus == 2) {
+                $status = 2;
+            } elseif ($respStatus == 3) {
+                $status = 3;
+            } elseif ($respStatus == 4) {
+                $status = 1;
+            }
+        } else {
+            $status = 3;
+        }
+
+        $this->payOut->platform_order_no = $orderId;
+        $this->payOut->status            = $status; // 0 未处理、1 处理成功、2 处理中、3 处理失败、4 已退汇、5 其他
+        $this->payOut->note              = $msg;
+        $this->payOut->remark            = json_encode($payOutStatus);
+        $this->payOut->save();
     }
 }

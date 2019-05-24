@@ -7,9 +7,9 @@ use GuzzleHttp\Client;
 //18
 class Qingying
 {
-    private $gateway         = 'http://df.superssr.com:11088/webservice/order'; // 生产环境下单地址
-    private $queryUrl        = 'http://df.superssr.com:11088/webservice/order'; // 查询接口地址
-    private $balanceQueryUrl = 'http://df.superssr.com:11088/webservice/order'; // 查询余额地址
+    private $gateway         = 'http://df.superway.info:11088/webservice/order'; // 生产环境下单地址
+    private $queryUrl        = 'http://df.superway.info:11088/webservice/order'; // 查询接口地址
+    private $balanceQueryUrl = 'http://df.superway.info:11088/webservice/order'; // 查询余额地址
 
     private $parterKey; //秘钥
     private $txcode; //交易代码

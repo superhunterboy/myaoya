@@ -54,7 +54,7 @@ class PaySingleController extends BaseController
         $money  = $postDatas['money'] ?? 0;
         $drawee = $postDatas['drawee'] ?? '';
 
-        if ($id && $member && $drawee && in_array($type, ['1', '2', '3']) && $money > 0) {
+        if ($id && $member && $drawee && in_array($type, ['1', '2', '3', '4']) && $money > 0) {
             $qrcode   = PrivateQrcode::where('id', '=', $id);
             $isQrcode = $qrcode->first();
             if ($isQrcode) {
@@ -129,17 +129,60 @@ class PaySingleController extends BaseController
                     $rechargeUrl    = $company->autorecharge_url;
                     if ($status == 1 && $isPri->status == 0 && $isAutorecharge == 1 && !empty($rechargeUrl)) {
                         // 只有 未处理 的记录，才执行入款操作
+                        $money = $isPri->money;
+                        if($isPri->type == 4)
+                        {
+                            $money = 1.01 * ($isPri->money);
+                        }
                         $requestParams = [
                             'account'      => $isPri->member,
-                            'fee'          => $isPri->money,
+                            'fee'          => $money,
                             'orderNo'      => $id,
                             'rechargeTime' => date('Y-m-d H:i:s'),
                         ];
+
                         $requestParams['sign']   = Utils::generateSignature($requestParams);
                         $requestParams['act']    = 'useRecharge';
-                        $requestParams['remark'] = $isPri->type == 1 ? '个人微信收款码' : ($isPri->type == 2 ? '个人支付宝收款码' : ($isPri->type == 3 ? '个人QQ收款码' : ''));
+                        if($isPri->type == 1)
+                        {
+                            $requestParams['remark'] = '个人微信收款码';
+                        }
+                        elseif($isPri->type == 2)
+                        {
+                            $requestParams['remark'] = '个人支付宝收款码';
+                        }
+                        elseif($isPri->type == 3)
+                        {
+                            $requestParams['remark'] = '个人QQ收款码';
+                        }
+                        elseif($isPri->type == 4)
+                        {
+                            $requestParams['remark'] = '个人云闪付收款码';
+                        }
                         $client                  = new Client();
-                        $rechargeRes             = $client->request('POST', $rechargeUrl, ['form_params' => $requestParams]);
+                        //$rechargeRes             = $client->request('POST', $rechargeUrl, ['form_params' => $requestParams]);
+                        /*# log #*/
+
+                        try {
+                            $rechargeRes             = $client->request('POST', $rechargeUrl, ['form_params' => $requestParams]);
+                        } catch (ClientException $e) {
+                            $getRequest  =$e->getRequest();
+                            $getResponse =$e->getResponse();
+                        }
+
+
+                        $http_code=$rechargeRes->getStatusCode();
+                        file_put_contents(__DIR__ . '/../../logs/lock_return_error' . date('Ymd') . '.txt', $http_code."====".$getRequest."===".$getResponse."====".$rechargeRes->getBody(). "\n", FILE_APPEND | LOCK_EX);
+
+
+
+                        $resData_sign = $rechargeRes->getBody();
+                        $resData_sign = json_decode($resData_sign, true);
+                        $requestParams['url']=   $rechargeUrl;
+                        $requestParams['code']=  $rechargeRes->getStatusCode();
+                        $requestParams['array']=  $resData_sign;
+                        $this->logger->addInfo('paySing-log:', $requestParams);
+                        /*# log #*/
                         if ($rechargeRes->getStatusCode() == '200') {
                             $resData = $rechargeRes->getBody();
                             $resData = json_decode($resData, true);
@@ -156,7 +199,10 @@ class PaySingleController extends BaseController
                             }
                         }
                     }
-                    if (in_array($status, [0, 1, 2])) {
+                    if (in_array($status, [0, 1, 2, 3] )) {
+                        if($status == 3){
+                            $status=0;
+                        }
                         $data['status'] = strval($status);
                     }
                     $state = $priCode->update($data);
@@ -299,8 +345,15 @@ class PaySingleController extends BaseController
         $payQrcodes = $payQrcodes->addSelect($this->db::raw("*, CONVERT_TZ(`created_at`, '+08:00', '-04:00') AS `created_at_edt`"));
 
         if (empty($down_excel)) {
-            $priQrcodePay = $payQrcodes->orderBy('id', 'DESC')->paginate($perPage);
-
+            $priQrcodePay = $payQrcodes->orderBy('id', 'DESC')->paginate($perPage)->toArray();
+            foreach($priQrcodePay['data'] as $k=>$v){
+                if((time()-strtotime($v['created_at']))>24*3600){
+                    $priQrcodePay['data'][$k]['ishftrue']=1;      //超过24小时
+                }else{
+                    $priQrcodePay['data'][$k]['ishftrue']=2;      //24小时内
+                }
+            }
+            $priQrcodePay=(object)$priQrcodePay;
             return $response->withJson($priQrcodePay);
         } else {
             $result = $payQrcodes->orderBy('id', 'DESC')->get()->toArray();
@@ -331,6 +384,8 @@ class PaySingleController extends BaseController
                 $filename = '支付宝个人码收款记录-' . date('Ymd') . '.xls';
             } elseif ($type == '3') {
                 $filename = 'QQ个人码收款记录-' . date('Ymd') . '.xls';
+            } elseif ($type == '4') {
+                $filename = '云闪付收款记录-' . date('Ymd') . '.xls';
             } else {
                 $filename = '';
             }

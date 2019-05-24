@@ -75,7 +75,7 @@ $(document).ready(function(){
         if (mobile.match(/^(13[0-9]|14[579]|15[0-3,5-9]|16[6]|17[0135678]|18[0-9]|19[89])\d{8}$/)) {
             layer.confirm('确认更新吗？', {icon: 3, title:'提示'}, function(index){
                 $.ajax({
-                    url: '/updateSms',
+                    url: '/admin/updateSms',
                     type: 'POST',
                     data: $('#updateForm').serialize(),
                     success: function (result) {
@@ -97,7 +97,7 @@ $(document).ready(function(){
         layer.prompt({title: '请输入管理员密码', formType: 1}, function(password, index, elem){
             layer.close(index);
             $.ajax({
-                url: '/getSms',
+                url: '/admin/getSms',
                 type: 'POST',
                 data: {"username": username, "password": password},
                 success: function (result) {

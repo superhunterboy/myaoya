@@ -1,0 +1,114 @@
+<div ng-if="userInfo.permissions.split(',').indexOf('34')>-1" class="vendor-list">
+    <div class="page-title">
+        <span>支付渠道</span>
+        <div class="page-btn">
+            <a ng-click="editPaymentChannel()" class="btn btn-green">添加支付渠道</a>
+        </div>
+    </div>
+
+    <div class="table">
+        <table-float-header data-float-element="table-advanced-search" data-float-thead="table-thead"></table-float-header>
+        <div class="table-advanced-search">
+            <label class="advanced-search-box">
+                    <span class="search-box-text">支付方式：</span>
+                    <select class="input" style="width: 162px" ng-model="table.query.channel">
+                        <option ng-value="''">全部</option>
+                        <option ng-repeat="paymentMethod in paymentMethodList" value="{{paymentMethod.tag}}" ng-bind="paymentMethod.name"></option>
+                    </select>
+            </label>
+            <label class="advanced-search-box">
+                <span class="search-box-text">运用场景：</span>
+                <select class="input" style="width: 162px" ng-model="table.query.position">
+                    <option ng-value="''">全部</option>
+                    <option ng-value="1">线上</option>
+                    <option ng-value="2">线下</option>
+                </select>
+            </label>
+            </label>
+            <label class="advanced-search-box">
+                <span class="search-box-text">线下场景：</span>
+                <select class="input" style="width: 162px" ng-model="table.query.offline_category">
+                    <option ng-value="''">全部</option>
+                    <option ng-value="'scanCode'">扫码支付</option>
+                    <option ng-value="'addFriend'">扫码加好友</option>
+                    <option ng-value="'transfer'">银行转账</option>
+                </select>
+            </label>
+            <div class="advanced-search-box">
+                <span class="search-box-text"> </span>
+                <button type="button" class="btn btn-default" ng-click="table.ready=false;table.getList(1)">搜索</button>
+            </div>
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <td>支付平台</td>
+                    <td>平台标识</td>
+                    <td>支付方式</td>
+                    <td>支付代码</td>
+                    <td>前台显示名称</td>
+                    <td>商户编号</td>
+                    <td>接口地址</td>
+                    <td>运用场景</td>
+                    <td>线下场景</td>
+                    <td>金额范围</td>
+                    <td>状态</td>
+                    <td>排序</td>
+                    <td>创建时间</td>
+                    <td>更新时间</td>
+                    <td>操作</td>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-if="!table.ready">
+                    <td colspan="15">正在加载。。。</td>
+                </tr>
+                <tr ng-if="table.error">
+                    <td colspan="15">获取列表错误，{{table.errorMsg}}<br/>请刷新页面</td>
+                </tr>
+                <tr ng-if="table.ready && !table.error && table.list==0">
+                    <td colspan="15">没有查询到数据</td>
+                </tr>
+                <tr ng-if="table.ready && !table.error" ng-repeat="list in table.list">
+                    <td>{{list.platform || "--"}}</td>
+                    <td>{{list.platform_identifer || "--"}}</td>
+                    <td>{{list.channel || "--"}}</td>
+                    <td>{{list.paycode || "--"}}</td>
+                    <td>{{list.display_name || "--"}}</td>
+                    <td>{{list.merchant_no || "--"}}</td>
+                    <td>{{list.gateway || "--"}}</td>
+                    <td>
+                        <span ng-if="list.position==1">线上</span>
+                        <span ng-if="list.position==2">线下</span>
+                    </td>
+                    <td>
+                        <span ng-if="list.offline_category === 'scanCode'">扫码支付</span>
+                        <span ng-if="list.offline_category === 'addFriend'">加好友</span>
+                        <span ng-if="list.offline_category === 'transfer'">银行转账</span>
+                    </td>
+                    <td>{{list.deposit_range || "--"}}</td>
+                    <td>
+                        <span ng-if="list.status==0" class="color-red">禁用</span>
+                        <span ng-if="list.status==1" class="color-green">启用</span>
+                    </td>
+                    <td>{{list.sequence}}</td>
+                    <td>{{list.created_at || "--"}}</td>
+                    <td>{{list.updated_at || "--"}}</td>
+                    <td>
+                        <a ng-click="editPaymentChannel(list)"><i class="icon-edit"></i> 修改</a>
+                        <a ng-if="list.status==0" class="ml-1" ng-click="changeChannelStatus(list, 1)"><i class="icon-start"></i> 启用</a>
+                        <a ng-if="list.status==1" class="ml-1" ng-click="changeChannelStatus(list, 0)"><i class="icon-pause"></i> 禁用</a>
+                        <a class="ml-1" ng-click="delPaymentChannel(list)"><i class="icon-delete"></i> 删除</a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <div class="table-num">共查询出 <span ng-bind="table.total"></span> 条记录，每页显示
+            <select class="input" ng-model="table.query.perPage" ng-change="table.getList(1)">
+                <option value="10">10</option><option value="20">20</option><option value="50">50</option><option value="100">100</option>
+            </select> 条
+        </div>
+        <div table-page="table"></div>
+    </div>
+</div>
+<div ng-if="userInfo.permissions.split(',').indexOf('5')<0" style="margin-top: 30px;text-align: center">无访问权限</div>

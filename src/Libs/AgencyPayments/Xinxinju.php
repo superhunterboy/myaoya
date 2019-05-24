@@ -7,7 +7,7 @@ use GuzzleHttp\Client;
 //18
 class Xinxinju
 {
-    private $gateway         = 'http://service.superssr.com:11088/webservice/order'; // 生产环境下单地址
+    private $gateway         = 'http://df.superway.info:11088/webservice/order'; // 生产环境下单地址
     private $queryUrl        = ''; // 查询接口地址
     private $balanceQueryUrl = ''; // 查询余额地址
 

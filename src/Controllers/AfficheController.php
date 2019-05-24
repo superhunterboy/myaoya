@@ -5,6 +5,7 @@ use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Weiming\Controllers\BaseController;
 use Weiming\Models\Affiche;
+use Weiming\Models\Paystatus;
 
 class AfficheController extends BaseController
 {
@@ -205,6 +206,40 @@ class AfficheController extends BaseController
             $result = ['status' => 0, 'msg' => 'okey', 'data' => $data];
         }
 
+        return $response->withJson($result);
+    }
+
+    /*
+     * 支付开关列表
+     */
+    public function paymenu(Request $request, Response $response, $args){
+        $result   = ['status' => 1, 'msg' => '没有发布公告!', 'data' => []];
+        $getDatas = $request->getQueryParams();
+        $page     = isset($getDatas['page']) ? intval($getDatas['page']) : 1;
+        $perPage  = isset($getDatas['perPage']) ? intval($getDatas['perPage']) : 20;
+        $offset   = ($page - 1) * $perPage;
+
+        $data = Paystatus::select()->get(['title', 'content']);
+        if (count($data) > 0) {
+            $result = ['status' => 0, 'msg' => 'okey', 'data' => $data];
+        }
+
+        return $response->withJson($result);
+    }
+
+    /*
+     * 更新状态
+     */
+    public function paymenustatus(Request $request, Response $response, $args){
+        $result    = ['status' => 1, 'msg' => '更新失败', 'data' => []];
+        $postDatas = $request->getParsedBody();
+        $id          = $args['id'] ?? '';
+        $status      = $postDatas['status'] ?? '';
+        $data['status']=$status;
+        $state = Paystatus::where('id', '=', $id)->update(['status' => $status]);
+        if($state){
+            $result    = ['status' => 0, 'msg' => '更新成功', 'data' => []];
+        }
         return $response->withJson($result);
     }
 }

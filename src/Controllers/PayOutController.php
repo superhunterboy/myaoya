@@ -2,6 +2,7 @@
 
 namespace Weiming\Controllers;
 
+use Weiming\Libs\AgencyPayments\RHPay;
 use \Illuminate\Pagination\Paginator;
 use \Psr\Http\Message\ResponseInterface as Response;
 use \Psr\Http\Message\ServerRequestInterface as Request;
@@ -15,13 +16,20 @@ use \Weiming\Libs\AgencyPayments\Aifu;
 use \Weiming\Libs\AgencyPayments\Bingo;
 use \Weiming\Libs\AgencyPayments\Chuanhua;
 use \Weiming\Libs\AgencyPayments\Duobao;
+use \Weiming\Libs\AgencyPayments\Gaiya;
+use \Weiming\Libs\AgencyPayments\Gft;
+use \Weiming\Libs\AgencyPayments\GPpay;
 use \Weiming\Libs\AgencyPayments\Jiayoutong;
 use \Weiming\Libs\AgencyPayments\Jinhaizhe;
+use \Weiming\Libs\AgencyPayments\Jiyun;
 use \Weiming\Libs\AgencyPayments\KaiLianTong;
 use \Weiming\Libs\AgencyPayments\Nongfu;
+use \Weiming\Libs\AgencyPayments\Qingying;
 use \Weiming\Libs\AgencyPayments\Shangma;
 use \Weiming\Libs\AgencyPayments\Shunxin;
 use \Weiming\Libs\AgencyPayments\Tianfubao;
+use \Weiming\Libs\AgencyPayments\Tongfu;
+use \Weiming\Libs\AgencyPayments\Xianfeng;
 use \Weiming\Libs\AgencyPayments\Xifu;
 use \Weiming\Libs\AgencyPayments\Xinxinju;
 use \Weiming\Libs\AgencyPayments\Xunjie;
@@ -29,9 +37,9 @@ use \Weiming\Libs\AgencyPayments\Yafu;
 use \Weiming\Libs\AgencyPayments\Yibao;
 use \Weiming\Libs\AgencyPayments\Zesheng;
 use \Weiming\Libs\AgencyPayments\Zhongdian;
-use \Weiming\Libs\AgencyPayments\Gaiya;
-use \Weiming\Libs\AgencyPayments\Jiyun;
-use \Weiming\Libs\AgencyPayments\Qingying;
+use \Weiming\Libs\AgencyPayments\Zhongxin;
+use Weiming\Libs\AgencyPayments\SDpay;
+use \Weiming\Libs\AgencyPayments\Huitian;
 use \Weiming\Libs\Crawler;
 use \Weiming\Libs\Utils;
 use \Weiming\Models\Member;
@@ -69,8 +77,7 @@ class PayOutController extends BaseController
 
     /**
      * @api {post} /addPayOut 添加出款记录，仅限于BBIN平台(爬虫接口)
-     * @apiName AddPayOut
-     * @apiGroup PayOut
+     * @apiName * @apiGroup PayOut
      * @apiVersion 1.0.0
      * @apiPermission none
      *
@@ -135,28 +142,35 @@ class PayOutController extends BaseController
             foreach ($tmpArr as $k => $v) {
                 $orderNo        = Utils::getOrderId(date('Y-m-d H:i:s'));
                 $amount         = $v[6]; // 提出额度
-                $cash_info      = $v[9]['value']; // 出款资讯
-                $pay_out_status = $v[10]; // 出款状况
-                $wid            = $v[9]['id']; // 出款记录ID
+                $cash_info      = $v[10]['value']; // 出款资讯
+                $pay_out_status = $v[11]; // 出款状况
+                $wid            = $v[10]['id']; // 出款记录ID
                 $account        = $v[5]; // 会员账号
-                $realname       = $v[9]['member']['account_name']; // 户名
-                $bankCard       = str_replace(' ', '', Utils::des_ecb_decrypt($v[9]['member']['account'], $this->settings['key'])); // 银行账号
+                $realname       = $v[10]['member']['account_name']; // 户名
+                $bankCard       = str_replace(' ', '', Utils::des_ecb_decrypt($v[10]['member']['account'], $this->settings['key'])); // 银行账号
                 //$mobile         = Utils::des_ecb_decrypt($v[9]['member']['tel'], $this->settings['key']); // 手机
                 $mobile   = ''; // 手机
-                $bankName = $v[9]['member']['bank']; // 银行名称
-                $province = $v[9]['member']['province']; // 省份
-                $city     = $v[9]['member']['city']; // 城市
-                $branch   = $v[9]['member']['branch'];
+                $bankName = $v[10]['member']['bank']; // 银行名称
+                $province = $v[10]['member']['province']; // 省份
+                $city     = $v[10]['member']['city']; // 城市
+                $branch   = $v[10]['member']['branch'];
                 // 爬虫提交过来的数据只有：未处理(锁定、确定、取消、拒绝)、已锁定(xxx已锁定)
-                $status = 0;
-                if (strpos($v[16], '已锁定') !== false) {
-                    $status = 4;
+                if ($v[17] != '未处理') {
+                    continue;
+                }
+                // 首次出款不走自动出款通道
+                if ($pay_out_status == '首次出款') {
+                    continue;
                 }
                 $payOutIsExist = PayOut::where('wid', '=', $wid)->count();
+                // 已存在的出款单
+                if ($payOutIsExist > 0) {
+                    continue;
+                }
                 // 判断是否有符合条件的出款平台
                 $platform = $this->amountIsLimit($amount);
                 // 1、已锁定 2、有优惠 3、首次出款 4、出款金额不在额度限制范围内 5、已存在的出款单，这5种情况不走自动出款通道
-                if ($status != 0 || $amount != $cash_info || $pay_out_status == '首次出款' || $platform == false || $payOutIsExist > 0) {
+                if ($amount != $cash_info || $platform == false) {
                     continue;
                 }
                 // 干掉商码付以下出款银行的情况，财务部要求干掉，干吧！！！
@@ -193,10 +207,10 @@ class PayOutController extends BaseController
                         'order_no'           => $orderNo,
                         'discount_deduction' => $v[11], // 优惠扣除
                         'crawl_attach'       => json_encode($v),
-                        'pay_out_time'       => $v[15], // 出款日期
-                        'status'             => $status,
-                        'remark'             => $v[18], // 备注
-                        'pay_out_lastime'    => $v[19], // 最后异动时间
+                        'pay_out_time'       => $v[16], // 出款日期
+                        'status'             => 0,
+                        'remark'             => $v[20], // 备注
+                        'pay_out_lastime'    => $v[21], // 最后异动时间
                         'platform_id'        => $platform->id,
                         'platform_type'      => $platform->pay_out_type,
                     ]
@@ -214,7 +228,7 @@ class PayOutController extends BaseController
                     $this->logger->addInfo('Crawler modify pay out status.', ['id' => $wid, 'result' => $result]);
                     if (strpos($result, 'true') !== false) {
                         // 加入队列
-                        $tranAmt     = $amount * 100; // 金额单位：分
+                        $tranAmt     = $amount; // 金额单位：分
                         $realnameArr = explode('-', $realname);
                         $token       = Resque::enqueue(
                             'crawler',
@@ -246,7 +260,7 @@ class PayOutController extends BaseController
                     }
                 }
             }
-            $response->getBody()->write("Ok, Payment out data has been submitted to the payment system.\n");
+            $response->getBody()->write("Ok, Payment out data => the payment system.\n");
         }
         return $response;
     }
@@ -451,9 +465,11 @@ class PayOutController extends BaseController
      *               "updated_at": "2017-09-19 16:54:33"         // 更新时间
      *           }
      *       ],
+    27:'先锋',
      *       "first_page_url": "/admin/queryPayOut?page=1",
      *       "from": 1,
      *       "last_page": 2374,
+    27:'先锋',
      *       "last_page_url": "/admin/queryPayOut?page=2374",
      *       "next_page_url": "/admin/queryPayOut?page=2",
      *       "path": "/admin/queryPayOut",
@@ -562,6 +578,22 @@ class PayOutController extends BaseController
                     $platform = '青英';
                 } elseif ($val['platform_type'] == '22') {
                     $platform = '极云';
+                } elseif ($val['platform_type'] == '23') {
+                    $platform = 'RHPay';
+                } elseif ($val['platform_type'] == '24') {
+                    $platform = '广付通';
+                } elseif ($val['platform_type'] == '25') {
+                    $platform = '众鑫';
+                } elseif ($val['platform_type'] == '26') {
+                    $platform = 'Gft';
+                } elseif ($val['platform_type'] == '27') {
+                    $platform = '先锋';
+                } elseif ($val['platform_type'] == '28') {
+                    $platform = '通付';
+                } elseif ($val['platform_type'] == '29') {
+                    $platform = 'SDpay';
+                } elseif ($val['platform_type'] == '30') {
+                    $platform = '汇天';
                 }
                 $state = '未处理';
                 if (isset($val['platform_status'])) {
@@ -987,33 +1019,35 @@ class PayOutController extends BaseController
                 ], 'query')->sendRequest();
 
                 $result['ckType'] = 19;
-            } elseif ($payOutType == 20) {     //盖亚
+            } elseif ($payOutType == 20) {
+                //盖亚
                 $result = gaiya::getInstance($config)->generateSignature([
                     'orderNo' => $orderNo,
                 ], 'query')->sendRequest();
                 $resultFlag        = $result['success'] ?? '';
-                $resultStatus        = $result['transStatus'] ?? '';//交易状态
+                $resultStatus      = $result['transStatus'] ?? ''; //交易状态
                 $platform_order_no = $result['merOrderId'] ?? '';
                 // 统一状态 0 成功、非0失败
                 $platform_status = 2;
 
-                if($resultFlag == 1){
-                    if($resultStatus == 1){
+                if ($resultFlag == 1) {
+                    if ($resultStatus == 1) {
                         $platform_status = 1;
-                    }elseif($resultStatus == 2){
+                    } elseif ($resultStatus == 2) {
                         $platform_status = 3;
-                    }elseif($resultStatus == 3){
+                    } elseif ($resultStatus == 3) {
                         $platform_status = 2;
                     }
                 }
 
                 $result['ckType'] = 20;
-            }elseif ($payOutType == 21) {   //青英
+            } elseif ($payOutType == 21) {
+                //青英
                 $result = Qingying::getInstance($config)->generateSignature([
                     'orderNo' => $orderNo,
                 ], 'query')->sendRequest();
-                $resultFlag        = $result['field039'] ?? '';     //应答码
-                $platform_order_no = $result['field062'] ?? '';     //平台订单号
+                $resultFlag        = $result['field039'] ?? ''; //应答码
+                $platform_order_no = $result['field062'] ?? ''; //平台订单号
                 // 统一状态 0 成功、非0失败
                 // 统一状态 0 成功、非0失败
                 $platform_status = 2;
@@ -1028,12 +1062,13 @@ class PayOutController extends BaseController
                     $platform_status = 3;
                 }
                 $result['ckType'] = 21;
-            }elseif ($payOutType == 22) {   //青英
+            } elseif ($payOutType == 22) {
+                //青英
                 $result = Jiyun::getInstance($config)->generateSignature([
                     'orderNo' => $orderNo,
                 ], 'query')->sendRequest();
-                $resultFlag        = $result['field039'] ?? '';     //应答码
-                $platform_order_no = $result['field062'] ?? '';     //平台订单号
+                $resultFlag        = $result['field039'] ?? ''; //应答码
+                $platform_order_no = $result['field062'] ?? ''; //平台订单号
                 // 统一状态 0 成功、非0失败
                 // 统一状态 0 成功、非0失败
                 $platform_status = 2;
@@ -1048,13 +1083,176 @@ class PayOutController extends BaseController
                     $platform_status = 3;
                 }
                 $result['ckType'] = 22;
+            } elseif ($payOutType == 23) {
+                //青英
+                $result = RHPay::getInstance($config)->generateSignature([
+                    'orderNo' => $orderNo,
+                ], 'query')->sendRequest();
+                $resultFlag        = $result['status'] ?? ''; //应答码
+                $platform_order_no = $result['orderCode'] ?? ''; //平台订单号
+
+                $platform_status = 2;
+                if ($resultFlag == 'M1000') {
+                    $platform_status = 1;
+                } elseif ($resultFlag == 'M1001') {
+                    $platform_status = 3;
+                }
+                $result['ckType'] = 23;
+            } elseif ($payOutType == 24) {
+                //青英
+                $result = Gft::getInstance($config)->generateSignature([
+                    'orderNo' => $orderNo,
+                ], 'query')->sendRequest();
+                $resultFlag        = $result['data']['status'] ?? ''; //应答码
+                $platform_order_no = $result['data']['mchOrderNo'] ?? ''; //平台订单号
+
+                $platform_status = 2;
+                if ($resultFlag == 2) {
+                    $platform_status = 1;
+                } elseif ($resultFlag == 'M1001') {
+                    $platform_status = 3;
+                }
+                $result['ckType'] = 24;
+            } elseif ($payOutType == 25) {
+                //众鑫
+                $orderInfo = Withdrawal::where('order_no', '=', $orderNo)->get()->toArray();
+                $result    = Zhongxin::getInstance($config)->generateSignature([
+                    'orderNo' => $orderNo,
+                    'tradeNo' => $orderInfo[0]['platform_order_no'],
+                    'tranAmt' => $orderInfo[0]['amount'],
+                ], 'query')->sendRequest();
+                // 0 未处理、1 处理成功、2 处理中、3 处理失败、4 已退汇、5 其他
+                $resultFlag        = $result['data']['code'] ?? ''; //应答码
+                $platform_order_no = $result['data']['trade_no'] ?? ''; //平台订单号
+                $status            = $result['data']['status'] ?? ''; //应答码
+
+                $status = 2;
+                if ($resultFlag == 00) {
+                    if ($status == 0) {
+                        $platform_status = 0;
+                    } elseif ($status == 1) {
+                        $platform_status = 5;
+                    } elseif ($status == 2) {
+                        $platform_status = 2;
+                    } elseif ($status == 3) {
+                        $platform_status = 3;
+                    } elseif ($status == 4) {
+                        $platform_status = 1;
+                    }
+                } else {
+                    $platform_status = 3;
+                }
+                $result['ckType'] = 25;
+            } elseif ($payOutType == 26) {
+                //GPpay
+                // 统一状态 0 未处理、1 处理成功、2 处理中、3 处理失败、4 已退汇、5 其他
+                $result = GPpay::getInstance($config)->generateSignature([
+                    'orderNo' => $orderNo,
+                ], 'query')->sendRequest();
+                $resultFlag      = $result['result'] ?? ''; //结果代码
+                $platform_msg    = $result['result_msg'] ?? ''; //结果消息
+                $platform_status = 2;
+                if ($resultFlag == 'S') {
+                    $platform_status = 1;
+                } elseif ($resultFlag == 'F') {
+                    $platform_status = 3;
+                } else {
+                    $platform_status = 5;
+                }
+
+                $result['ckType'] = 26;
+            } elseif ($payOutType == 27) {
+                //先锋
+                // 统一状态 0 未处理、1 处理成功、2 处理中、3 处理失败、4 已退汇、5 其他
+                $result = Xianfeng::getInstance($config)->generateSignature([
+                    'orderNo' => $orderNo,
+                ], 'query')->sendRequest();
+                $queryStatus  = $result['RSPCOD'];
+                $resultFlag   = $result['STATE'] ?? ''; //结果代码
+                $platform_msg = $result['RSPMSG'] ?? ''; //结果消息
+                if ($queryStatus == '000000') {
+                    $platform_status = 2;
+                    if ($resultFlag == '1') {
+                        $platform_status = 1;
+                    } elseif ($resultFlag == '2') {
+                        $platform_status = 2;
+                    } elseif ($resultFlag == '3') {
+                        $platform_status = 3;
+                    } else {
+                        $platform_status = 5;
+                    }
+                }
+
+                $result['ckType'] = 27;
+            } elseif ($payOutType == 28) {
+                // 通付
+                // 统一状态 0 未处理、1 处理成功、2 处理中、3 处理失败、4 已退汇、5 其他
+                $result = Tongfu::getInstance($config)->generateSignature([
+                    'orderNo' => $orderNo,
+                ], 'query')->sendRequest();
+                $resultFlag      = $result['fxstatus'] ?? ''; //结果代码
+                $platform_msg    = $result['fxmsg'] ?? ''; //结果消息
+                $platform_status = 2;
+                if ($resultFlag == '1') {
+                    $platform_status = 1;
+                } else {
+                    $platform_status = 3;
+                }
+
+                $result['ckType'] = 28;
+            } elseif ($payOutType == 29) {
+                // 通付
+                // 统一状态 0 未处理、1 处理成功、2 处理中、3 处理失败、4 已退汇、5 其他
+                $result = SDpay::getInstance($config)->generateSignature([
+                    'orderNo' => $orderNo,
+                ], 'query')->sendRequest();
+                $result = json_decode($result,true);
+                $resultFlag      = $result['orderStatus'] ?? ''; //结果代码
+                $platform_status = 2;
+                if ($resultFlag == '1') {
+                    $platform_status = 2;
+                } elseif ($resultFlag == '2') {
+                    $platform_status = 1;
+                } elseif ($resultFlag == '3') {
+                    $platform_status = 3;
+                } else {
+                    $platform_status = 5;
+                }
+                $result['status'] = $resultFlag;
+                $result['ckType'] = 29;
+            } elseif ($payOutType == 30) {
+                //GPpay
+                // 统一状态 0 未处理、1 处理成功、2 处理中、3 处理失败、4 已退汇、5 其他
+                $result = Huitian::getInstance($config)->generateSignature([
+                    'orderNo' => $orderNo,
+                ], 'query')->sendRequest();
+                $queryStatus     = $result['ret_code'];
+                $resultFlag      = $result['STATE'] ?? ''; //结果代码
+                $platform_msg    = $result['RSPMSG'] ?? ''; //结果消息
+
+                $detail_datastr=explode("^",$result['detail_data']);
+
+                if ($queryStatus == '0000') {
+                    $platform_status = 2;
+                    if ($detail_datastr[4] == 'S') {
+                        $platform_status = 1;
+                    } else {
+                        $platform_status = 3;
+                    }
+                }
+
+                $result['ckType'] = 20;
             }
             // 已完成的就不要更新状态了
             if ($payOut->platform_status != 1) {
-                $payOut->platform_id = $platform->id;
                 // $payOut->platform_order_no = $platform_order_no;
                 // $payOut->platform_status   = $platform_status;
-                $payOut->platform_attach = json_encode($result);
+                $payOut->platform_id = $platform->id;
+                $payOut->status      = $platform_status;
+                if ($type == 0) {
+                    $payOut->platform_attach = json_encode($result);
+                }
+
                 $payOut->save();
             }
 
@@ -1084,8 +1282,13 @@ class PayOutController extends BaseController
 
                 $payOut->platform_id       = $platform->id;
                 $payOut->platform_order_no = $platform_order_no;
-                $payOut->platform_status   = $platform_status; // 0 未处理、1 处理成功、2 处理中、3 处理失败、4 已退汇、5 其他
-                $payOut->platform_attach   = json_encode($result);
+                if ($type != 1) {
+                    $payOut->platform_status = $platform_status; // 0 未处理、1 处理成功、2 处理中、3 处理失败、4 已退汇、5 其他
+                }
+                if ($type == 0) {
+                    $payOut->platform_attach = json_encode($result);
+                }
+
                 $payOut->save();
             }
         }
@@ -1245,7 +1448,7 @@ class PayOutController extends BaseController
         }
 
         // 人工
-        $withdrawals = Withdrawal::where('status', '=', 2)->where('created_at', '>=', $dateTime)->get();
+        $withdrawals = Withdrawal::where('status', '=', 2)->where('created_at', '>=', $dateTime)->limit(20)->get();
         if ($withdrawals) {
             foreach ($withdrawals as $withdrawal) {
                 $prevToken = $withdrawal->job_id;

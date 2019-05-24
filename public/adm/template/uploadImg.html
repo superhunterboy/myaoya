@@ -1,4 +1,4 @@
-<div class="upload-img table">
+<div ng-if="userInfo.permissions.split(',').indexOf('7')>-1" class="upload-img table">
     <div class="table-title">
         在线支付二维码
         <select ng-show="companyList.length>1" class="input" ng-change="changeCompany()" ng-model="nowCompany">
@@ -51,3 +51,4 @@
     </div>
 
 </div>
+<div ng-if="userInfo.permissions.split(',').indexOf('7')<0" style="margin-top: 30px;text-align: center">无访问权限</div>

@@ -59,17 +59,17 @@ class PermissionController extends BaseController
     public function getPermissions(Request $request, Response $response, $args)
     {
         $categories = [
-            0  => ['category' => '其他', 'permission' => []],
-            1  => ['category' => '支付记录', 'permission' => []],
-            2  => ['category' => '出款记录', 'permission' => []],
-            3  => ['category' => '支付平台', 'permission' => []],
-            4  => ['category' => '出款平台', 'permission' => []],
-            5  => ['category' => '用户', 'permission' => []],
-            6  => ['category' => '系统设置', 'permission' => []],
-            7  => ['category' => '微信二维码', 'permission' => []],
-            8  => ['category' => '加好友二维码', 'permission' => []],
-            9  => ['category' => '业务平台', 'permission' => []],
-            10 => ['category' => '登录', 'permission' => []],
+            0  => ['category' => '在线支付', 'permission' => []],
+            1  => ['category' => '转账汇款', 'permission' => []],
+            2  => ['category' => '支付宝支付', 'permission' => []],
+            3  => ['category' => '微信支付', 'permission' => []],
+            4  => ['category' => 'QQ支付', 'permission' => []],
+            5  => ['category' => '云闪付', 'permission' => []],
+            6  => ['category' => '人工存入支付列表', 'permission' => []],
+            7  => ['category' => '出款管理', 'permission' => []],
+            8  => ['category' => '入款数据统计', 'permission' => []],
+            9  => ['category' => '公告管理', 'permission' => []],
+            10  =>['category' => '后台账号', 'permission' => []],
         ];
         $permissions = Permission::all()->toArray();
         foreach ($permissions as $permission) {

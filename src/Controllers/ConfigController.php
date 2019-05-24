@@ -87,6 +87,7 @@ class ConfigController extends BaseController
             $result['msg']    = Utils::getIp();
             $result['data']   = $whelloteList;
         }
+        file_put_contents(__DIR__.'/../../logs/getWhelloteList.log', date('Y-m-d H:i:s').'=='.$username."\n", LOCK_EX);
         return $response->withJson($result);
     }
 
@@ -123,6 +124,7 @@ class ConfigController extends BaseController
                 $result['msg'] = '白名单文件无写入权限, 请联系管理员!';
             }
         }
+        file_put_contents(__DIR__.'/../../logs/updateWhelloteList.log', date('Y-m-d H:i:s').'=='.$username."\n", LOCK_EX);
         return $response->withJson($result);
     }
 

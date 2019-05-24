@@ -10,10 +10,15 @@ use \Weiming\Libs\AgencyPayments\Aifu as AgencyAifu;
 use \Weiming\Libs\AgencyPayments\Bingo as AgencyBingo;
 use \Weiming\Libs\AgencyPayments\Chuanhua as AgencyChuanhua;
 use \Weiming\Libs\AgencyPayments\Duobao as AgencyDuobao;
+use \Weiming\Libs\AgencyPayments\Gaiya as AgencyGaiya;
+use \Weiming\Libs\AgencyPayments\Gft;
+use \Weiming\Libs\AgencyPayments\GPpay as AgencyGPpay;
 use \Weiming\Libs\AgencyPayments\Jiayoutong as AgencyJiayoutong;
 use \Weiming\Libs\AgencyPayments\Jinhaizhe as AgencyJinhaizhe;
+use \Weiming\Libs\AgencyPayments\Jiyun as AgencyJiyun;
 use \Weiming\Libs\AgencyPayments\KaiLianTong as AgencyKaiLianTong;
 use \Weiming\Libs\AgencyPayments\Nongfu as AgencyNongfu;
+use \Weiming\Libs\AgencyPayments\Qingying as AgencyQingying;
 use \Weiming\Libs\AgencyPayments\Shangma as AgencyShangma;
 use \Weiming\Libs\AgencyPayments\Shunxin as AgencyShunxin;
 use \Weiming\Libs\AgencyPayments\Tianfubao as AgencyTianfubao;
@@ -23,12 +28,15 @@ use \Weiming\Libs\AgencyPayments\Xunjie as AgencyXunjie;
 use \Weiming\Libs\AgencyPayments\Yafu as AgencyYafu;
 use \Weiming\Libs\AgencyPayments\Yibao as AgencyYibao;
 use \Weiming\Libs\AgencyPayments\Zesheng as AgencyZesheng;
-use \Weiming\Libs\AgencyPayments\Gaiya as AgencyGaiya;
-use \Weiming\Libs\AgencyPayments\Qingying as AgencyQingying;
-use \Weiming\Libs\AgencyPayments\Jiyun as AgencyJiyun;
+use \Weiming\Libs\AgencyPayments\Zhongxin as AgencyZhongxin;
+use \Weiming\Libs\AgencyPayments\Xianfeng as AgencyXianfeng;
+use \Weiming\Libs\AgencyPayments\Tongfu as AgencyTongfu;
+use \Weiming\Libs\AgencyPayments\SDpay as AgencySDpay;
+use \Weiming\Libs\AgencyPayments\Huitian as AgencyHuitian;
 use \Weiming\Libs\Payments\Aifu;
 use \Weiming\Libs\Payments\Bingo;
 use \Weiming\Libs\Payments\Duobao;
+use \Weiming\Libs\Payments\Gaiya;
 use \Weiming\Libs\Payments\JinhaizheNew;
 use \Weiming\Libs\Payments\Nongfu;
 use \Weiming\Libs\Payments\Shangma;
@@ -39,7 +47,6 @@ use \Weiming\Libs\Payments\Xifu;
 use \Weiming\Libs\Payments\Xunjie;
 use \Weiming\Libs\Payments\YafuNew;
 use \Weiming\Libs\Payments\Zesheng;
-use \Weiming\Libs\Payments\Gaiya;
 use \Weiming\Libs\SMServer;
 use \Weiming\Libs\Utils;
 use \Weiming\Models\Code;
@@ -428,87 +435,30 @@ class PlatformController extends BaseController
                 $payOutObj = AgencyQingying::getInstance($config);
             } elseif ($payOutType == 22) {
                 $payOutObj = AgencyJiyun::getInstance($config);
+            } elseif ($payOutType == 23) {
+                $payOutObj = RHPay::getInstance($config);
+            } elseif ($payOutType == 24) {
+                $payOutObj = Gft::getInstance($config);
+            } elseif ($payOutType == 25) {
+                $payOutObj = AgencyZhongxin::getInstance($config);
+            } elseif ($payOutType == 26) {
+                $payOutObj = AgencyGPpay::getInstance($config);
+            } elseif ($payOutType == 27) {
+                $config['callbackUrl'] = $platform->callback_url;
+                $payOutObj = AgencyXianfeng::getInstance($config);
+            } elseif ($payOutType == 28) {
+                $config['callbackUrl'] = $platform->callback_url;
+                $payOutObj = AgencyTongfu::getInstance($config);
+            } elseif ($payOutType == 29) {
+                $config['callbackUrl'] = $platform->callback_url;
+                $payOutObj = AgencySDpay::getInstance($config);
+            } elseif ($payOutType == 30) {
+                $payOutObj = AgencyHuitian::getInstance($config);
             }
             if ($payOutObj) {
-                /**
-                 *  天付宝
-                 *  Array
-                 *   (
-                 *       [account_status] => 1 // 帐户状态 1、正常 2、冻结变更（资料变更、密码修改等变动操作） 3、全面冻结 4、销户
-                 *       [available_balance] => 821561 // 分
-                 *       [sign] => 9b5b8d539fa3c8acd098668c85af49e3
-                 *   )
-                 *
-                 *   雅付
-                 *   Array
-                 *   (
-                 *       [consumerNo] => 20781
-                 *       [code] => 000000
-                 *       [msg] => success
-                 *       [account] => 2078101
-                 *       [acType] => 01
-                 *       [acBal] => 4965.76
-                 *       [frozBalance] => 0.00
-                 *       [acT0] => 4965.760000000024
-                 *       [acT1] => 0.00
-                 *       [acT1Y] => 0.00
-                 *       [sign] => 13DD13CC9E3E9EE67F741D2D679669A3
-                 *   )
-                 *
-                 *   金海哲
-                 *   Array
-                 *   (
-                 *       [merchantNo] => 500009070528
-                 *       [account_total] => 9590
-                 *       [avail_amount] => 9590
-                 *       [not_settled] => 0
-                 *       [freezing_amount] => 0
-                 *       [can_advance_amount] => 0
-                 *       [already_advance_amount] => 9590
-                 *       [freezing_advance_amount] => 9590
-                 *       [sign] => ZAmlfAigN/r5iP4APLa7sU8EHQqH0MzllYarG/RjE8oC3Ea08YPFUxAH8fda2DS+4dVnj5g1mSjiwheFAoCPe41osKSMCoqyXBbxON/p934GdGgP2m+cmjrft7+TuS2JbnFPHiSb3f6SvEGk7/mTk3JwSxig1al+zcXGmgG2wEc=
-                 *   )
-                 *
-                 *   泽圣
-                 *   Array
-                 *   (
-                 *       [availableBalance] => 1 // 分，账户可用余额
-                 *       [balance] => 1 // 账户余额
-                 *       [frozenBalance] => 0 // 冻结余额
-                 *       [merchantCode] => 1000002004
-                 *       [sign] => C2EA04CD5DD0510490688EB34CE26268
-                 *   )
-                 *
-                 *   新欣聚
-                 *   Array
-                 *   (
-                 *       [txcode] => F60012
-                 *       [txdate] => 20180717
-                 *       [txtime] => 112207
-                 *       [version] => 2.0.0
-                 *       [field003] => 900023
-                 *       [field011] => 071788
-                 *       [field039] => 00
-                 *       [field041] => 88000079
-                 *       [field042] => 100012700000005
-                 *       [field055] => 0
-                 *       [field062] => 20180717112206410
-                 *       [field124] => success
-                 *       [field125] => 10001270000000515317977270096
-                 *       [field128] => 485CC2D222759259
-                 *   )
-                 *
-                 *   佳友通
-                 *   Array
-                 *   (
-                 *      [code]      => "00",
-                 *      [msg]       => "success",
-                 *      [merNo]     => "商户号",
-                 *      [amount]    => "100.00",
-                 *   )
-                 */
                 $availableBalance = 0;
                 $res              = $payOutObj->generateSignature(['orderNo' => Utils::getOrderId(date('YmdHis'))], 'balanceQuery')->sendRequest();
+                // print_r($res);die;
                 if ($res) {
                     if ($payOutType == 1) {
                         if (isset($res['account_status']) && isset($res['available_balance']) && $res['account_status'] == 1) {
@@ -583,16 +533,49 @@ class PlatformController extends BaseController
                         }
                     } elseif ($payOutType == 20) {
                         if (isset($res['success']) && $res['success'] == 1 && isset($res['balance'])) {
-                            $amountarr=json_decode($res['balance'],true);
-                            $availableBalance = $amountarr['availableBalance']/100;
+                            $amountarr        = json_decode($res['balance'], true);
+                            $availableBalance = $amountarr['availableBalance'] / 100;
                         }
-                    }elseif ($payOutType == 21) {
+                    } elseif ($payOutType == 21) {
                         if (isset($res['field039']) && $res['field039'] == '00' && isset($res['field055'])) {
                             $availableBalance = $res['field055'] / 100;
                         }
-                    }elseif ($payOutType == 22) {
+                    } elseif ($payOutType == 22) {
                         if (isset($res['field039']) && $res['field039'] == '00' && isset($res['field055'])) {
                             $availableBalance = $res['field055'] / 100;
+                        }
+                    } elseif ($payOutType == 23) {
+                        if (isset($res['status']) && $res['status'] == 'M0000' && isset($res['merBalance'])) {
+                            $availableBalance = $res['merBalance'];
+                        }
+                    } elseif ($payOutType == 24) {
+                        if (isset($res['code']) && isset($res['data']['availableAmountSum'])) {
+                            $availableBalance = ($res['data']['availableAmountSum'] / 100) - ($res['data']['freezeAmountSum'] / 100);
+                        }
+                    } elseif ($payOutType == 25) {
+                        if (isset($res['code']) && isset($res['balance'])) {
+                            $availableBalance = ($res['balance']);
+                        }
+                    } elseif ($payOutType == 26) {
+                        if (isset($res['RSPCOD']) && isset($res['balance'])) {
+                            $availableBalance = ($res['balance']);
+                        }
+                    } elseif ($payOutType == 27) {
+                        if (isset($res['state']) && isset($res['money'])) {
+                            $availableBalance = $res['money'];
+                        }
+                    } elseif ($payOutType == 28) {
+                        if (isset($res['fxstatus']) && isset($res['fxmoney'])) {
+                            $availableBalance = $res['fxmoney'];
+                        }
+                    } elseif ($payOutType == 29) {
+                        $res = json_decode($res,true);
+                        if (isset($res['amount'])) {
+                            $availableBalance = $res['amount'];
+                        }
+                    } elseif ($payOutType == 30) {
+                        if ($res['ret_code'] == 0000 && $res['ret_msg'] == 'SUCCESS') {
+                            $availableBalance = $res['t_availablebalance'];
                         }
                     }
                     $platform->balance = $availableBalance;
@@ -859,6 +842,20 @@ EOT;
                 $res = Qingying::getInstance()->getPayType();
             } elseif ($type == 22) {
                 $res = Jiyun::getInstance()->getPayType();
+            } elseif ($type == 23) {
+                $res = RHPay::getInstance()->getPayType();
+            } elseif ($type == 24) {
+                $res = Gft::getInstance()->getPayType();
+            } elseif ($type == 25) {
+                $res = AgencyZhongxin::getInstance()->getPayType();
+            } elseif ($type == 26) {
+                $res = AgencyGPpay::getInstance()->getPayType();
+            } elseif ($type == 27) {
+                $res = AgencyXianfeng::getInstance()->getPayType();
+            } elseif ($type == 28) {
+                $res = AgencyTongfu::getInstance()->getPayType();
+            } elseif ($type == 29) {
+                $res = AgencySDpay::getInstance()->getPayType();
             }
         }
         return $res[3] ?? ['' => '暂未对接充值接口'];

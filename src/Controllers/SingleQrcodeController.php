@@ -61,6 +61,30 @@ class SingleQrcodeController extends BaseController
         return $response->withJson($result);
     }
 
+    public function getSingleYUN(Request $request, Response $response, $args)
+    {
+        $result = ['status' => 1, 'msg' => '请联系客服，更新云闪付收款二维码，谢谢！', 'data' => []];
+        $wechat = Setting::where('key', 'qq_single_qrcode')->first(); // QQ支付：1 个人二维码
+        $type   = 0;
+        if (!empty($wechat) && in_array($wechat->val, [1])) {
+            $type = $wechat->val;
+        }
+        if ($type == 1) {
+            $privateQrcode = PrivateQrcode::where('type', '4')->where('status', '1')->first(); // orderBy('money', 'ASC')->orderBy('count', 'ASC')->
+            if (empty($privateQrcode)) {
+                $privateQrcode = PrivateQrcode::where('type', '4')->where('status', '!=', '2')->orderBy('money', 'ASC')->orderBy('count', 'ASC')->first();
+            }
+            if ($privateQrcode) {
+                $result['status']       = 0;
+                $result['msg']          = '';
+                $result['data']['id']   = $privateQrcode->id;
+                $result['data']['type'] = $privateQrcode->type;
+                $result['data']['url']  = $privateQrcode->url;
+            }
+        }
+        return $response->withJson($result);
+    }
+
     /**
      * @api {get} /getSingleWechat 获取微信收款二维码
      * @apiName GetSingleWechat
@@ -526,7 +550,8 @@ class SingleQrcodeController extends BaseController
         $page     = isset($getDatas['page']) ? intval($getDatas['page']) : 1;
         $perPage  = isset($getDatas['perPage']) ? intval($getDatas['perPage']) : 20;
         $type     = $args['type'] ?? '';
-        if (empty($type) || !in_array($type, [1, 2, 3])) {
+
+        if (empty($type) || !in_array($type, [1, 2, 3 ,4 ])) {
             return $response->withJson(['status' => 1, 'msg' => '二维码类型错误!', 'data' => []]);
         }
 

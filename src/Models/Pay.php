@@ -28,5 +28,8 @@ class Pay extends Eloquent
         'vendor_id',
         'vendor_type',
         'pay_datetime',
+        'notify_url',
+        'notify_msg',
+        'version'
     ];
 }

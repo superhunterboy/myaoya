@@ -1,4 +1,4 @@
-<div class="pay-out-list">
+<div ng-if="userInfo.permissions.split(',').indexOf('25')>-1" class="pay-out-list">
     <div class="page-title"><span>手动出款记录</span>
         <div class="page-btn">
             <a ng-click="export()" class="btn btn-green">导出EXCEL</a>
@@ -112,3 +112,4 @@
         <div table-page="table"></div>
     </div>
 </div>
+<div ng-if="userInfo.permissions.split(',').indexOf('25')<0" style="margin-top: 30px;text-align: center">无访问权限</div>

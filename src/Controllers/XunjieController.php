@@ -47,7 +47,7 @@ class XunjieController extends BaseController
             $order_no = $returnData['orderNo']; // 上传订单号
             $money    = sprintf("%.2f", $returnData['transAmt'] / 100); // 金额
             $state    = $returnData['respCode'] ?? ''; // 支付状态
-            if($returnData['productId']=='0122')
+            if($returnData['productId']=='0101')
             {
                 $money = sprintf("%.2f", intval($returnData['transAmt'] / 100)); // 金额
             }

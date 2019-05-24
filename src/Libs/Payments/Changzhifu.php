@@ -223,8 +223,6 @@ class Changzhifu implements WMPay
                 $returnStr = $res->getBody()->getContents();
                 if (Utils::isJSON($returnStr)) {
                     $resArr = json_decode($returnStr, true);
-            
-                    // file_put_contents('C:\wwwroot\pay\src\1.txt', var_export($resArr,ture));
                     $code   = $resArr['code'] ?? '';
                     $msg    = $resArr['msg'] ?? '';
                     if ($code !== '' && $code == '1') {

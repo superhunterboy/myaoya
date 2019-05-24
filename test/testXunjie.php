@@ -9,7 +9,7 @@ echo \Weiming\Libs\Payments\Xunjie::getInstance([
     'parterKey' => $key,
     'callbackUrl' => 'http://47.90.98.83:9898/payment/xunjie/callback',
     'notifyUrl' => 'http://47.90.98.83:9898/payment/xunjie/notify'
-])->signature('0122', 100, date('YmdHis'))->payment();
+])->signature('0132', 120, date('YmdHis'))->payment();
 
 // $orderNo = date('YmdHis');
 

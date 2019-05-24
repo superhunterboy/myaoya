@@ -41,6 +41,7 @@ var user=angular.module('user',['ngDialog']).directive("user",["$rootScope","$ht
                     rs.socket.onmessage = function (event) {
                         rs.heartCheck.reset();
                         var res=JSON.parse(event.data);
+                        //res.ret=1006;
                         if(res.ret==1001){
                             console.log(res.msg);
                             if(scope.otpStatus==0){

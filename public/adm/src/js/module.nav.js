@@ -19,6 +19,10 @@ nav.constant("myModulesConfig", [
         ]
     },
     {
+        name: "echarts",
+        files: ["js/echarts.min.js"]
+    },
+    {
         name: "datatype",
         files: ["js/directive.datatype.js"]
     },
@@ -45,7 +49,7 @@ nav.constant("myModulesConfig", [
     {
         name: "userList",
         files: [
-            "js/controller.userList.js?v=" + version,
+            "src/js/controller.userList.js?v=" + version,
             //"js/controller.userList.js",
             "css/userList.css"
         ]
@@ -102,6 +106,20 @@ nav.constant("myModulesConfig", [
         ]
     },
     {
+        name: "paymentMethod",
+        files: [
+            "js/controller.paymentMethod.js?v=" + version,
+            //"css/paymentMethod.css"
+        ]
+    },
+    {
+        name: "paymentChannelList",
+        files: [
+            "js/controller.paymentChannelList.js?v=" + version,
+            //"css/paymentChannelList.css"
+        ]
+    },
+    {
         name: "uploadImg",
         files: [
             "js/controller.uploadImg.js?v="+version,
@@ -120,6 +138,13 @@ nav.constant("myModulesConfig", [
     {
         name: "payOutPlatforms",
         files: ["js/controller.payOutPlatforms.js"]
+    },
+    {
+        name: "payDataReport",
+        files: [
+            "js/controller.payDataReport.js?v=" + version,
+            "css/payDataReport.css"
+        ]
     },
     {
         name: "payCompanyReport",
@@ -177,6 +202,18 @@ nav.constant("myModulesConfig", [
         name:"qqPersonalQrList",
         files:[
             "js/controller.qqPersonalQrList.js?v=" + version,
+            "css/personalQrcode.css"
+        ]
+    },{
+        name:"yunPayList",
+        files:[
+            "js/controller.yunPayList.js?v=" + version,
+            "css/wechatPayList.css"
+        ]
+    },{
+        name:"yunPersonalQrList",
+        files:[
+            "js/controller.yunPersonalQrList.js?v=" + version,
             "css/personalQrcode.css"
         ]
     },{
@@ -289,6 +326,18 @@ nav.config([
                 resolve: loadSequence("ngDialog", "table", "vendorList"),
                 controller: "vendorList"
             })
+            .state("paymentMethod", {
+                url: "/paymentMethod",
+                templateUrl: "template/paymentMethod.html",
+                resolve: loadSequence("ngDialog", "table", "paymentMethod"),
+                controller: "paymentMethod"
+            })
+            .state("paymentChannelList", {
+                url: "/paymentChannelList",
+                templateUrl: "template/paymentChannelList.html",
+                resolve: loadSequence("ngDialog", "table", "paymentChannelList"),
+                controller: "paymentChannelList"
+            })
             .state("userList", {
                 url: "/userList",
                 templateUrl: "template/userList.html",
@@ -334,6 +383,12 @@ nav.config([
                 templateUrl: "template/payOutPlatforms.html",
                 resolve: loadSequence("ngDialog", "table", "datatype", "payOutPlatforms"),
                 controller: "payOutPlatforms"
+            })
+            .state("payDataReport", {
+                url: "/payDataReport",
+                templateUrl: "template/payDataReport.html",
+                resolve: loadSequence("ngDialog","table","datePicker", "echarts", "datatype", "payDataReport"),
+                controller: "payDataReport"
             })
             .state("payCompanyReport", {
                 url: "/payCompanyReport",
@@ -437,6 +492,18 @@ nav.config([
                 resolve: loadSequence("ngDialog","table","imgUpload", "qqPersonalQrList"),
                 controller: "qqPersonalQrList"
             })
+            .state("yunPayList", {
+                url: "/yunPayList",
+                templateUrl: "template/yunPayList.html",
+                resolve: loadSequence("ngDialog","table","datePicker", "yunPayList"),
+                controller: "yunPayList"
+            })
+            .state("yunPersonalQrList", {
+                url: "/yunPersonalQrList",
+                templateUrl: "template/yunPersonalQrList.html",
+                resolve: loadSequence("ngDialog","table","imgUpload", "yunPersonalQrList"),
+                controller: "yunPersonalQrList"
+            })
             .state("noticeList", {
                 url: "/noticeList",
                 templateUrl: "template/noticeList.html",
@@ -483,116 +550,137 @@ nav.config([
                     '<div class="nav">\
                       <ul>\
                           <li class="nav-first" ng-class="{true:\'nav-active\'}[nowMenu==\'welcome\']"  ><a class="waves-effect waves-dark" ui-sref="welcome">首页</a></li>\
-                          <li ng-if="userInfo.type==1 || userInfo.type==0 || userInfo.type==3" class="nav-first" \
-                          ng-class="{true:\'nav-open\'}[nowMenu==\'payList\' || nowMenu==\'wechatList\' || nowMenu==\'alipayList\'|| nowMenu==\'failList\' || nowMenu==\'vendorList\' || nowMenu==\'companyList\' || nowMenu==\'uploadImg\']"><i class="icon-xiangxia1"></i><a>在线支付</a>\
-                          <ul class="nav-second" ng-style="{true:{\'display\':\'block\'}}[nowMenu==\'payList\' || nowMenu==\'wechatList\' || nowMenu==\'alipayList\'|| nowMenu==\'failList\' || nowMenu==\'vendorList\' || nowMenu==\'companyList\' || nowMenu==\'uploadImg\']">\
-                            <li ng-class="{true:\'nav-active\'}[nowMenu==\'payList\']" >\
+                          <li ng-if="userInfo.permissions.split(\',\').indexOf(\'1\')>-1 ||  userInfo.permissions.split(\',\').indexOf(\'2\')>-1 ||  userInfo.permissions.split(\',\').indexOf(\'3\')>-1 || userInfo.permissions.split(\',\').indexOf(\'4\')>-1 || userInfo.permissions.split(\',\').indexOf(\'5\')>-1 || userInfo.permissions.split(\',\').indexOf(\'6\')>-1 || userInfo.permissions.split(\',\').indexOf(\'7\')>-1 || userInfo.permissions.split(\',\').indexOf(\'8\')>-1 || userInfo.permissions.split(\',\').indexOf(\'34\')>-1" class="nav-first" ng-class="{true:\'nav-open\'}[nowMenu==\'payList\' || nowMenu==\'wechatList\' || nowMenu==\'alipayList\'|| nowMenu==\'failList\' || nowMenu==\'vendorList\'  || nowMenu==\'paymentMethod\'  || nowMenu==\'paymentChannelList\' || nowMenu==\'companyList\' || nowMenu==\'uploadImg\' || nowMenu==\'paymenuList\']"><i class="icon-xiangxia1"></i><a>在线支付</a>\
+                          <ul class="nav-second" ng-style="{true:{\'display\':\'block\'}}[nowMenu==\'payList\' || nowMenu==\'wechatList\' || nowMenu==\'alipayList\'|| nowMenu==\'failList\' || nowMenu==\'vendorList\'|| nowMenu==\'paymentMethod\'  || nowMenu==\'paymentChannelList\' || nowMenu==\'companyList\' || nowMenu==\'uploadImg\' || nowMenu==\'paymenuList\']">\
+                            <li ng-if="userInfo.permissions.split(\',\').indexOf(\'1\')>-1" ng-class="{true:\'nav-active\'}[nowMenu==\'payList\']" >\
                                 <a class="waves-effect waves-dark" ui-sref="payList({payType:0})" >支付成功记录<span ng-if="newPay>0" ng-bind="newPay>99?\'99+\':newPay"></span></a>\
                             </li>\
-                            <li ng-class="{true:\'nav-active\'}[nowMenu==\'wechatList\']" >\
+                            <li ng-if="userInfo.permissions.split(\',\').indexOf(\'2\')>-1" ng-class="{true:\'nav-active\'}[nowMenu==\'wechatList\']" >\
                                 <a class="waves-effect waves-dark" ui-sref="wechatList({payType:2})" >微信加好友记录<span ng-if="newWechat>0" ng-bind="newWechat>99?\'99+\':newWechat"></span></a>\
                             </li>\
-                            <li ng-class="{true:\'nav-active\'}[nowMenu==\'alipayList\']" >\
+                            <li ng-if="userInfo.permissions.split(\',\').indexOf(\'3\')>-1" ng-class="{true:\'nav-active\'}[nowMenu==\'alipayList\']" >\
                                 <a class="waves-effect waves-dark" ui-sref="alipayList({payType:3})" >支付宝加好友记录<span ng-if="newAlipay>0" ng-bind="newAlipay>99?\'99+\':newAlipay"></span></a>\
                             </li>\
-                            <li ng-class="{true:\'nav-active\'}[nowMenu==\'failList\']" >\
+                            <li ng-if="userInfo.permissions.split(\',\').indexOf(\'4\')>-1" ng-class="{true:\'nav-active\'}[nowMenu==\'failList\']" >\
                                 <a class="waves-effect waves-dark" ui-sref="failList({payType:1})" >支付失败记录</a>\
                             </li>\
-                            <li ng-class="{true:\'nav-active\'}[nowMenu==\'vendorList\']" >\
+                            <li ng-if="userInfo.permissions.split(\',\').indexOf(\'5\')>-1" ng-class="{true:\'nav-active\'}[nowMenu==\'vendorList\']" >\
                                 <a class="waves-effect waves-dark" ui-sref="vendorList" >支付平台设置</a>\
                             </li>\
-                            <li ng-class="{true:\'nav-active\'}[nowMenu==\'companyList\']" >\
+                            <li ng-if="userInfo.permissions.split(\',\').indexOf(\'35\')>-1" ng-class="{true:\'nav-active\'}[nowMenu==\'paymentMethod\']" >\
+                                <a class="waves-effect waves-dark" ui-sref="paymentMethod" >支付方式</a>\
+                            </li>\
+                            <li ng-if="userInfo.permissions.split(\',\').indexOf(\'34\')>-1" ng-class="{true:\'nav-active\'}[nowMenu==\'paymentChannelList\']" >\
+                                <a class="waves-effect waves-dark" ui-sref="paymentChannelList" >支付渠道</a>\
+                            </li>\
+                            <li ng-if="userInfo.permissions.split(\',\').indexOf(\'6\')>-1" ng-class="{true:\'nav-active\'}[nowMenu==\'companyList\']" >\
                                 <a class="waves-effect waves-dark" ui-sref="companyList" >业务平台设置</a>\
                             </li>\
-                            <li ng-class="{true:\'nav-active\'}[nowMenu==\'uploadImg\']" >\
+                            <li ng-if="userInfo.permissions.split(\',\').indexOf(\'7\')>-1" ng-class="{true:\'nav-active\'}[nowMenu==\'uploadImg\']" >\
                                 <a class="waves-effect waves-dark" ui-sref="uploadImg" >在线支付二维码</a>\
+                            </li>\
+                            <li ng-if="userInfo.permissions.split(\',\').indexOf(\'8\')>-1" ng-class="{true:\'nav-active\'}[nowMenu==\'paymenuList\']" >\
+                                <a class="waves-effect waves-dark" ui-sref="paymenuList" >支付显示设置</a>\
                             </li>\
                             </ul>\
                           </li>\
-                          <li ng-if="userInfo.type==1 || userInfo.type==0 || userInfo.type==3" class="nav-first" ng-class="{true:\'nav-open\'}[nowMenu==\'bankSetting\'|| nowMenu==\'bankPayList\']"><i class="icon-xiangxia1"></i><a>转账汇款</a>\
+                          <li ng-if="userInfo.permissions.split(\',\').indexOf(\'9\')>-1 ||  userInfo.permissions.split(\',\').indexOf(\'10\')>-1" class="nav-first" ng-class="{true:\'nav-open\'}[nowMenu==\'bankSetting\'|| nowMenu==\'bankPayList\']"><i class="icon-xiangxia1"></i><a>转账汇款</a>\
                             <ul class="nav-second" ng-style="{true:{\'display\':\'block\'}}[nowMenu==\'bankSetting\'|| nowMenu==\'bankPayList\']">\
-                                <li ng-class="{true:\'nav-active\'}[nowMenu==\'bankPayList\']"  >\
+                                <li ng-if="userInfo.permissions.split(\',\').indexOf(\'9\')>-1" ng-class="{true:\'nav-active\'}[nowMenu==\'bankPayList\']"  >\
                                     <a class="waves-effect waves-dark" ui-sref="bankPayList" >转账汇款记录<span ng-if="newBank>0" ng-bind="newBank>99?\'99+\':newBank"></span></a> \
                                 </li>\
-                                <li ng-class="{true:\'nav-active\'}[nowMenu==\'bankSetting\']" >\
+                                <li ng-if="userInfo.permissions.split(\',\').indexOf(\'10\')>-1" ng-class="{true:\'nav-active\'}[nowMenu==\'bankSetting\']" >\
                                     <a class="waves-effect waves-dark" ui-sref="bankSetting">转账银行卡设置</a>\
                                 </li>\
                             </ul>\
                           </li>\
-                          <li ng-if="userInfo.type==1 || userInfo.type==2 ||userInfo.type==3" class="nav-first" ng-class="{true:\'nav-open\'}[nowMenu==\'alipayRecords\' || nowMenu==\'alipayBankList\' || nowMenu==\'alipayPersonalQrList\'|| nowMenu==\'alipayMerchantQrList\']" ><i class="icon-xiangxia1"></i><a>支付宝支付</a>\
+                          <li ng-if="userInfo.permissions.split(\',\').indexOf(\'11\')>-1 ||  userInfo.permissions.split(\',\').indexOf(\'12\')>-1 ||  userInfo.permissions.split(\',\').indexOf(\'13\')>-1 ||  userInfo.permissions.split(\',\').indexOf(\'14\')>-1" class="nav-first" ng-class="{true:\'nav-open\'}[nowMenu==\'alipayRecords\' || nowMenu==\'alipayBankList\' || nowMenu==\'alipayPersonalQrList\'|| nowMenu==\'alipayMerchantQrList\']" ><i class="icon-xiangxia1"></i><a>支付宝支付</a>\
                                 <ul class="nav-second" ng-style="{true:{\'display\':\'block\'}}[nowMenu==\'alipayRecords\' || nowMenu==\'alipayBankList\' || nowMenu==\'alipayPersonalQrList\' || nowMenu==\'alipayMerchantQrList\']">\
-                                    <li ng-class="{true:\'nav-active\'}[nowMenu==\'alipayRecords\']" >\
+                                    <li ng-if="userInfo.permissions.split(\',\').indexOf(\'11\')>-1" ng-class="{true:\'nav-active\'}[nowMenu==\'alipayRecords\']" >\
                                         <a class="waves-effect waves-dark" ui-sref="alipayRecords" >支付宝支付记录</a>\
                                     </li>\
-                                    <li ng-class="{true:\'nav-active\'}[nowMenu==\'alipayBankList\']" >\
+                                    <li ng-if="userInfo.permissions.split(\',\').indexOf(\'12\')>-1" ng-class="{true:\'nav-active\'}[nowMenu==\'alipayBankList\']" >\
                                         <a class="waves-effect waves-dark" ui-sref="alipayBankList" >转到银行卡</a>\
                                     </li>\
-                                    <li ng-class="{true:\'nav-active\'}[nowMenu==\'alipayPersonalQrList\']" >\
+                                    <li ng-if="userInfo.permissions.split(\',\').indexOf(\'13\')>-1" ng-class="{true:\'nav-active\'}[nowMenu==\'alipayPersonalQrList\']" >\
                                         <a class="waves-effect waves-dark" ui-sref="alipayPersonalQrList" >个人支付宝扫码</a>\
                                     </li>\
-                                    <li ng-class="{true:\'nav-active\'}[nowMenu==\'alipayMerchantQrList\']" >\
+                                    <li ng-if="userInfo.permissions.split(\',\').indexOf(\'14\')>-1" ng-class="{true:\'nav-active\'}[nowMenu==\'alipayMerchantQrList\']" >\
                                         <a class="waves-effect waves-dark" ui-sref="alipayMerchantQrList" >商家扫码</a>\
                                     </li>\
                                 </ul>\
                           </li>\
-                          <li ng-if="userInfo.type==1 || userInfo.type==2 ||userInfo.type==3" class="nav-first" ng-class="{true:\'nav-open\'}[nowMenu==\'wechatPayList\' || nowMenu==\'wechatPersonalQrList\'|| nowMenu==\'wechatMerchantQrList\'|| nowMenu==\'wechatQRList\']" ><i class="icon-xiangxia1"></i><a>微信支付</a>\
+                          <li ng-if="userInfo.permissions.split(\',\').indexOf(\'15\')>-1 ||  userInfo.permissions.split(\',\').indexOf(\'16\')>-1 ||  userInfo.permissions.split(\',\').indexOf(\'17\')>-1 ||  userInfo.permissions.split(\',\').indexOf(\'18\')>-1" class="nav-first" ng-class="{true:\'nav-open\'}[nowMenu==\'wechatPayList\' || nowMenu==\'wechatPersonalQrList\'|| nowMenu==\'wechatMerchantQrList\'|| nowMenu==\'wechatQRList\']" ><i class="icon-xiangxia1"></i><a>微信支付</a>\
                                 <ul class="nav-second" ng-style="{true:{\'display\':\'block\'}}[ nowMenu==\'wechatPayList\' || nowMenu==\'wechatPersonalQrList\' || nowMenu==\'wechatMerchantQrList\'|| nowMenu==\'wechatQRList\']">\
-                                    <li ng-class="{true:\'nav-active\'}[nowMenu==\'wechatPayList\']" >\
+                                    <li ng-if="userInfo.permissions.split(\',\').indexOf(\'15\')>-1" ng-class="{true:\'nav-active\'}[nowMenu==\'wechatPayList\']" >\
                                         <a class="waves-effect waves-dark" ui-sref="wechatPayList" >微信支付记录</a>\
                                     </li>\
-                                    <li ng-class="{true:\'nav-active\'}[nowMenu==\'wechatPersonalQrList\']" >\
+                                    <li ng-if="userInfo.permissions.split(\',\').indexOf(\'16\')>-1" ng-class="{true:\'nav-active\'}[nowMenu==\'wechatPersonalQrList\']" >\
                                         <a class="waves-effect waves-dark" ui-sref="wechatPersonalQrList" >个人微信扫码</a>\
                                     </li>\
-                                    <li ng-class="{true:\'nav-active\'}[nowMenu==\'wechatMerchantQrList\']" >\
+                                    <li ng-if="userInfo.permissions.split(\',\').indexOf(\'17\')>-1" ng-class="{true:\'nav-active\'}[nowMenu==\'wechatMerchantQrList\']" >\
                                         <a class="waves-effect waves-dark" ui-sref="wechatMerchantQrList" >商家微信扫码</a>\
                                     </li>\
-                                    <li ng-class="{true:\'nav-active\'}[nowMenu==\'wechatQRList\']" >\
+                                    <li ng-if="userInfo.permissions.split(\',\').indexOf(\'18\')>-1" ng-class="{true:\'nav-active\'}[nowMenu==\'wechatQRList\']" >\
                                         <a class="waves-effect waves-dark" ui-sref="wechatQRList" >智能微信扫码</a>\
                                     </li>\
                                 </ul>\
                             </li>\
-                          <li ng-if="userInfo.type==1 || userInfo.type==2 ||userInfo.type==3" class="nav-first" ng-class="{true:\'nav-open\'}[nowMenu==\'qqPayList\' || nowMenu==\'qqPersonalQrList\']" ><i class="icon-xiangxia1"></i><a>QQ支付</a>\
+                          <li ng-if="userInfo.permissions.split(\',\').indexOf(\'19\')>-1 ||  userInfo.permissions.split(\',\').indexOf(\'20\')>-1" class="nav-first" ng-class="{true:\'nav-open\'}[nowMenu==\'qqPayList\' || nowMenu==\'qqPersonalQrList\']" ><i class="icon-xiangxia1"></i><a>QQ支付</a>\
                                 <ul class="nav-second"  ng-style="{true:{\'display\':\'block\'}}[nowMenu==\'qqPayList\' || nowMenu==\'qqPersonalQrList\']">\
-                                    <li ng-class="{true:\'nav-active\'}[nowMenu==\'qqPayList\']" >\
+                                    <li ng-if="userInfo.permissions.split(\',\').indexOf(\'19\')>-1" ng-class="{true:\'nav-active\'}[nowMenu==\'qqPayList\']" >\
                                         <a class="waves-effect waves-dark" ui-sref="qqPayList" >QQ支付记录</a>\
                                     </li>\
-                                     <li ng-class="{true:\'nav-active\'}[nowMenu==\'qqPersonalQrList\']" >\
+                                     <li ng-if="userInfo.permissions.split(\',\').indexOf(\'20\')>-1" ng-class="{true:\'nav-active\'}[nowMenu==\'qqPersonalQrList\']" >\
                                         <a class="waves-effect waves-dark" ui-sref="qqPersonalQrList" >个人QQ扫码</a>\
                                      </li>\
                                 </ul>\
                           </li>\
-                          <li ng-if="userInfo.type==1 || userInfo.type==2 ||userInfo.type==3" class="nav-first" ng-class="{true:\'nav-active\'}[nowMenu==\'artificialDepositList\']"><a class="waves-effect waves-dark" ui-sref="artificialDepositList">人工存入支付列表</a></li></li>\
-                          <li ng-if="userInfo.type==1 || userInfo.type==2 ||userInfo.type==3" class="nav-first" ng-class="{true:\'nav-open\'}[nowMenu==\'payOutList\'|| nowMenu==\'payOutPlatforms\' || nowMenu==\'payOutLimit\' || nowMenu==\'personalPayOutList\']" ><i class="icon-xiangxia1"></i><a>出款管理</a>\
+                          <li ng-if="userInfo.permissions.split(\',\').indexOf(\'21\')>-1 ||  userInfo.permissions.split(\',\').indexOf(\'22\')>-1" class="nav-first" ng-class="{true:\'nav-open\'}[nowMenu==\'yunPayList\' || nowMenu==\'yunPersonalQrList\']" ><i class="icon-xiangxia1"></i><a>云闪付</a>\
+                              <ul class="nav-second"  ng-style="{true:{\'display\':\'block\'}}[nowMenu==\'yunPayList\' || nowMenu==\'yunPersonalQrList\']">\
+                                  <li ng-if="userInfo.permissions.split(\',\').indexOf(\'21\')>-1" ng-class="{true:\'nav-active\'}[nowMenu==\'yunPayList\']" >\
+                                        <a class="waves-effect waves-dark" ui-sref="yunPayList" >云闪付记录</a>\
+                                  </li>\
+                                  <li ng-if="userInfo.permissions.split(\',\').indexOf(\'22\')>-1" ng-class="{true:\'nav-active\'}[nowMenu==\'yunPersonalQrList\']" >\
+                                        <a class="waves-effect waves-dark" ui-sref="yunPersonalQrList" >云闪付扫码</a>\
+                                  </li>\
+                              </ul>\
+                          </li>\
+                          <li  ng-if="userInfo.permissions.split(\',\').indexOf(\'23\')>-1" class="nav-first" ng-class="{true:\'nav-active\'}[nowMenu==\'artificialDepositList\']"><a class="waves-effect waves-dark" ui-sref="artificialDepositList">人工存入支付列表</a></li></li>\
+                          <li ng-if="userInfo.permissions.split(\',\').indexOf(\'24\')>-1 ||  userInfo.permissions.split(\',\').indexOf(\'25\')>-1 || userInfo.permissions.split(\',\').indexOf(\'26\')>-1 || userInfo.permissions.split(\',\').indexOf(\'27\')>-1" class="nav-first" ng-class="{true:\'nav-open\'}[nowMenu==\'payOutList\'|| nowMenu==\'payOutPlatforms\' || nowMenu==\'payOutLimit\' || nowMenu==\'personalPayOutList\']" ><i class="icon-xiangxia1"></i><a>出款管理</a>\
                               <ul class="nav-second" ng-style="{true:{\'display\':\'block\'}}[nowMenu==\'payOutList\' || nowMenu==\'payOutPlatforms\' || nowMenu==\'payOutLimit\' || nowMenu==\'personalPayOutList\']">\
-                                  <li ng-class="{true:\'nav-active\'}[nowMenu==\'payOutList\']" >\
+                                  <li ng-if="userInfo.permissions.split(\',\').indexOf(\'24\')>-1" ng-class="{true:\'nav-active\'}[nowMenu==\'payOutList\']" >\
                                       <a class="waves-effect waves-dark" ui-sref="payOutList" >自动出款记录</a>\
                                   </li>\
-                                  <li ng-class="{true:\'nav-active\'}[nowMenu==\'personalPayOutList\']" >\
+                                  <li ng-if="userInfo.permissions.split(\',\').indexOf(\'25\')>-1" ng-class="{true:\'nav-active\'}[nowMenu==\'personalPayOutList\']" >\
                                       <a class="waves-effect waves-dark" ui-sref="personalPayOutList" >手动出款记录</a>\
                                   </li>\
-                                  <li ng-class="{true:\'nav-active\'}[nowMenu==\'payOutPlatforms\']" >\
+                                  <li ng-if="userInfo.permissions.split(\',\').indexOf(\'26\')>-1" ng-class="{true:\'nav-active\'}[nowMenu==\'payOutPlatforms\']" >\
                                       <a class="waves-effect waves-dark" ui-sref="payOutPlatforms" >出款平台设置</a>\
                                   </li>\
-                                  <li ng-class="{true:\'nav-active\'}[nowMenu==\'payOutLimit\']" >\
+                                  <li ng-if="userInfo.permissions.split(\',\').indexOf(\'27\')>-1" ng-class="{true:\'nav-active\'}[nowMenu==\'payOutLimit\']" >\
                                       <a class="waves-effect waves-dark" ui-sref="payOutLimit" >出款次数设置</a>\
                                   </li>\
                               </ul>\
                           </li>\
-                          <li ng-if="userInfo.type==1 || userInfo.type==3" class="nav-first" ng-class="{true:\'nav-open\'}[nowMenu==\'payCompanyReport\'|| nowMenu==\'artificialDepositReport\'|| nowMenu==\'payOnlineReport\']"><i class="icon-xiangxia1"></i><a>入款数据统计</a>\
+                          <li ng-if="userInfo.permissions.split(\',\').indexOf(\'28\')>-1 ||  userInfo.permissions.split(\',\').indexOf(\'29\')>-1 || userInfo.permissions.split(\',\').indexOf(\'30\')>-1" class="nav-first" ng-class="{true:\'nav-open\'}[nowMenu==\'payCompanyReport\'|| nowMenu==\'artificialDepositReport\'|| nowMenu==\'payOnlineReport\']"><i class="icon-xiangxia1"></i><a>入款数据统计</a>\
                                <ul class="nav-second" ng-style="{true:{\'display\':\'block\'}}[nowMenu==\'payCompanyReport\'|| nowMenu==\'artificialDepositReport\'|| nowMenu==\'payOnlineReport\']">\
-                                    <li ng-class="{true:\'nav-active\'}[nowMenu==\'payCompanyReport\']">\
+                                    <li ng-if="userInfo.permissions.split(\',\').indexOf(\'33\')>-1" ng-class="{true:\'nav-active\'}[nowMenu==\'payDataReport\']">\
+                                        <a class="waves-effect waves-dark" ui-sref="payDataReport" >入款数据报表</a>\
+                                    </li>\
+                                    <li ng-if="userInfo.permissions.split(\',\').indexOf(\'28\')>-1" ng-class="{true:\'nav-active\'}[nowMenu==\'payCompanyReport\']">\
                                         <a class="waves-effect waves-dark" ui-sref="payCompanyReport" >公司入款统计</a>\
                                     </li>\
-                                    <li ng-class="{true:\'nav-active\'}[nowMenu==\'artificialDepositReport\']">\
+                                    <li ng-if="userInfo.permissions.split(\',\').indexOf(\'29\')>-1" ng-class="{true:\'nav-active\'}[nowMenu==\'artificialDepositReport\']">\
                                         <a class="waves-effect waves-dark" ui-sref="artificialDepositReport" >人工存入统计</a>\
                                     </li>\
-                                    <li ng-class="{true:\'nav-active\'}[nowMenu==\'payOnlineReport\']">\
+                                    <li ng-if="userInfo.permissions.split(\',\').indexOf(\'30\')>-1" ng-class="{true:\'nav-active\'}[nowMenu==\'payOnlineReport\']">\
                                         <a class="waves-effect waves-dark" ui-sref="payOnlineReport" >线上支付统计</a>\
                                     </li>\
                                </ul>\
                           </li>\
-                          <li ng-if="userInfo.type==1" class="nav-first" ng-class="{true:\'nav-active\'}[nowMenu==\'noticeList\']"><a class="waves-effect waves-dark" ui-sref="noticeList">公告管理</a></li></li>\
-                          <li ng-if="userInfo.type==1" class="nav-first" ng-class="{true:\'nav-active\'}[nowMenu==\'userList\']"><a class="waves-effect waves-dark" ui-sref="userList">后台账号</a></li></li>\
+                          <li ng-if="userInfo.permissions.split(\',\').indexOf(\'31\')>-1" class="nav-first" ng-class="{true:\'nav-active\'}[nowMenu==\'noticeList\']"><a class="waves-effect waves-dark" ui-sref="noticeList">公告管理</a></li></li>\
+                          <li  ng-if="userInfo.permissions.split(\',\').indexOf(\'32\')>-1" class="nav-first" ng-class="{true:\'nav-active\'}[nowMenu==\'userList\']"><a class="waves-effect waves-dark" ui-sref="userList">后台账号</a></li></li>\
                       </ul>\
                   </div>',
                 link: function (scope, element, attrs, ctrl) {

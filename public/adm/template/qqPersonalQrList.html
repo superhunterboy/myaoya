@@ -1,5 +1,5 @@
 <div ng-if="!smsCode" smscode></div>
-<div ng-if="smsCode"  class="personal-qr-list">
+<div ng-if="smsCode && userInfo.permissions.split(',').indexOf('20')>-1"  class="personal-qr-list">
     <div class="page-title">
         <span>个人QQ扫码</span>
         <div class="page-btn">

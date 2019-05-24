@@ -70,6 +70,8 @@ class VendorController extends BaseController
         $wap_baidu          = $postDatas['wap_baidu'] ?? 0;
         $union              = $postDatas['union'] ?? 0;
         $wap_union          = $postDatas['wap_union'] ?? 0;
+        $yun                = $postDatas['yun'] ?? 0;
+        $wap_yun            = $postDatas['wap_yun'] ?? 0;
 
         if (empty($company_id) || empty($pay_type) || empty($no) || empty($key)) {
 
@@ -157,6 +159,8 @@ class VendorController extends BaseController
         $wap_baidu          = $putDatas['wap_baidu'] ?? 0;
         $union              = $putDatas['union'] ?? 0;
         $wap_union          = $putDatas['wap_union'] ?? 0;
+        $yun                = $putDatas['yun'] ?? 0;
+        $wap_yun            = $putDatas['wap_yun'] ?? 0;
 
         if (empty($company_id) || empty($pay_type) || empty($no) || empty($key)) {
 
@@ -187,6 +191,8 @@ class VendorController extends BaseController
                 $vendor->wap_baidu          = $wap_baidu;
                 $vendor->union              = $union;
                 $vendor->wap_union          = $wap_union;
+                $vendor->yun                = $yun;
+                $vendor->wap_yun            = $wap_yun;
                 // $vendor->error_count = $putDatas['error_count'];
                 $res = $vendor->save();
 

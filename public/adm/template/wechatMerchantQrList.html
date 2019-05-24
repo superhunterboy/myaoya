@@ -1,4 +1,4 @@
-<div class="merchant-pay-list">
+<div ng-if="userInfo.permissions.split(',').indexOf('17')>-1" class="merchant-pay-list">
     <div class="page-title">商家微信扫码</div>
 
     <div class="table">
@@ -59,3 +59,4 @@
         <div table-page="table"></div>
     </div>
 </div>
+<div ng-if="userInfo.permissions.split(',').indexOf('17')<0" style="margin-top: 30px;text-align: center">无访问权限</div>

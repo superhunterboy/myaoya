@@ -10,23 +10,31 @@ use Weiming\Libs\AgencyPayments\Aifu;
 use Weiming\Libs\AgencyPayments\Bingo;
 use Weiming\Libs\AgencyPayments\Chuanhua;
 use Weiming\Libs\AgencyPayments\Duobao;
+use Weiming\Libs\AgencyPayments\Gaiya;
+use Weiming\Libs\AgencyPayments\Gft;
+use Weiming\Libs\AgencyPayments\GPpay;
 use Weiming\Libs\AgencyPayments\Jiayoutong;
 use Weiming\Libs\AgencyPayments\Jinhaizhe;
+use Weiming\Libs\AgencyPayments\Jiyun;
 use Weiming\Libs\AgencyPayments\KaiLianTong;
 use Weiming\Libs\AgencyPayments\Nongfu;
+use Weiming\Libs\AgencyPayments\Qingying;
+use Weiming\Libs\AgencyPayments\RHPay;
+use Weiming\Libs\AgencyPayments\SDpay;
 use Weiming\Libs\AgencyPayments\Shangma;
 use Weiming\Libs\AgencyPayments\Shunxin;
 use Weiming\Libs\AgencyPayments\Tianfubao;
+use Weiming\Libs\AgencyPayments\Tongfu;
+use Weiming\Libs\AgencyPayments\Xianfeng;
 use Weiming\Libs\AgencyPayments\Xifu;
+use Weiming\Libs\AgencyPayments\Xinxinju;
 use Weiming\Libs\AgencyPayments\Xunjie;
 use Weiming\Libs\AgencyPayments\Yafu;
 use Weiming\Libs\AgencyPayments\Yibao;
 use Weiming\Libs\AgencyPayments\Zesheng;
 use Weiming\Libs\AgencyPayments\Zhongdian;
-use Weiming\Libs\AgencyPayments\Xinxinju;
-use Weiming\Libs\AgencyPayments\Gaiya;
-use Weiming\Libs\AgencyPayments\Qingying;
-use Weiming\Libs\AgencyPayments\Jiyun;
+use Weiming\Libs\AgencyPayments\Zhongxin;
+use Weiming\Libs\AgencyPayments\Huitian;
 use Weiming\Libs\Utils;
 use Weiming\Models\Member;
 use Weiming\Models\Platform;
@@ -36,6 +44,12 @@ class WithdrawalsController extends BaseController
 {
     public function withdrawals(Request $request, Response $response, $args)
     {
+        $permissions    = $this->jwt->userInfo->permissions;
+        $permissionsArr = explode(',', $permissions);
+        if (!in_array(36, $permissionsArr)) {
+            $result = ['status' => 1, 'msg' => '没有权限出款', 'data' => []];
+            return $response->withJson($result);
+        }
         $result       = ['status' => 1, 'msg' => '参数错误', 'data' => []];
         $postDatas    = $request->getParsedBody();
         $platformType = $postDatas['platformType'] ?? 0;
@@ -46,11 +60,11 @@ class WithdrawalsController extends BaseController
         $bankName     = $postDatas['bankName'] ?? '';
         $amount       = $postDatas['amount'] ?? 0;
         //$mobile       = $postDatas['mobile'] ?? '';
-        $mobile       = '';
-        $province     = $postDatas['province'] ?? '';
-        $city         = $postDatas['city'] ?? '';
-        $branch       = $postDatas['branch'] ?? '';
-        $subbranch    = $postDatas['subbranch'] ?? '';
+        $mobile    = '';
+        $province  = $postDatas['province'] ?? '';
+        $city      = $postDatas['city'] ?? '';
+        $branch    = $postDatas['branch'] ?? '';
+        $subbranch = $postDatas['subbranch'] ?? '';
         // 手输入银行名称
         if ($bankName == 'enterBankName') {
             $bankName = $postDatas['enterBankName'] ?? '';
@@ -74,7 +88,7 @@ class WithdrawalsController extends BaseController
             if (in_array($platformType, [2]) && (empty($province) || empty($city))) {
                 return $response->withJson($result);
             }
-            if (!in_array($platformType, [7, 14]) && empty($bankName)) {
+            if (!in_array($platformType, [7, 14, 27]) && empty($bankName)) {
                 return $response->withJson($result);
             }
             // if (in_array($platformType, []) && empty($branch)) {
@@ -82,7 +96,7 @@ class WithdrawalsController extends BaseController
             // }
             // yafu、shangma、aifu、nongfu、shunxin、bingo要传银行编码，扯淡滴很，fuck
             $bankCode = 'UNKNOWN';
-            if (in_array($platformType, [2, 8, 10, 11, 12, 16, 17, 20])) {
+            if (in_array($platformType, [2, 8, 10, 11, 12, 16, 17, 20, 25, 26, 29])) {
                 $bankLists = [];
                 if ($platformType == 2) {
                     $bankLists = $this->settings['bank'];
@@ -100,6 +114,12 @@ class WithdrawalsController extends BaseController
                     $bankLists = $this->settings['yibao'];
                 } elseif ($platformType == 20) {
                     $bankLists = $this->settings['gaiya'];
+                } elseif ($platformType == 25) {
+                    $bankLists = $this->settings['zhongxin'];
+                } elseif ($platformType == 26) {
+                    $bankLists = $this->settings['gppay'];
+                } elseif ($platformType == 29) {
+                    $bankLists = $this->settings['sdpay'];
                 }
                 foreach ($bankLists as $bankNameKeyword => $bankCode) {
                     if (strpos($bankName, $bankNameKeyword) !== false) {
@@ -140,8 +160,9 @@ class WithdrawalsController extends BaseController
                         $res  = '';
                         $data = '';
                         $conf = [
-                            'parterNo'  => $platform->no,
-                            'parterKey' => $platform->key,
+                            'parterNo'    => $platform->no,
+                            'parterKey'   => $platform->key,
+                            'callbackUrl' => $platform->callback_url,
                         ];
                         if ($platformType == 1) {
                             $res = Tianfubao::getInstance($conf)->generateSignature([
@@ -320,7 +341,7 @@ class WithdrawalsController extends BaseController
                                 'mobile'   => $mobile,
                             ], 'payment')->sendRequest();
                             $data = $res;
-                        }elseif ($platformType == 19) {
+                        } elseif ($platformType == 19) {
                             $res = Jiayoutong::getInstance($conf)->generateSignature([
                                 'orderNo'  => $orderId,
                                 'acctId'   => $bankNo,
@@ -330,7 +351,7 @@ class WithdrawalsController extends BaseController
                                 'mobile'   => $mobile,
                             ], 'payment')->sendRequest();
                             $data = $res;
-                        }elseif ($platformType == 20) {
+                        } elseif ($platformType == 20) {
                             $res = Gaiya::getInstance($conf)->generateSignature([
                                 'orderNo'  => $orderId,
                                 'acctId'   => $bankNo,
@@ -338,10 +359,10 @@ class WithdrawalsController extends BaseController
                                 'tranAmt'  => $amount * 100, // 分
                                 'bankName' => $bankName,
                                 'mobile'   => $mobile,
-                                'bankCode' => $bankCode
+                                'bankCode' => $bankCode,
                             ], 'payment')->sendRequest();
                             $data = $res;
-                        }elseif ($platformType == 21) {
+                        } elseif ($platformType == 21) {
                             $res = Qingying::getInstance($conf)->generateSignature([
                                 'orderNo'  => $orderId,
                                 'acctId'   => $bankNo,
@@ -351,7 +372,7 @@ class WithdrawalsController extends BaseController
                                 'mobile'   => $mobile,
                             ], 'payment')->sendRequest();
                             $data = $res;
-                        }elseif ($platformType == 22) {
+                        } elseif ($platformType == 22) {
                             $res = Jiyun::getInstance($conf)->generateSignature([
                                 'orderNo'  => $orderId,
                                 'acctId'   => $bankNo,
@@ -361,19 +382,119 @@ class WithdrawalsController extends BaseController
                                 'mobile'   => $mobile,
                             ], 'payment')->sendRequest();
                             $data = $res;
+                        } elseif ($platformType == 23) {
+                            $res = RHPay::getInstance($conf)->generateSignature([
+                                'orderNo'  => $orderId,
+                                'acctId'   => $bankNo,
+                                'acctName' => $username,
+                                'tranAmt'  => $amount * 100, // 分
+                                'bankName' => $bankName,
+                                'mobile'   => $mobile,
+                            ], 'payment')->sendRequest();
+                            $data = $res;
+                        } elseif ($platformType == 24) {
+                            $res = Gft::getInstance($conf)->generateSignature([
+                                'orderNo'  => $orderId,
+                                'acctId'   => $bankNo,
+                                'acctName' => $username,
+                                'tranAmt'  => $amount * 100, // 分
+                                'bankName' => $bankName,
+                                'mobile'   => $mobile,
+                            ], 'payment')->sendRequest();
+                            $data = $res;
+                        } elseif ($platformType == 25) {
+                            $res = Zhongxin::getInstance($conf)->generateSignature([
+                                'orderNo'  => $orderId,
+                                'acctId'   => $bankNo,
+                                'acctName' => $username,
+                                'tranAmt'  => $amount, // 分
+                                'bankCode' => $bankCode,
+                                'mobile'   => $mobile,
+                            ], 'payment')->sendRequest();
+                            $data = $res;
+                        } elseif ($platformType == 26) {
+                            $res = GPpay::getInstance($conf)->generateSignature([
+                                'orderNo'  => $orderId,
+                                'acctId'   => $bankNo,
+                                'acctName' => $username,
+                                'tranAmt'  => $amount,
+                                'bankName' => $bankName,
+                                'bankCode' => $bankCode, // 特殊处理
+                                'mobile'   => $mobile,
+                            ], 'payment')->sendRequest();
+                            $data = $res;
+                        } elseif ($platformType == 27) {
+                            $res = Xianfeng::getInstance($conf)->generateSignature([
+                                'orderNo'     => $orderId,
+                                'acctId'      => $bankNo,
+                                'acctName'    => $username,
+                                'tranAmt'     => $amount,
+                                'bankName'    => $bankName,
+                                'mobile'      => $mobile,
+                                'callbackUrl' => $platform->callback_url,
+                            ], 'payment')->sendRequest();
+                            $data = $res;
+                        } elseif ($platformType == 28) {
+                            $res = Tongfu::getInstance($conf)->generateSignature([
+                                'orderNo'     => $orderId,
+                                'acctId'      => $bankNo,
+                                'acctName'    => $username,
+                                'tranAmt'     => $amount,
+                                'bankName'    => $bankName,
+                                'mobile'      => $mobile,
+                                'callbackUrl' => $platform->callback_url,
+                            ], 'payment')->sendRequest();
+                            $data = $res;
+                        } elseif ($platformType == 29) {
+                            $res = SDpay::getInstance($conf)->generateSignature([
+                                'orderNo'     => $orderId,
+                                'acctId'      => $bankNo,
+                                'acctName'    => $username,
+                                'tranAmt'     => $amount,
+                                'bankName'    => $bankName,
+                                'bankCode'    => $bankCode,
+                                'mobile'      => $mobile,
+                                'callbackUrl' => $platform->callback_url,
+                            ], 'payment')->sendRequest();
+                            $data = $res;
+                        } elseif ($platformType == 30) {
+                            $res = Huitian::getInstance($conf)->generateSignature([
+                                'orderNo'     => $orderId,
+                                'acctId'      => $bankNo,
+                                'acctName'    => $username,
+                                'tranAmt'     => $amount,
+                                'bankName'    => $bankName,
+                                'mobile'      => $mobile,
+                                'callbackUrl' => $platform->callback_url,
+                            ], 'payment')->sendRequest();
+                            $data = $res;
                         }
-                    // 解析返回数据，更新状态、单号、返回消息
-                        $parseResult                    = $this->parseWithdrawalStatus($data, $platformType, $conf, $orderId);
-                        $withdrawals->platform_order_no = $parseResult['order_no'];
-                        $withdrawals->status            = $parseResult['status']; // 状态，0 未处理、1 处理成功、2 处理中、3 处理失败、4 已退汇、5 其他
-                        $withdrawals->note              = $parseResult['msg'];
-                        $withdrawals->remark            = json_encode($res);
+                        $parseResult = $this->parseWithdrawalStatus($data, $platformType, $conf, $orderId);
+                        if ($platformType == 26) {
+                            $withdrawals->remark = json_encode($res);
+                            $withdrawals->status = 2;
+                        } elseif ($platformType == 27) {
+                            $withdrawals->remark = json_encode($res);
+                            $withdrawals->status = 2;
+                        } elseif ($platformType == 28) {
+                            $withdrawals->remark = json_encode($res);
+                            $withdrawals->status = 2;
+                        } elseif ($platformType == 29) {
+                            $withdrawals->remark = json_encode($res);
+                            $withdrawals->status = 2;
+                        } else {
+                            // 解析返回数据，更新状态、单号、返回消息
+                            $withdrawals->platform_order_no = $parseResult['order_no'];
+                            $withdrawals->status            = $parseResult['status']; // 状态，0 未处理、1 处理成功、2 处理中、3 处理失败、4 已退汇、5 其他
+                            $withdrawals->note              = $parseResult['msg'];
+                            $withdrawals->remark            = json_encode($res);
+                        }
                         $withdrawals->save();
                         $result['status'] = 0;
-                        $result['msg']    = '';
+                        $result['msg']    = $withdrawals->note;
                         $result['data']   = $data;
                         // Redis 解锁
-                        // $this->redisLock->unlock($payOutLock);
+                        $this->redisLock->unlock($payOutLock);
                     }
                 } else {
                     $result['msg'] = '疑似70秒内重复出款';
@@ -786,9 +907,9 @@ class WithdrawalsController extends BaseController
             $tmpArr['msg']      = $msg;
         } elseif ($type == 18) {
             // Xinxinju
-            $ret_Code           = $res['field039'] ?? '';
-            $platform_order_no  = $res['field062'] ?? '';
-            $msg                = $res['field124'] ?? '';
+            $ret_Code          = $res['field039'] ?? '';
+            $platform_order_no = $res['field062'] ?? '';
+            $msg               = $res['field124'] ?? '';
 
             // 统一状态
             $status = 2;
@@ -807,10 +928,10 @@ class WithdrawalsController extends BaseController
             $tmpArr['msg']      = $msg;
         } elseif ($type == 19) {
             // Jiayoutong
-            $ret_Code           = $res['code'] ?? '';
-            $resStatus          = $res['status'] ?? '';
-            $platform_order_no  = $res['businessNo'] ?? '';
-            $msg                = $res['describe'] ?? '';
+            $ret_Code          = $res['code'] ?? '';
+            $resStatus         = $res['status'] ?? '';
+            $platform_order_no = $res['businessNo'] ?? '';
+            $msg               = $res['describe'] ?? '';
 
             // 统一状态
             $status = 3;
@@ -831,10 +952,10 @@ class WithdrawalsController extends BaseController
             $tmpArr['msg']      = $msg;
         } elseif ($type == 20) {
             // Jiayoutong
-            $ret_Code           = $res['success'] ?? '';
-            $resStatus          = $res['code'] ?? '';
-            $platform_order_no  = $res['merOrderId'] ?? '';
-            $msg                = $res['msg'] ?? '';
+            $ret_Code          = $res['success'] ?? '';
+            $resStatus         = $res['code'] ?? '';
+            $platform_order_no = $res['merOrderId'] ?? '';
+            $msg               = $res['msg'] ?? '';
             //状态，0 未处理、1 处理成功、2 处理中、3 处理失败、4 已退汇、5 其他
             // 统一状态
             $status = 3;
@@ -855,9 +976,9 @@ class WithdrawalsController extends BaseController
             $tmpArr['msg']      = $msg;
         } elseif ($type == 21) {
             // 青英
-            $ret_Code           = $res['field039'] ?? '';
-            $platform_order_no  = $res['field062'] ?? '';
-            $msg                = $res['field124'] ?? '';
+            $ret_Code          = $res['field039'] ?? '';
+            $platform_order_no = $res['field062'] ?? '';
+            $msg               = $res['field124'] ?? '';
 
             // 统一状态
             $status = 2;
@@ -876,9 +997,9 @@ class WithdrawalsController extends BaseController
             $tmpArr['msg']      = $msg;
         } elseif ($type == 22) {
             // 极云
-            $ret_Code           = $res['field039'] ?? '';
-            $platform_order_no  = $res['field062'] ?? '';
-            $msg                = $res['field124'] ?? '';
+            $ret_Code          = $res['field039'] ?? '';
+            $platform_order_no = $res['field062'] ?? '';
+            $msg               = $res['field124'] ?? '';
 
             // 统一状态
             $status = 2;
@@ -895,8 +1016,167 @@ class WithdrawalsController extends BaseController
             $tmpArr['order_no'] = $platform_order_no;
             $tmpArr['status']   = $status;
             $tmpArr['msg']      = $msg;
-        }
+        } elseif ($type == 23) {
+            // 极云
+            $ret_Code          = $res['status'] ?? '';
+            $platform_order_no = $res['orderCode'] ?? '';
+            $msg               = $res['msg'] ?? '';
 
+            // 统一状态
+            $status = 3;
+            if ($ret_Code == 'M0000') {
+                $status = 2;
+            }
+
+            $tmpArr['order_no'] = $platform_order_no;
+            $tmpArr['status']   = $status;
+            $tmpArr['msg']      = $msg;
+        } elseif ($type == 24) {
+            // 极云
+            $ret_Code          = $res['code'] ?? '';
+            $platform_order_no = $res['data']['mchOrderNo'] ?? '';
+            $msg               = $res['msg'] ?? '';
+            // 统一状态
+            $status = 3;
+            if ($ret_Code == '200') {
+                $status = 2;
+            }
+            $tmpArr['order_no'] = $platform_order_no;
+            $tmpArr['status']   = $status;
+            $tmpArr['msg']      = $msg;
+        } elseif ($type == 25) {
+            // 众鑫
+            $ret_Code          = $res['code'] ?? '';
+            $platform_order_no = $res['trade_no'] ?? '';
+            $msg               = $res['message'] ?? '';
+            // 统一状态
+            $status = 3;
+            if ($ret_Code == '00') {
+                $status = 2;
+            }
+            $tmpArr['order_no'] = $platform_order_no;
+            $tmpArr['status']   = $status;
+            $tmpArr['msg']      = $msg;
+        } elseif ($type == 26) {
+            // GPpay
+            $status     = $res['result_code'] ?? '';
+            $resultMsg  = $res['result_msg'] ?? '';
+            $resultFlag = $res['result'] ?? 'H';
+
+            // 统一状态 0 未处理、1 处理成功、2 处理中、3 处理失败、4 已退汇、5 其他
+            if ($status == '000000' || $status == 'TRS003') {
+                if ($resultFlag == 'H') {
+                    $resultCode = 2;
+                } elseif ($resultFlag == 'F') {
+                    $resultCode = 3;
+                } elseif ($resultFlag == 'S') {
+                    $resultCode = 1;
+                } else {
+                    $resultCode = 5;
+                }
+            } elseif ($status == 'TRS001') {
+                $resultCode       = 3;
+                $tmpArr['status'] = $resultCode;
+                $tmpArr['msg']    = $resultMsg;
+                $ret_Code         = $res['result_code'] ?? '';
+                $msg              = $res['result_msg'] ?? '';
+            } else {
+                $resultCode = 3;
+            }
+            $tmpArr['status'] = $resultCode;
+            $tmpArr['msg']    = $resultMsg;
+            $ret_Code         = $res['result_code'] ?? '';
+            $msg              = $res['result_msg'] ?? '';
+        } elseif ($type == 26) {
+            // GPpay
+            $status     = $res['result_code'] ?? '';
+            $resultMsg  = $res['result_msg'] ?? '';
+            $resultFlag = $res['result'] ?? 'H';
+
+            // 统一状态 0 未处理、1 处理成功、2 处理中、3 处理失败、4 已退汇、5 其他
+            if ($status == '000000' || $status == 'TRS003') {
+                if ($resultFlag == 'H') {
+                    $resultCode = 2;
+                } elseif ($resultFlag == 'F') {
+                    $resultCode = 3;
+                } elseif ($resultFlag == 'S') {
+                    $resultCode = 1;
+                } else {
+                    $resultCode = 5;
+                }
+            } elseif ($status == 'TRS001') {
+                $resultCode       = 3;
+                $tmpArr['status'] = $resultCode;
+                $tmpArr['msg']    = $resultMsg;
+                $ret_Code         = $res['result_code'] ?? '';
+                $msg              = $res['result_msg'] ?? '';
+            } else {
+                $resultCode = 3;
+            }
+            $tmpArr['status'] = $resultCode;
+            $tmpArr['msg']    = $resultMsg;
+            $ret_Code         = $res['result_code'] ?? '';
+            $msg              = $res['result_msg'] ?? '';
+        } elseif ($type == 27) {
+            // 先锋
+            $resultMsg  = $res['respMsg'] ?? '';
+            $resultFlag = $res['respCod'] ?? '';
+
+            // 统一状态 0 未处理、1 处理成功、2 处理中、3 处理失败、4 已退汇、5 其他
+            if ($resultFlag == '99' || $resultFlag == '000000') {
+                $resultCode = 2;
+            } else {
+                $resultCode = 5;
+            }
+            $tmpArr['status'] = $resultCode;
+            $tmpArr['msg']    = $resultMsg;
+            $ret_Code         = $res['respCod'] ?? '';
+            $msg              = $res['respMsg'] ?? '';
+        } elseif ($type == 28) {
+            // 通付
+            $resultMsg  = $res['fxmsg'] ?? '';
+            $resultFlag = $res['fxstatus'] ?? '';
+
+            // 统一状态 0 未处理、1 处理成功、2 处理中、3 处理失败、4 已退汇、5 其他
+            if ($resultFlag == '1') {
+                $resultCode = 2;
+            } else {
+                $resultCode = 3;
+            }
+            $tmpArr['status'] = $resultCode;
+            $tmpArr['msg']    = $resultMsg;
+            $ret_Code         = $res['fxstatus'] ?? '';
+            $msg              = $res['fxmsg'] ?? '';
+        } elseif ($type == 29) {
+            // SDpay
+            $resultMsg    = $res['message'] ?? '';
+            $resultCode   = $res['code'] ?? '';
+            $securityCode = $res['securityCode'] ?? '';
+
+            // 统一状态 0 未处理、1 处理成功、2 处理中、3 处理失败、4 已退汇、5 其他
+            if ($resultCode == '200') {
+                $resultCode = 2;
+            } else {
+                $resultCode = 3;
+            }
+            $tmpArr['status'] = $resultCode;
+            $tmpArr['msg']    = $resultMsg;
+        } elseif ($type == 30) {
+            // 汇天付
+            $resultMsg  = $res['ret_msg'] ?? '';
+            $resultFlag = $res['ret_code'] ?? '';
+
+            // 统一状态 0 未处理、1 处理成功、2 处理中、3 处理失败、4 已退汇、5 其他
+            if ($resultFlag == 0000 || $resultMsg == 'SUCCESS') {
+                $resultCode = 2;
+            } else {
+                $resultCode = 5;
+            }
+            $tmpArr['status'] = $resultCode;
+            $tmpArr['msg']    = $resultMsg;
+            $ret_Code         = $res['respCod'] ?? '';
+            $msg              = $res['respMsg'] ?? '';
+        }
 
         return $tmpArr;
     }
@@ -1029,12 +1309,10 @@ class WithdrawalsController extends BaseController
             'note',
             'created_at',
         ])->whereRaw($where);
-
         $result = $result->addSelect($this->db::raw("CONVERT_TZ(`created_at`, '+08:00', '-04:00') AS `created_at_edt`"));
 
         if ($isExport == 0) {
             $result = $result->orderBy('id', 'desc')->paginate($perPage);
-
             return $response->withJson($result);
         } else {
             $result = $result->orderBy('id', 'DESC')->get()->toArray();
@@ -1062,6 +1340,14 @@ class WithdrawalsController extends BaseController
                 20 => '盖亚',
                 21 => '青英',
                 22 => '极云',
+                23 => 'RHPay',
+                24 => '广付通',
+                25 => '众鑫',
+                26 => 'GPpay',
+                27 => '先锋',
+                28 => '通付',
+                29 => 'SDpay',                
+                20 => '汇天',
             ];
 
             $statusArr = [

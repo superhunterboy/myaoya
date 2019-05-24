@@ -24,7 +24,7 @@ class ReportController extends BaseController
         $reportIdArr   = [];
         $reportL1IdArr = [];
         // 美东时间
-        $starTime = Utils::myGMDate('Y-m-d', strtotime("-3 day"), -4);
+        $starTime = Utils::myGMDate('Y-m-d', strtotime("-1 day"), -4);
         $endTime  = Utils::myGMDate('Y-m-d', time(), -4);
         // 报表类型
         $reports = Report::select(['id', 'time', 'flag', 'total'])->whereRaw("`time` >= '{$starTime}' AND `time` <= '{$endTime}'")->get();
@@ -42,7 +42,7 @@ class ReportController extends BaseController
                 'flag'  => $report->flag,
                 'total' => $report->total,
             ]));
-            $this->redis->expireat($cacheKey, strtotime("+3 day"));
+            $this->redis->expireat($cacheKey, strtotime("+2 hours"));
         }
         // 报表类型下的分类
         if (empty($reportIdArr)) {
@@ -63,7 +63,7 @@ class ReportController extends BaseController
                 'total'     => $reportL1->total,
                 'tag'       => $reportL1->tag,
             ]));
-            $this->redis->expireat($cacheKey, strtotime("+3 day"));
+            $this->redis->expireat($cacheKey, strtotime("+2 hours"));
         }
         // 报表分类下的入款数据
         if (empty($reportL1IdArr)) {
@@ -79,7 +79,7 @@ class ReportController extends BaseController
                 continue;
             }
             $this->redis->set($cacheKey, $reportL2->order_no);
-            $this->redis->expireat($cacheKey, strtotime("+3 day"));
+            $this->redis->expireat($cacheKey, strtotime("+2 hours"));
         }
     }
 
@@ -188,7 +188,7 @@ class ReportController extends BaseController
                                             if ($reportPayCompany && $reportPayCompany->wasRecentlyCreated) {
                                                 // 第一次被创建，缓存单号，缓存3天
                                                 $this->redis->set($cacheKey, $orderNo);
-                                                $this->redis->expireat($cacheKey, strtotime("+3 day"));
+                                                $this->redis->expireat($cacheKey, strtotime("+2 hours"));
                                             }
                                         }
                                     }
@@ -214,7 +214,7 @@ class ReportController extends BaseController
                                         if ($reportPayOnline && $reportPayOnline->wasRecentlyCreated) {
                                             // 第一次被创建，缓存单号，缓存3天
                                             $this->redis->set($cacheKey, $orderNo);
-                                            $this->redis->expireat($cacheKey, strtotime("+3 day"));
+                                            $this->redis->expireat($cacheKey, strtotime("+2 hours"));
                                         }
                                     }
                                 } elseif ($type == 'artificial_Deposit') {
@@ -240,7 +240,7 @@ class ReportController extends BaseController
                                             if ($reportArtificialDeposit && $reportArtificialDeposit->wasRecentlyCreated) {
                                                 // 第一次被创建，缓存单号，缓存3天
                                                 $this->redis->set($cacheKey, $orderNo);
-                                                $this->redis->expireat($cacheKey, strtotime("+3 day"));
+                                                $this->redis->expireat($cacheKey, strtotime("+2 hours"));
                                             }
                                         } elseif (preg_match("/(\s*)/", $val1[3], $matches)) {
                                             // 人工存入取消出款 无单号 解决办法
@@ -267,7 +267,7 @@ class ReportController extends BaseController
                                             if ($reportArtificialDeposit && $reportArtificialDeposit->wasRecentlyCreated) {
                                                 // 第一次被创建，缓存单号，缓存3天
                                                 $this->redis->set($cacheKey, $orderNo);
-                                                $this->redis->expireat($cacheKey, strtotime("+3 day"));
+                                                $this->redis->expireat($cacheKey, strtotime("+2 hours"));
                                             }
                                         }
                                     }
@@ -277,7 +277,7 @@ class ReportController extends BaseController
                     }
                 }
             }
-            $response->getBody()->write("Ok, Report data has been submitted to the payment system.\n");
+            $response->getBody()->write("Ok, Report data => the payment system.\n");
         }
         return $response;
     }

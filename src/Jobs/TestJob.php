@@ -12,8 +12,8 @@ use Resque_Exception;
 class TestJob extends BaseJob
 {
     public function perform()
-    {
+    {echo date('YmdHis');
         // print_r($this->args);
-        Resque_Event::trigger('onFailure');
+        //Resque_Event::trigger('onFailure');
     }
 }

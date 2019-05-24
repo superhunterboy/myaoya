@@ -1,4 +1,4 @@
-<div class="report-list">
+<div ng-if="userInfo.permissions.split(',').indexOf('29')>-1" class="report-list">
     <div class="page-title">人工存入统计</div>
     <div class="table">
         <table-float-header data-float-element="table-advanced-search" data-float-thead="table-thead"></table-float-header>
@@ -70,3 +70,4 @@
         <div table-page="table"></div>
     </div>
 </div>
+<div ng-if="userInfo.permissions.split(',').indexOf('29')<0" style="margin-top: 30px;text-align: center">无访问权限</div>

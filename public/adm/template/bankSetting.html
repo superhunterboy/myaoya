@@ -1,5 +1,5 @@
 <div ng-if="!smsCode" smscode></div>
-<div ng-if="smsCode" class="bank-setting">
+<div ng-if="smsCode && userInfo.permissions.split(',').indexOf('10')>-1" class="bank-setting">
     <div class="page-title">转账银行卡设置
         <div class="page-btn">
             <a ng-click="edit()" class="btn btn-green">添加银行卡</a>

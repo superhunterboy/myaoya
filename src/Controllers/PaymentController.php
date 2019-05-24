@@ -7,13 +7,25 @@ use \Psr\Http\Message\ServerRequestInterface as Request;
 use \Resque;
 use \Weiming\Controllers\BaseController;
 use \Weiming\Jobs\AutoRechargeJob;
+use \Weiming\Libs\Payments\Af;
+use \Weiming\Libs\Payments\Aibide;
 use \Weiming\Libs\Payments\Aifu;
+use \Weiming\Libs\Payments\Az;
+use \Weiming\Libs\Payments\Baisheng;
+use \Weiming\Libs\Payments\Bh;
 use \Weiming\Libs\Payments\Bingo;
 use \Weiming\Libs\Payments\Changzhifu;
 use \Weiming\Libs\Payments\Chengwo;
+use \Weiming\Libs\Payments\Cy;
+use \Weiming\Libs\Payments\Daniu;
 use \Weiming\Libs\Payments\Dianfuyun;
 use \Weiming\Libs\Payments\Duoduo;
+use \Weiming\Libs\Payments\FhPay;
+use \Weiming\Libs\Payments\Gaiya;
 use \Weiming\Libs\Payments\Gaotong;
+use \Weiming\Libs\Payments\Gefu;
+use \Weiming\Libs\Payments\Gft;
+use \Weiming\Libs\Payments\Haitu;
 use \Weiming\Libs\Payments\Hebao;
 use \Weiming\Libs\Payments\Hengchen;
 use \Weiming\Libs\Payments\Hengtong;
@@ -23,11 +35,15 @@ use \Weiming\Libs\Payments\Huida;
 use \Weiming\Libs\Payments\Jinhaizhe;
 use \Weiming\Libs\Payments\JinhaizheNew;
 use \Weiming\Libs\Payments\Jinyang;
+use \Weiming\Libs\Payments\JrsjPay;
 use \Weiming\Libs\Payments\Kailiantong;
 use \Weiming\Libs\Payments\Lexiang;
 use \Weiming\Libs\Payments\Leying;
 use \Weiming\Libs\Payments\Likefu;
+use \Weiming\Libs\Payments\Ls;
+use \Weiming\Libs\Payments\Ly;
 use \Weiming\Libs\Payments\Mida;
+use \Weiming\Libs\Payments\NHH;
 use \Weiming\Libs\Payments\Nongfu;
 use \Weiming\Libs\Payments\Pppay;
 use \Weiming\Libs\Payments\Qiandai;
@@ -35,16 +51,22 @@ use \Weiming\Libs\Payments\Qianying;
 use \Weiming\Libs\Payments\Renxin;
 use \Weiming\Libs\Payments\Shanfu;
 use \Weiming\Libs\Payments\Shangma;
+use \Weiming\Libs\Payments\Shanrong;
 use \Weiming\Libs\Payments\Shanyi;
+use \Weiming\Libs\Payments\Shundatong;
 use \Weiming\Libs\Payments\Shunxin;
 use \Weiming\Libs\Payments\SingleQrPay;
 use \Weiming\Libs\Payments\Suiyifu;
 use \Weiming\Libs\Payments\Tengkun;
 use \Weiming\Libs\Payments\Tianfubao;
 use \Weiming\Libs\Payments\Tianji;
+use \Weiming\Libs\Payments\VPay;
 use \Weiming\Libs\Payments\Wallet;
+use \Weiming\Libs\Payments\Wande;
 use \Weiming\Libs\Payments\Wangfutong;
+use \Weiming\Libs\Payments\WenPay;
 use \Weiming\Libs\Payments\Wofu;
+use \Weiming\Libs\Payments\WoPay;
 use \Weiming\Libs\Payments\Wpay;
 use \Weiming\Libs\Payments\Wufu;
 use \Weiming\Libs\Payments\Xianxingfu;
@@ -55,7 +77,9 @@ use \Weiming\Libs\Payments\Xunbao;
 use \Weiming\Libs\Payments\Xunjie;
 use \Weiming\Libs\Payments\Yafu;
 use \Weiming\Libs\Payments\YafuNew;
+use \Weiming\Libs\Payments\Yf;
 use \Weiming\Libs\Payments\Yinxin;
+use \Weiming\Libs\Payments\Ylsl;
 use \Weiming\Libs\Payments\Youfu;
 use \Weiming\Libs\Payments\Yuntong;
 use \Weiming\Libs\Payments\Yunzhifu2;
@@ -63,16 +87,15 @@ use \Weiming\Libs\Payments\Yunzhifu;
 use \Weiming\Libs\Payments\Zesheng;
 use \Weiming\Libs\Payments\Zhongdian;
 use \Weiming\Libs\Payments\Zhongxin;
+use \Weiming\Libs\Payments\Zhongxinnew;
 use \Weiming\Libs\Payments\Ziyoufu;
 use \Weiming\Libs\Payments\ZiyoufuNew;
-use \Weiming\Libs\Payments\Shundatong;
-use \Weiming\Libs\Payments\Gaiya;
-use \Weiming\Libs\Payments\Ylsl;
-use \Weiming\Libs\Payments\Af;
-use \Weiming\Libs\Payments\Az;
 use \Weiming\Libs\Utils;
+use \Weiming\Models\Channel;
 use \Weiming\Models\Company;
 use \Weiming\Models\Pay;
+use \Weiming\Models\PaymentChannel;
+use \Weiming\Models\Paystatus;
 use \Weiming\Models\Vendor;
 
 class PaymentController extends BaseController
@@ -122,6 +145,8 @@ class PaymentController extends BaseController
                 $wapBaidu  = 1;
                 $union     = 1;
                 $wapUnion  = 1;
+                $yun       = 1;
+                $wapYun    = 1;
                 // 支付平台 1 雅付、2 闪付、3 讯宝、4 乐盈、5 自由付、6 沃雷特、7 金海哲、8 华仁、9 荷包、10 立刻付、11 多多支付、12 金海哲(新)、13 仁信、14 天付宝、15 高通、16 雅付(新)、17 先行付、18 我付、19 汇达、20 泽圣 21、新自由付 22、钱袋子 23、金阳 24、个人支付宝 25、旺富通 26、千应 27、优付 28、商码 29、恒辰 30、成沃 31、开联通 32、点付云 33、芯富 34、滕坤 35、天吉 36、众点 37、智能云支付 38、智能云支付2.0 39、喜付 40、艾付 41、Nong付 42、顺心付 43、米达 44、wpay 45、恒星闪付 46、众信 47、星捷 48、迅捷 49、云通 50、闪亿 51、恒通 52、Bingo 53、乐享 55、随意付 56、畅支付 57、银信 58、五福 59、Pppay 60、顺达通 61、盖亚 62、Ylsl 63 A付
                 $wechatPayType    = 0;
                 $wapWechatPayType = 0;
@@ -136,8 +161,10 @@ class PaymentController extends BaseController
                 $wapBaiduPayType  = 0;
                 $unionPayType     = 0;
                 $wapUnionPayType  = 0;
+                $yunPayType       = 0;
+                $wapYunPayType    = 0;
                 $res              = [];
-                $data             = [1 => [], 2 => [], 3 => [], 4 => [], 5 => [], 6 => [], 7 => [], 8 => [], 9 => [], 10 => [], 11 => [], 12 => [], 13 => []];
+                $data             = [1 => [], 2 => [], 3 => [], 4 => [], 5 => [], 6 => [], 7 => [], 8 => [], 9 => [], 10 => [], 11 => [], 12 => [], 13 => [], 14 => [], 15 => []];
 
                 $wechat_vendor_id     = $company->wechat_vendor_id;
                 $wap_wechat_vendor_id = $company->wap_wechat_vendor_id;
@@ -152,6 +179,8 @@ class PaymentController extends BaseController
                 $wap_baidu_vendor_id  = $company->wap_baidu_vendor_id;
                 $union_vendor_id      = $company->union_vendor_id;
                 $wap_union_vendor_id  = $company->wap_union_vendor_id;
+                $yun_vendor_id        = $company->yun_vendor_id;
+                $wap_yun_vendor_id    = $company->wap_yun_vendor_id;
                 $is_5qrcode           = $company->is_5qrcode;
 
                 if ($wechat_vendor_id > 0) {
@@ -177,7 +206,6 @@ class PaymentController extends BaseController
                     $res           = $this->getVendorPaymentInfo($netbank_vendor_id);
                     $netpayPayType = $res['payType'];
                     $data[3]       = $res['data'][3];
-                    file_put_contents('./1.txt',$netbank_vendor_id.json_encode($res));
                 } else {
                     $netpay = 0;
                 }
@@ -272,7 +300,31 @@ class PaymentController extends BaseController
                     $wapUnion = 0;
                 }
 
-                // 1 雅付、2 闪付、3 讯宝、4 乐盈、5 自由付、6 沃雷特、7 金海哲、8 华仁、9 荷包、10 立刻付、11 多多支付、12 金海哲(新)、13 仁信、14 天付宝、15 高通、16 雅付(新)、17 先行付、18 我付、19 汇达、20 泽圣 21、新自由付 22、钱袋子 23、金阳 24、个人支付宝 25、旺富通 26、千应 27、优付 28、商码 29、恒辰 30、成沃 31、开联通 32、点付云 33、芯富 34、滕坤 35、天吉 36、众点 37、智能云支付 38、智能云支付2.0 39、喜付 40、艾付 41、Nong付 42、顺心付 43、米达 44、wpay 45、恒星闪付 46、众信 47、星捷 48、迅捷 49、云通 50、闪亿 51、恒通 52、Bingo 53、乐享 55、随意付 56、畅支付 57、银信 58、五福 59、Pppay 60、顺达通 61、盖亚 62、ylsl
+                if ($yun_vendor_id > 0) {
+                    //银联wap
+                    $res        = $this->getVendorPaymentInfo($yun_vendor_id);
+                    $yunPayType = $res['payType'];
+                    $data[14]   = $res['data'][14];
+                } else {
+                    $yun = 0;
+                }
+
+                if ($wap_yun_vendor_id > 0) {
+                    //银联wap
+                    $res           = $this->getVendorPaymentInfo($wap_yun_vendor_id);
+                    $wapYunPayType = $res['payType'];
+                    $data[15]      = $res['data'][15];
+                } else {
+                    $wapYun = 0;
+                }
+
+                $wechat_op    = Paystatus::where('keys', 'wechat')->first(); //微信
+                $onlinepay_op = Paystatus::where('keys', 'onlinepay')->first(); //在线支付
+                $yunpay_op    = Paystatus::where('keys', 'yunpay')->first(); //云闪付
+                $trance_op    = Paystatus::where('keys', 'trance')->first(); //转帐汇款
+                $alipay_op    = Paystatus::where('keys', 'alipay')->first(); //支付宝支付
+
+                // 1 雅付、2 闪付、3 讯宝、4 乐盈、5 自由付、6 沃雷特、7 金海哲、8 华仁、9 荷包、10 立刻付、11 多多支付、12 金海哲(新)、13 仁信、14 天付宝、15 高通、16 雅付(新)、17 先行付、18 我付、19 汇达、20 泽圣 21、新自由付 22、钱袋子 23、金阳 24、个人支付宝 25、旺富通 26、千应 27、优付 28、商码 29、恒辰 30、成沃 31、开联通 32、点付云 33、芯富 34、滕坤 35、天吉 36、众点 37、智能云支付 38、智能云支付2.0 39、喜付 40、艾付 41、Nong付 42、顺心付 43、米达 44、wpay 45、恒星闪付 46、众信 47、星捷 48、迅捷 49、云通 50、闪亿 51、恒通 52、Bingo 53、乐享 55、随意付 56、畅支付 57、银信 58、五福 59、Pppay 60、顺达通 61、盖亚 62、ylsl 63、Az 64、A 65、百盛
                 $result['status'] = 0;
                 $result['msg']    = '';
                 $result['type']   = [
@@ -289,6 +341,8 @@ class PaymentController extends BaseController
                     'wapJd'     => $wapJdPayType,
                     'wapBaidu'  => $wapBaiduPayType,
                     'wapUnion'  => $wapUnionPayType,
+                    'yun'       => $yunPayType,
+                    'wapYun'    => $wapYunPayType,
                 ];
                 $result['payStatus'] = [
                     'wechat'    => $wechat,
@@ -304,7 +358,16 @@ class PaymentController extends BaseController
                     'wapJd'     => $wapJd,
                     'wapBaidu'  => $wapBaidu,
                     'wapUnion'  => $wapUnion,
+                    'yun'       => $yun,
+                    'wapYun'    => $wapYun,
                 ];
+
+                $result['weixin']    = $wechat_op->status;
+                $result['onlinepay'] = $onlinepay_op->status;
+                $result['yunpay']    = $yunpay_op->status;
+                $result['trance']    = $trance_op->status;
+                $result['alipay']    = $alipay_op->status;
+
                 $result['data']        = $data;
                 $result['multiQrcode'] = $is_5qrcode;
             }
@@ -313,115 +376,54 @@ class PaymentController extends BaseController
     }
 
     /**
-     * 前台充值页面数据渲染接口
-     */
-    // public function getPayInfo(Request $request, Response $response, $args)
-    // {
-
-    //     $result = ['status' => 1, 'msg' => '参数错误', 'type' => 0, 'data' => []];
-
-    //     if ($args['id']) {
-
-    //         $company = Company::where('no', '=', $args['id'])->first();
-
-    //         if ($company) {
-
-    //             $vendor_id = $company->vendor_id;
-
-    //             if ($vendor_id > 0) {
-
-    //                 $vendor = Vendor::where('id', '=', $vendor_id)->first();
-
-    //                 if ($vendor) {
-    //                     $conf                = [];
-    //                     $conf['parterNo']    = $vendor->no;
-    //                     $conf['parterKey']   = $vendor->key;
-    //                     $conf['callbackUrl'] = $vendor->callback_url;
-    //                     $conf['notifyUrl']   = $vendor->notify_url;
-
-    //                     // 1 雅付、2 闪付、3 讯宝、4 乐盈、5 自由付、6 沃雷特、7 金海哲、8 华仁、9 荷包
-    //                     if ($vendor->pay_type == 1) {
-
-    //                         $res = Yafu::getInstance()->getPayType();
-
-    //                     } elseif ($vendor->pay_type == 2) {
-
-    //                         $res = Shanfu::getInstance()->getPayType();
-
-    //                     } elseif ($vendor->pay_type == 3) {
-
-    //                         $res = Xunbao::getInstance()->getPayType();
-
-    //                     } elseif ($vendor->pay_type == 4) {
-
-    //                         $res = Leying::getInstance()->getPayType();
-
-    //                     } elseif ($vendor->pay_type == 5) {
-
-    //                         $res = Ziyoufu::getInstance()->getPayType();
-
-    //                     } elseif ($vendor->pay_type == 6) {
-
-    //                         $res = Wallet::getInstance()->getPayType();
-
-    //                     } elseif ($vendor->pay_type == 7) {
-
-    //                         $res = Jinhaizhe::getInstance($conf)->getPayType();
-
-    //                     } elseif ($vendor->pay_type == 8) {
-
-    //                         $res = Huaren::getInstance()->getPayType();
-
-    //                     } elseif ($vendor->pay_type == 9) {
-
-    //                         $res = Hebao::getInstance()->getPayType();
-
-    //                     }
-
-    //                     $result['status']    = 0;
-    //                     $result['msg']       = '';
-    //                     $result['type']      = $vendor->pay_type;
-    //                     $result['payStatus'] = ['wechat' => $vendor->wechat, 'alipay' => $vendor->alipay, 'netpay' => $vendor->netpay];
-    //                     $result['data']      = $res;
-    //                 }
-
-    //             } else {
-
-    //                 $result['msg'] = '请到后台配置目前要使用的支付平台';
-
-    //             }
-    //         }
-    //     }
-
-    //     $response->getBody()->write(json_encode($result));
-
-    //     return $response;
-    // }
-
-    /**
-     * 前端支付接口
+     * 前端支付接口------
      */
     public function payment(Request $request, Response $response, $args)
     {
-
-        $conf = [];
-
+        $conf      = [];
         $postDatas = $request->getParsedBody();
+        $this->logger->addInfo('doPayment order came in.', $postDatas);
+        if (isset($postDatas['order_id'])) {
+            //$this->bbCheck($postDatas); //验签
+            $number     = $postDatas['number'];
+            $notify_url = $postDatas['notify_url'];
+            $method_id  = $postDatas['method_id'];
+            $bank_id    = $postDatas['bank_id'];
+            $device     = "1";
+            $bbinkey    = "bbin" . $number;
+            if ($bank_id) {
+                //网银
+                $payType2 = $this->settings[$bbinkey]['bank'][$bank_id];
+            } else {
+                //扫码，h5
+                $payType = $this->settings[$bbinkey][$method_id];
+            }
 
-        $vendorType = $postDatas['vendorType'];
-        $companyNo  = $postDatas['companyNo'];
-        $money      = $postDatas['money'];
-        $payTime    = $postDatas['payTime'];
-        $account    = $postDatas['username'];
-        $payType    = $postDatas['paytype'];
-        $payType2   = $postDatas['paytype2'];
-        $device     = $postDatas['device'];
-        $ip         = $postDatas['ip'] ?? '';
-
-        $company = Company::where('no', '=', $companyNo)->first();
+            $payTime    = $postDatas['created_at'];
+            $money      = $postDatas['amount'];
+            $account    = $postDatas['username'];
+            $orderId    = $postDatas['order_id'];
+            $ip         = '127.0.0.1';
+            $Vendor     = Vendor::where('no', '=', $number)->first();
+            $company    = Company::where('no', '=', '00001')->first();
+            $vendorid   = $Vendor->id;
+            $vendorType = $Vendor->pay_type;
+        } else {
+            $notify_url = "";
+            $vendorType = $postDatas['vendorType'];
+            $companyNo  = $postDatas['companyNo'];
+            $money      = $postDatas['money'];
+            $payTime    = $postDatas['payTime'];
+            $account    = $postDatas['username'];
+            $payType    = $postDatas['paytype'];
+            $payType2   = $postDatas['paytype2'];
+            $device     = $postDatas['device'];
+            $ip         = $postDatas['ip'] ?? '';
+            $orderId    = Utils::getOrderId($payTime);
+            $company    = Company::where('no', '=', $companyNo)->first();
+        }
 
         if ($company) {
-
             $vendor_id = 0;
 
             $payCode = '';
@@ -429,40 +431,47 @@ class PaymentController extends BaseController
             $payTypeId = 1;
 
             // 注：以下支付 code 包含已经作废的 闪亿付 Shanyi
-            $jdCode = ['JDPAY', 'JD', 'MSJD', '0801', '912', '004', 'JdPay', '1008', 'JDSCAN', 'jdpay', '0001007', '0601', '01002', '41', 'JD_NATIVE', 'jdpay'];
+            $jdCode = ['JDPAY', 'JD', 'MSJD', '0801', '912', '004', 'JdPay', '1008', 'JDSCAN', 'jdpay', '0001007', '0601', '01002', '41', 'JD_NATIVE', 'jd', 'jdpay', 'JD_QRCODE_PAY'];
 
             $baiduCode = ['BAIDUPAY', 'BDPAY', 'BAIDU', '001003'];
 
-            $unionCode = ['UNIONPAY', '0701', '913', '005', '001007', 'UNIONQRPAY', 'unionPayQR', 'ylsm', 'UNION_WALLET', '001009', '1001', '0002', 'UNIONPAY_NATIVE', 'unionpayqr', '60000103','unionpay'];
+            $unionCode = ['UNIONPAY', '0040', '0701', '913', '005', '001007', 'UNIONQRPAY', 'unionPayQR', 'ylsm', 'UNION_WALLET', '001009', '1001', '0002', 'UNIONPAY_NATIVE', 'unionpayqr', '60000103', 'unionpay', 'UNIONPAY_QRCODE_PAY'];
 
-            $qqCode = ['6011', 'QQWALLET', 'QQ', '993', 'qqpay', 'QQPAY', '0501', '01009', 'tenpay_scan', '31', 'MSTENPAY', '10000170', '1010', '908', '003',
-                'QQZF', '46', '1593', '010500', 'tenpay', 'QQSCAN', 'qq', 'qqQR', '0102', '01005', 'QQ_NATIVE', 'qqpay'];
+            $qqCode = ['qqrcode', '6011', 'QQWALLET', 'QQ', '993', 'qqpay', 'QQPAY', '0501', '01009', 'tenpay_scan', '31', 'MSTENPAY', '10000170', '1010', '908', '003',
+                'QQZF', '46', '1593', '010500', 'tenpay', 'QQSCAN', 'qq', 'qqQR', '0102', '01005', 'QQ_NATIVE', 'qqpay', 'QQ_QRCODE_PAY'];
 
-            $wechatCode = ['0201', '0202', '1004', '1007', '8011', 'wx', 'weixin', '12', '100010', '100012', '1003', 'WEIXIN', 'MSWEIXIN', 'WECHATQR', '6001', 'WEIXIN_NATIVE', 'wechat',
-                'wxpay', 'weixin_scan', 'WXPAY', '21', '10000168', '902', '102', '001', 'WXZF', '20', 'WxSm', '02', '2', '20001', 'WECHAT', '0101', '0122', 'WX', '1000', '10', 'wxpay', '10000103','wxcode'];
+            $wechatCode = ['wxewm', '0201', 'WECHAT_PC', '0202', '1004', '1007', '8011', 'wx', 'weixin', '12', '100010', '100012', '1003', 'WEIXIN', 'MSWEIXIN', 'WECHATQR', '6001', 'WEIXIN_NATIVE', 'wechat',
+                'wxpay', 'weixin_scan', 'WXPAY', '21', '10000168', '902', '102', '001', 'WXZF', '20', 'WxSm', '02', '2', '20001', 'WECHAT', '0101', 'WX', '1000', '10', 'wxpay', '10000103', 'wxcode', '60', 'WXP', 'zxweixin', 'pay.weixin.scan.trade.precreate'];
 
-            $alipayCode = ['0301', '0302', '992', '1006', '8012', 'zfb', 'alipay', '30', '400010', '400012', '1009', 'ZHIFUBAO', 'MSAli', 'ALIPAYQR', '6003', 'ALIPAY_NATIVE',
-                'ALIPAY', '01003', 'alipay_scan', '10000169', '7', '101', '903', '002', '22', 'DFYzfb', '1', '10001', '0103', 'ZFB', '02010', '020', 'alipay', '2', '20000303','alipay'];
+            $alipayCode = ['VPay_ZFB', 'ALIPAY_PC', 'ali', '0301', '0302', '992', '1006', '8012', 'zfb', 'alipay', '30', '400010', '400012', '1009', 'ZHIFUBAO', 'MSAli', 'ALIPAYQR', '6003', 'ALIPAY_NATIVE',
+                'ALIPAY', '01003', 'alipay_scan', '10000169', '7', '101', '903', '002', '22', 'DFYzfb', '1', '10001', '0103', '0132', 'ZFB', '02010', '020', 'alipay', '2', '20000303', 'alipay', 'ALIPAY_QRCODE_PAY', 'sm', '21', 'alpls', 'VPay_ZFB', 'zxalp', '903', '8006', 'shunda001'];
 
-            $wapWechatCode = ['WEIXINWAP', '901', '01007', 'WXZFWAP', '48', '1005', 'WECHATWAP', 'wxpayh5', 'wxwap', 'wxh5', 'W1WEIXIN_PAY', 'WX_WAP', '1002', '01030', '1100', '11', 'WEIXIN_H5', '10000203','wxwap'];
+            $wapWechatCode = ['WEIXINWAP', 'WECHAT_MOBILE', '901', '01007', 'WXZFWAP', '48', '1005', 'WECHATWAP', 'wxpayh5', 'wxwap', 'wxh5', 'W1WEIXIN_PAY', 'WX_WAP', '1002', '01030', '1100', '11', 'WEIXIN_H5', '10000203', 'WXWAP', '0121', '62', 'WXH5', 'zxweixin', 'pay.weixin.scan.trade.precreate'];
 
-            $wapAlipayCode = ['ALIPAYWAP', '904', '4', '01006', '38', 'ZfbWap', 'aliwap', 'alipaywap', 'Z2ALIPAY', 'ZFB_WAP', '01004', '0203', '1101', '022', 'ALIPAY_H5','alipayh5','2', '20000203','alipaywap'];
+            $wapAlipayCode = ['ALIPAYWAP', '904', '4', '01006', '38', 'ZfbWap', 'aliwap', 'alipaywap', 'Z2ALIPAY', 'ZFB_WAP', '01004', '0203', '1101', '022', 'ALIPAY_H5', 'alipayh5', '2', '20000203', 'alipaywap', '0131', 'ALIPAY_WAP_PAY', 'sm', '21', 'alpls', 'ALIPAY_MOBILE', 'zxalp', '904', '8007', 'shunda001'];
 
             $wapQqCode = ['QQ_H5', 'QQPAYWAP', 'QQWAP', '905', '01008', '1594', 'qqpayh5', 'qqwap', 'Q2TEN_PAY', 'QQ_WAP', '001006', '0503', '1102'];
 
-            $wapJdCode = ['JD_H5', 'JDPAYWAP', 'JDWAP', '910', 'JD_WAP', '001008', '0603', '01012'];
+            $wapJdCode = ['JD_H5', 'JDPAYWAP', 'jdwap', 'JDWAP', '910', 'JD_WAP', '001008', '0603', '01012', 'JD_H5', 'JD_WAP_PAY'];
 
             $wapBaiduCode = [];
 
-            $wapUnionCode = ['UNIONPAY_H5', 'UNION_WALLET_H5', '1012', 'unionpayqrh5', '60000103'];
+            $wapUnionCode = ['UNIONPAY_H5', '0050', 'UNION_WALLET_H5', '1012', 'unionpayqrh5', '60000103', 'UNIONPAY_WAP_PAY'];
+
+            $wapYunCode = ['daniuyun'];
+
+            $yunCode = ['daniuyun'];
 
             if (in_array($payType, $unionCode, true)) {
 
                 $payCode = $payType;
 
                 $payTypeId = 7;
-
-                $vendor_id = $company->union_vendor_id;
+                if (isset($postDatas['order_id'])) {
+                    $vendor_id = $vendorid;
+                } else {
+                    $vendor_id = $company->union_vendor_id;
+                }
 
             } elseif (in_array($payType, $baiduCode, true)) {
 
@@ -470,88 +479,140 @@ class PaymentController extends BaseController
 
                 $payTypeId = 6;
 
-                $vendor_id = $company->baidu_vendor_id;
-
+                if (isset($postDatas['order_id'])) {
+                    $vendor_id = $vendorid;
+                } else {
+                    $vendor_id = $company->baidu_vendor_id;
+                }
             } elseif (in_array($payType, $jdCode, true)) {
 
                 $payCode = $payType;
 
                 $payTypeId = 5;
 
-                $vendor_id = $company->jd_vendor_id;
-
+                if (isset($postDatas['order_id'])) {
+                    $vendor_id = $vendorid;
+                } else {
+                    $vendor_id = $company->jd_vendor_id;
+                }
             } elseif (in_array($payType, $qqCode, true)) {
 
                 $payCode = $payType;
 
                 $payTypeId = 4;
 
-                $vendor_id = $company->qq_vendor_id;
-
+                if (isset($postDatas['order_id'])) {
+                    $vendor_id = $vendorid;
+                } else {
+                    $vendor_id = $company->qq_vendor_id;
+                }
             } elseif (in_array($payType, $alipayCode, true)) {
 
                 $payCode = $payType;
 
                 $payTypeId = 3;
 
-                $vendor_id = $company->alipay_vendor_id;
-
+                if (isset($postDatas['order_id'])) {
+                    $vendor_id = $vendorid;
+                } else {
+                    $vendor_id = $company->alipay_vendor_id;
+                }
             } elseif (in_array($payType, $wechatCode, true)) {
 
                 $payCode = $payType;
 
                 $payTypeId = 2;
 
-                $vendor_id = $company->wechat_vendor_id;
-
+                if (isset($postDatas['order_id'])) {
+                    $vendor_id = $vendorid;
+                } else {
+                    $vendor_id = $company->wechat_vendor_id;
+                }
             } elseif (in_array($payType, $wapWechatCode, true)) {
 
                 $payCode = $payType;
 
                 $payTypeId = 8;
 
-                $vendor_id = $company->wap_wechat_vendor_id;
-
+                if (isset($postDatas['order_id'])) {
+                    $vendor_id = $vendorid;
+                } else {
+                    $vendor_id = $company->wap_wechat_vendor_id;
+                }
             } elseif (in_array($payType, $wapAlipayCode, true)) {
 
                 $payCode = $payType;
 
                 $payTypeId = 9;
 
-                $vendor_id = $company->wap_alipay_vendor_id;
-
+                if (isset($postDatas['order_id'])) {
+                    $vendor_id = $vendorid;
+                } else {
+                    $vendor_id = $company->wap_alipay_vendor_id;
+                }
             } elseif (in_array($payType, $wapQqCode, true)) {
 
                 $payCode = $payType;
 
                 $payTypeId = 10;
 
-                $vendor_id = $company->wap_qq_vendor_id;
-
+                if (isset($postDatas['order_id'])) {
+                    $vendor_id = $vendorid;
+                } else {
+                    $vendor_id = $company->wap_qq_vendor_id;
+                }
             } elseif (in_array($payType, $wapJdCode, true)) {
 
                 $payCode = $payType;
 
                 $payTypeId = 11;
 
-                $vendor_id = $company->wap_jd_vendor_id;
-
+                if (isset($postDatas['order_id'])) {
+                    $vendor_id = $vendorid;
+                } else {
+                    $vendor_id = $company->wap_jd_vendor_id;
+                }
             } elseif (in_array($payType, $wapBaiduCode, true)) {
 
                 $payCode = $payType;
 
                 $payTypeId = 12;
 
-                $vendor_id = $company->wap_baidu_vendor_id;
-
+                if (isset($postDatas['order_id'])) {
+                    $vendor_id = $vendorid;
+                } else {
+                    $vendor_id = $company->wap_baidu_vendor_id;
+                }
             } elseif (in_array($payType, $wapUnionCode, true)) {
 
                 $payCode = $payType;
 
                 $payTypeId = 13;
+                if (isset($postDatas['order_id'])) {
+                    $vendor_id = $vendorid;
+                } else {
+                    $vendor_id = $company->wap_union_vendor_id;
+                }
+            } elseif (in_array($payType, $yunCode, true)) {
 
-                $vendor_id = $company->wap_union_vendor_id;
+                $payCode = $payType;
 
+                $payTypeId = 14;
+                if (isset($postDatas['order_id'])) {
+                    $vendor_id = $vendorid;
+                } else {
+                    $vendor_id = $company->yun_vendor_id;
+                }
+            } elseif (in_array($payType, $wapYunCode, true)) {
+
+                $payCode = $payType;
+
+                $payTypeId = 15;
+                if (isset($postDatas['order_id'])) {
+                    $vendor_id = $vendorid;
+                } else {
+                    $vendor_id = $company->wap_yun_vendor_id;
+                }
             } else {
 
                 $payCode = $payType2;
@@ -559,11 +620,12 @@ class PaymentController extends BaseController
                 $vendor_id = $company->netbank_vendor_id;
 
             }
-
             if ($vendor_id > 0) {
-
+                if ($payType == 'VPay_ZFB') //for test
+                {
+                    $vendor_id = 77;
+                }
                 $vendor = Vendor::where('id', '=', $vendor_id)->first();
-
                 if ($vendor) {
 
                     $conf['parterNo']    = $vendor->no;
@@ -571,9 +633,8 @@ class PaymentController extends BaseController
                     $conf['callbackUrl'] = $vendor->callback_url;
                     $conf['notifyUrl']   = $vendor->notify_url;
 
-                    $orderId = Utils::getOrderId($payTime);
                     if ($vendorType == 59) {
-                        $orderId = substr($orderId,0,20);
+                        $orderId = substr($orderId, 0, 20);
                     }
 
                     // 日志
@@ -600,7 +661,8 @@ class PaymentController extends BaseController
                         'money'       => $money,
                         'company_id'  => $company->id,
                         'vendor_id'   => $vendor->id,
-                        'vendor_type' => $vendor->pay_type, // 1 雅付、2 闪付、3 讯宝、4 乐盈、5 自由付、6 沃雷特、7 金海哲、8 华仁、9 荷包、10 立刻付、11 多多支付、12 金海哲(新)、13 仁信、14 天付宝、15 高通、16 雅付(新)、17 先行付、18 我付、19 汇达、20 泽圣 21、新自由付 22、钱袋子 23、金阳 24、个人支付宝 25、旺富通 26、千应 27、优付 28、商码 29、恒辰 30、成沃 31、开联通 32、点付云 33、芯富 34、滕坤 35、天吉 36、众点 37、智能云支付 38、智能云支付2.0 39、喜付 40、艾付 41、Nong付 42、顺心付 43、米达 44、wpay 45、恒星闪付 46、众信 47、星捷 48、迅捷 49、云通 50、闪亿 51、恒通 52、Bingo 53、乐享 55、随意付 56、畅支付 57、银信 58、五福 59、Pppay 60、顺达通 61、盖亚 62、ylsl
+                        'vendor_type' => $vendor->pay_type, // 1 雅付、2 闪付、3 讯宝、4 乐盈、5 自由付、6 沃雷特、7 金海哲、8 华仁、9 荷包、10 立刻付、11 多多支付、12 金海哲(新)、13 仁信、14 天付宝、15 高通、16 雅付(新)、17 先行付、18 我付、19 汇达、20 泽圣 21、新自由付 22、钱袋子 23、金阳 24、个人支付宝 25、旺富通 26、千应 27、优付 28、商码 29、恒辰 30、成沃 31、开联通 32、点付云 33、芯富 34、滕坤 35、天吉 36、众点 37、智能云支付 38、智能云支付2.0 39、喜付 40、艾付 41、Nong付 42、顺心付 43、米达 44、wpay 45、恒星闪付 46、众信 47、星捷 48、迅捷 49、云通 50、闪亿 51、恒通 52、Bingo 53、乐享 55、随意付 56、畅支付 57、银信 58、五福 59、Pppay 60、顺达通 61、盖亚 62、ylsl  63、Az 64、A 65、百盛 70、联胜 71、个付
+                        'notify_url'  => $notify_url,
                     ]);
 
                     if ($newOrder) {
@@ -613,7 +675,7 @@ class PaymentController extends BaseController
 
                         }
 
-                        // 1 雅付、2 闪付、3 讯宝、4 乐盈、5 自由付、6 沃雷特、7 金海哲、8 华仁、9 荷包、10 立刻付、11 多多支付、12 金海哲(新)、13 仁信、14 天付宝、15 高通、16 雅付(新)、17 先行付、18 我付、19 汇达、20 泽圣 21、新自由付 22、钱袋子 23、金阳 24、个人支付宝 25、旺富通 26、千应 27、优付 28、商码 29、恒辰 30、成沃 31、开联通 32、点付云 33、芯富 34、滕坤 35、天吉 36、众点 37、智能云支付 38、智能云支付2.0 39、喜付 40、艾付 41、Nong付 42、顺心付 43、米达 44、wpay 45、恒星闪付 46、众信 47、星捷 48、迅捷 49、云通 50、闪亿 51、恒通 52、Bingo 53、乐享 55、随意付 56、畅支付 57、银信 58、五福 59、Pppay 60、顺达通 61、盖亚 62、ylsl
+                        // 1 雅付、2 闪付、3 讯宝、4 乐盈、5 自由付、6 沃雷特、7 金海哲、8 华仁、9 荷包、10 立刻付、11 多多支付、12 金海哲(新)、13 仁信、14 天付宝、15 高通、16 雅付(新)、17 先行付、18 我付、19 汇达、20 泽圣 21、新自由付 22、钱袋子 23、金阳 24、个人支付宝 25、旺富通 26、千应 27、优付 28、商码 29、恒辰 30、成沃 31、开联通 32、点付云 33、芯富 34、滕坤 35、天吉 36、众点 37、智能云支付 38、智能云支付2.0 39、喜付 40、艾付 41、Nong付 42、顺心付 43、米达 44、wpay 45、恒星闪付 46、众信 47、星捷 48、迅捷 49、云通 50、闪亿 51、恒通 52、Bingo 53、乐享 55、随意付 56、畅支付 57、银信 58、五福 59、Pppay 60、顺达通 61、盖亚 62、ylsl 63、Az 64、A 65、百盛 70、联胜 71、个付
                         if ($vendorType == 1) {
 
                             $res = Yafu::getInstance($conf)->signature($payType, $money, $orderId)->payment();
@@ -805,7 +867,6 @@ class PaymentController extends BaseController
                         } elseif ($vendor->pay_type == 48) {
 
                             $res = Xunjie::getInstance($conf)->signature($payType, $money, $orderId)->payment();
-
                         } elseif ($vendor->pay_type == 49) {
 
                             $orderId = $orderId . '_' . $ip;
@@ -868,8 +929,98 @@ class PaymentController extends BaseController
 
                             $res = Az::getInstance($conf)->signature($payType, $money, $orderId)->payment();
 
-                        }
+                        } elseif ($vendor->pay_type == 65) {
 
+                            $res = Baisheng::getInstance($conf)->signature($payType, $money, $orderId)->payment();
+
+                        } elseif ($vendor->pay_type == 66) {
+                            //豪富 自接支付
+                            $res   = FhPay::getInstance($conf)->signature($payType, $money, $orderId)->payment();
+                            $fharr = json_decode($res, true);
+                            if ($fharr['is_success'] == "T") {
+                                $response->getBody()->write($res);
+                                header('Location: ' . $fharr['result']);
+                            } else {
+                                echo $fharr['result'];
+                            }
+                            exit();
+                        } elseif ($vendor->pay_type == 67) {
+                            //酷呗 金融世家 自接支付
+                            $data67['payType'] = $payType;
+                            $data67['money']   = $money;
+                            $data67['money']   = $money;
+                            $res               = JrsjPay::getInstance($conf)->signature($payType, $money, $orderId)->payment();
+                            $Jrsj              = json_decode($res, true);
+                            if ($Jrsj['state'] == "Successful") {
+                                $response->getBody()->write($res);
+                                header('Location: ' . $Jrsj['payUrl']);
+                            } else {
+                                echo "请求失败";
+                            }
+                            exit();
+                        } elseif ($vendor->pay_type == 68) {
+                            $res = VPay::getInstance($conf)->signature($payType, $money, $newOrder)->payment();
+                        } elseif ($vendor->pay_type == 69) {
+                            //广付通
+                            $conf['banknumber'] = $postDatas['banknumber'];
+                            $res                = Gft::getInstance($conf)->signature($payType, $money, $orderId)->payment();
+                        } elseif ($vendor->pay_type == 70) {
+                            //联胜
+                            if (!isset($postDatas['order_id'])) {
+                                $lsarr = Ls::getInstance($conf)->signature($payType, $money, $orderId)->payment();
+                                $res   = $lsarr['pageUrl'];
+                            } else {
+                                $payType = 'alpls';
+                                $res     = Ls::getInstance($conf)->signature($payType, $money, $orderId)->payment();
+                                if ($res['code'] == '1000') {
+                                    header('Location: ' . $res['pageUrl']);
+                                    exit;
+                                } else {
+                                    echo "请求失败";
+                                }
+                            }
+                        } elseif ($vendor->pay_type == 71) {
+                            $res = Gefu::getInstance($conf)->signature($payType, $money, $orderId)->payment();
+                        } elseif ($vendor->pay_type == 72) {
+                            //百汇
+                            $res = Bh::getInstance($conf)->signature($payType, $money, $orderId)->payment();
+                        } elseif ($vendor->pay_type == 73) {
+                            //创优
+                            $res = Cy::getInstance($conf)->signature($payType, $money, $orderId)->payment();
+                        } elseif ($vendor->pay_type == 74) {
+                            //创优
+                            $res = Nhh::getInstance($conf)->signature($payType, $money, $orderId)->payment();
+                        } elseif ($vendor->pay_type == 75) {
+                            //善融
+                            $res = Shanrong::getInstance($conf)->signature($payType, $money, $orderId)->payment();
+                        } elseif ($vendor->pay_type == 76) {
+                            //众鑫
+                            $res = Zhongxinnew::getInstance($conf)->signature($payType, $money, $orderId)->payment();
+                        } elseif ($vendor->pay_type == 77) {
+                            //众鑫
+                            $res = Daniu::getInstance($conf)->signature($payType, $money, $orderId)->payment();
+                        } elseif ($vendor->pay_type == 78) {
+                            //盈付
+                            $res = Yf::getInstance($conf)->signature($payType, $money, $orderId)->payment();
+                        } elseif ($vendor->pay_type == 79) {
+                            // 万德
+                            $res = Wande::getInstance($conf)->signature($payType, $money, $orderId)->payment();
+                        } elseif ($vendor->pay_type == 80) {
+                            // 海图
+                            $res = Haitu::getInstance($conf)->signature($payType, $money, $orderId)->payment();
+                        } elseif ($vendor->pay_type == 81) {
+                            // 凌云
+                            $res = Ly::getInstance($conf)->signature($payType, $money, $orderId)->payment();
+                        } elseif ($vendor->pay_type == 82) {
+                            // 艾必德
+                            $res = Aibide::getInstance($conf)->signature($payType, $money, $orderId)->payment();
+                        } elseif ($vendor->pay_type == 83) {
+                            // 稳付
+                            $res = WenPay::getInstance($conf)->signature($payType, $money, $orderId)->payment();
+                        } elseif ($vendor->pay_type == 84) {
+                            // 沃支付
+                            $res = WoPay::getInstance($conf)->signature($payType, $money, $orderId)->payment();
+                        }
                         $response->getBody()->write($res);
                     }
                 }
@@ -880,149 +1031,121 @@ class PaymentController extends BaseController
     }
 
     /**
-     * 前端支付接口
+     * 前端支付请求接口------新版
      */
-    // public function payment(Request $request, Response $response, $args)
-    // {
+    public function doPayment(Request $request, Response $response, $args)
+    {
+        $conf      = [];
+        $postDatas = $request->getParsedBody();
+        // 日志
+        $this->logger->addInfo('doPayment order came in.', $postDatas);
 
-    //     $conf = [];
+        $id      = $postDatas['id'];
+        $money   = $postDatas['money'];
+        $payTime = $postDatas['payTime'];
+        $account = $postDatas['username'];
+        $device  = $postDatas['device'];
+        $ip      = $postDatas['ip'] ?? '';
 
-    //     $postDatas = $request->getParsedBody();
+        $orderId         = Utils::getOrderId($payTime);
+        $oPaymentChannel = PaymentChannel::find($id);
+        if ($oPaymentChannel) {
+            $conf['parterNo']    = $oPaymentChannel->merchant_no;
+            $conf['parterKey']   = $oPaymentChannel->key;
+            $conf['callbackUrl'] = $oPaymentChannel->callback_url;
+            $conf['notifyUrl']   = $oPaymentChannel->notify_url;
 
-    //     $vendorType = $postDatas['vendorType'];
+            if ($postDatas['netbankPaycode']) //如果是网银充值
+            {
+                $payCode = $postDatas['netbankPaycode'];
+            } else {
+                $payCode = $oPaymentChannel->paycode;
+            }
 
-    //     $companyNo = $postDatas['companyNo'];
+            $oChannel = Channel::where('tag', $oPaymentChannel->channel)->first();
 
-    //     $money = $postDatas['money'];
+            $vendor   = Vendor::where('no', $oPaymentChannel->merchant_no)->first(); //向旧版兼容
+            $newOrder = Pay::create([
+                'pay_type'    => $oChannel->id,
+                'pay_code'    => $payCode,
+                'user'        => $account,
+                'device'      => $device, // 1 pc端，2 手机端
+                'order_no'    => $orderId,
+                'money'       => $money,
+                'company_id'  => 1,
+                'vendor_id'   => is_object($vendor) ? $vendor->id : 888,
+                'vendor_type' => $oPaymentChannel->id, // 1 雅付、2 闪付、3 讯宝、4 乐盈、5 自由付、6 沃雷特、7 金海哲、8 华仁、9 荷包、10 立刻付、11 多多支付、12 金海哲(新)、13 仁信、14 天付宝、15 高通、16 雅付(新)、17 先行付、18 我付、19 汇达、20 泽圣 21、新自由付 22、钱袋子 23、金阳 24、个人支付宝 25、旺富通 26、千应 27、优付 28、商码 29、恒辰 30、成沃 31、开联通 32、点付云 33、芯富 34、滕坤 35、天吉 36、众点 37、智能云支付 38、智能云支付2.0 39、喜付 40、艾付 41、Nong付 42、顺心付 43、米达 44、wpay 45、恒星闪付 46、众信 47、星捷 48、迅捷 49、云通 50、闪亿 51、恒通 52、Bingo 53、乐享 55、随意付 56、畅支付 57、银信 58、五福 59、Pppay 60、顺达通 61、盖亚 62、ylsl  63、Az 64、A 65、百盛 70、联胜 71、个付
+                //'notify_url'  => $oPaymentChannel->notify_url,
+                'version'     => '2.0',
+            ]);
 
-    //     $payTime = $postDatas['payTime'];
+            if ($newOrder) {
+                $sPlatform = $oPaymentChannel->platform_identifer;
+                if ($sPlatform == 'FhPay') {
+                    //豪富 自接支付
+                    $res   = FhPay::getInstance($conf)->signature($payCode, $money, $orderId)->payment();
+                    $fharr = json_decode($res, true);
+                    if ($fharr['is_success'] == "T") {
+                        $response->getBody()->write($res);
+                        header('Location: ' . $fharr['result']);
+                    } else {
+                        echo $fharr['result'];
+                    }
+                    exit();
+                } elseif ($sPlatform == 'JrsjPay') {
+                    //酷呗 金融世家 自接支付
+                    $data67['payType'] = $payCode;
+                    $data67['money']   = $money;
+                    $data67['money']   = $money;
+                    $res               = JrsjPay::getInstance($conf)->signature($payCode, $money, $orderId)->payment();
+                    $Jrsj              = json_decode($res, true);
+                    if ($Jrsj['state'] == "Successful") {
+                        $response->getBody()->write($res);
+                        header('Location: ' . $Jrsj['payUrl']);
+                    } else {
+                        echo "请求失败";
+                    }
+                    exit();
+                } elseif ($sPlatform == 'Gft') {
+                    //广付通
+                    $conf['banknumber'] = $postDatas['banknumber'];
+                    $res                = Gft::getInstance($conf)->signature($payCode, $money, $orderId)->payment();
+                } elseif ($sPlatform == 'Ls') {
+                    //联胜
+                    if (!isset($postDatas['order_id'])) {
+                        $lsarr = Ls::getInstance($conf)->signature($payCode, $money, $orderId)->payment();
+                        $res   = $lsarr['pageUrl'];
+                    } else {
+                        $payCode = 'alpls';
+                        $res     = Ls::getInstance($conf)->signature($payCode, $money, $orderId)->payment();
+                        if ($res['code'] == '1000') {
+                            header('Location: ' . $res['pageUrl']);
+                            exit;
+                        } else {
+                            echo "请求失败";
+                        }
+                    }
+                } else {
+                    $sPlatform = "\Weiming\Libs\Payments\\" . $sPlatform;
+                    try
+                    {
+                        $res = $sPlatform::getInstance($conf)->signature($payCode, $money, $orderId)->payment();
+                    } catch (Exception $e) {
+                        return $response->withJson(['status' => 1, 'msg' => '支付渠道信息错误']);
+                    }
 
-    //     $account = $postDatas['username'];
+                }
 
-    //     $payType = $postDatas['paytype'];
+                $response->getBody()->write($res);
+            } else {
+                return $response->withJson(['status' => 1, 'msg' => '充值订单写入失败！']);
+            }
+        } else {
+            return $response->withJson(['status' => 1, 'msg' => '充值渠道不存在！']);
+        }
 
-    //     $payType2 = $postDatas['paytype2'];
-
-    //     $device = $postDatas['device'];
-
-    //     $company = Company::where('no', '=', $companyNo)->first();
-
-    //     if ($company) {
-
-    //         $vendor_id = $company->vendor_id;
-
-    //         if ($vendor_id > 0) {
-
-    //             $vendor = Vendor::where('id', '=', $vendor_id)->first();
-
-    //             if ($vendor) {
-
-    //                 $conf['parterNo']    = $vendor->no;
-    //                 $conf['parterKey']   = $vendor->key;
-    //                 $conf['callbackUrl'] = $vendor->callback_url;
-    //                 $conf['notifyUrl']   = $vendor->notify_url;
-
-    //                 $orderId = Utils::getOrderId($payTime);
-
-    //                 $payCode = '';
-
-    //                 $payTypeId = 1;
-
-    //                 $wechatCode = ['02', '1004', '1007', '8011', 'wx', 'weixin', '12', '100010', '100012', '1003', 'WEIXIN'];
-
-    //                 $alipayCode = ['03', '992', '1006', '8012', 'zfb', 'alipay', '30', '400010', '400012', '1009', 'ZHIFUBAO'];
-
-    //                 if (in_array($payType, $wechatCode)) {
-
-    //                     $payCode = $payType;
-
-    //                     $payTypeId = 2;
-
-    //                 } elseif (in_array($payType, $alipayCode)) {
-
-    //                     $payCode = $payType;
-
-    //                     $payTypeId = 3;
-
-    //                 } else {
-
-    //                     $payCode = $payType2;
-
-    //                 }
-
-    //                 // 日志
-    //                 $this->logger->addInfo('Payment order came in.', $postDatas);
-
-    //                 // 订单入库
-    //                 $newOrder = Pay::create([
-    //                     'pay_type'    => $payTypeId, // 3 支付宝，2 微信，1 网银
-    //                     'pay_code'    => $payCode,
-    //                     'user'        => $account,
-    //                     'device'      => $device, // 1 pc端，2 手机端
-    //                     'order_no'    => $orderId,
-    //                     'money'       => $money,
-    //                     'company_id'  => $company->id,
-    //                     'vendor_id'   => $vendor->id,
-    //                     'vendor_type' => $vendor->pay_type, // 1 雅付、2 闪付、3 讯宝、4 乐盈、5 自由付、6 沃雷特、7 金海哲、8 华仁、9 荷包
-    //                 ]);
-
-    //                 if ($newOrder) {
-
-    //                     $res = '';
-
-    //                     if ($payType == '01') {
-
-    //                         $payType = $payType2;
-
-    //                     }
-
-    //                     // 1 雅付、2 闪付、3 讯宝、4 乐盈、5 自由付、6 沃雷特、7 金海哲
-    //                     if ($vendorType == 1) {
-
-    //                         $res = Yafu::getInstance($conf)->signature($payType, $money, $orderId)->payment();
-
-    //                     } elseif ($vendorType == 2) {
-
-    //                         $res = Shanfu::getInstance($conf)->signature($payType, $money, $orderId)->payment();
-
-    //                     } elseif ($vendorType == 3) {
-
-    //                         $res = Xunbao::getInstance($conf)->signature($payType, $money, $orderId)->payment();
-
-    //                     } elseif ($vendorType == 4) {
-
-    //                         $res = Leying::getInstance($conf)->signature($payType, $money, $orderId)->payment();
-
-    //                     } elseif ($vendorType == 5) {
-
-    //                         $res = Ziyoufu::getInstance($conf)->signature($payType, $money, $orderId)->payment();
-
-    //                     } elseif ($vendorType == 6) {
-
-    //                         $res = Wallet::getInstance($conf)->signature($payType, $money, $orderId)->payment();
-
-    //                     } elseif ($vendorType == 7) {
-
-    //                         $res = Jinhaizhe::getInstance($conf)->signature($payType, $money, $orderId)->payment();
-
-    //                     } elseif ($vendorType == 8) {
-
-    //                         $res = Huaren::getInstance($conf)->signature($payType, $money, $orderId)->payment();
-
-    //                     } elseif ($vendor->pay_type == 9) {
-
-    //                         $res = Hebao::getInstance($conf)->signature($payType, $money, $orderId)->payment();
-
-    //                     }
-
-    //                     $response->getBody()->write($res);
-    //                 }
-    //             }
-    //         }
-    //     }
-
-    //     return $response;
-    // }
+        return $response;
+    }
 
     /**
      * 支付后端回调
@@ -1041,66 +1164,6 @@ class PaymentController extends BaseController
 
         // 日志
         $this->logger->addInfo('Payment orders have results.', $getDatas);
-
-        // 雅付老接口停用
-        // Array
-        // (
-        //     [consumerNo] => 12035
-        //     [orderId] => 20170227153114102058
-        //     [OutOrderId] =>
-        //     [merRemark1] => CZ
-        //     [tranAmt] => 0.01
-        //     [callbackUrl] => http://119.254.167.10/payment/callback
-        //     [merOrderNum] => 201702271530529483110
-        //     [goodsName] => CZ
-        //     [signValue] => 405524d4a1770332329c64c86cca0f1e
-        //     [respCode] => ok
-        // )
-
-        // 闪付
-        // Array
-        // (
-        //     [orderid] => 201702271610186651025
-        //     [opstate] => 0
-        //     [ovalue] => 2
-        //     [systime] => 2017/02/27 16:10:48
-        //     [sysorderid] => 1702271610275790539
-        //     [completiontime] => 2017/02/27 16:10:48
-        //     [attach] => CZ
-        //     [msg] =>
-        //     [sign] => 60088d577bf164b1d96a93521a437d01
-        // )
-
-        // 讯宝
-        // Array
-        // (
-        //     [orderid] => 201702271618506821855
-        //     [opstate] => 0
-        //     [ovalue] => 0.02
-        //     [sysorderid] => B4956900709304413023
-        //     [systime] => 2017/02/27 16:19:20
-        //     [attach] => CZ
-        //     [msg] =>
-        //     [sign] => 8ce291428e36695e332d88e502efce89
-        // )
-
-        // 乐盈
-        // Array
-        // (
-        //     [charset] => 1
-        //     [orderNo] => 1051702271656073823
-        //     [orderID] => 201702271656205175628
-        //     [resultCode] =>
-        //     [completeTime] => 20170227165644
-        //     [acquiringTime] => 20170227165629
-        //     [remark] => CZ
-        //     [orderAmount] => 1
-        //     [payAmount] => 1
-        //     [signType] => 2
-        //     [stateCode] => 2
-        //     [partnerID] => 10000008982
-        //     [signMsg] => b6a9101a941b274c4a3516033f53988c
-        // )
 
         $order_no = '';
 
@@ -1410,7 +1473,7 @@ class PaymentController extends BaseController
         $fee     = $getDatas['fee'];
         $qrcode  = $getDatas['qrcode'];
         $codeurl = isset($getDatas['codeurl']) ? strtolower($getDatas['codeurl']) : '';
-
+        print_r($getDatas);die;
         if (isset($getDatas['trade_no']) && isset($getDatas['fee']) && isset($getDatas['qrcode']) && $tradeNo && $fee && $qrcode) {
 
             $payType = '手机';
@@ -2967,9 +3030,100 @@ class PaymentController extends BaseController
             } elseif ($vendor->pay_type == 64) {
 
                 $res = Az::getInstance()->getPayType();
+            } elseif ($vendor->pay_type == 65) {
+
+                $res = Baisheng::getInstance()->getPayType();
+            } elseif ($vendor->pay_type == 66) {
+
+                $res = FhPay::getInstance()->getPayType();
+            } elseif ($vendor->pay_type == 67) {
+
+                $res = JrsjPay::getInstance()->getPayType();
+            } elseif ($vendor->pay_type == 68) {
+
+                $res = VPay::getInstance()->getPayType();
+            } elseif ($vendor->pay_type == 69) {
+
+                $res = Gft::getInstance()->getPayType();
+            } elseif ($vendor->pay_type == 70) {
+
+                $res = Ls::getInstance()->getPayType();
+            } elseif ($vendor->pay_type == 71) {
+
+                $res = Gefu::getInstance()->getPayType();
+            } elseif ($vendor->pay_type == 72) {
+
+                $res = Bh::getInstance()->getPayType();
+            } elseif ($vendor->pay_type == 73) {
+
+                $res = Cy::getInstance()->getPayType();
+            } elseif ($vendor->pay_type == 74) {
+
+                $res = Nhh::getInstance()->getPayType();
+            } elseif ($vendor->pay_type == 75) {
+
+                $res = Shanrong::getInstance()->getPayType();
+            } elseif ($vendor->pay_type == 76) {
+
+                $res = Zhongxinnew::getInstance()->getPayType();
+            } elseif ($vendor->pay_type == 77) {
+
+                $res = Daniu::getInstance()->getPayType();
+            } elseif ($vendor->pay_type == 78) {
+
+                $res = Yf::getInstance()->getPayType();
+            } elseif ($vendor->pay_type == 79) {
+
+                $res = Wande::getInstance()->getPayType();
+            } elseif ($vendor->pay_type == 80) {
+
+                $res = Haitu::getInstance()->getPayType();
+            } elseif ($vendor->pay_type == 81) {
+
+                $res = Ly::getInstance()->getPayType();
+            } elseif ($vendor->pay_type == 82) {
+
+                $res = Aibide::getInstance()->getPayType();
+            } elseif ($vendor->pay_type == 83) {
+
+                $res = WenPay::getInstance()->getPayType();
+            } elseif ($vendor->pay_type == 84) {
+
+                $res = WoPay::getInstance()->getPayType();
             }
         }
         return ['payType' => $vendor->pay_type, 'data' => $res];
+    }
+
+    public function bbCheck($post)
+    {
+        $bbKey = '70D5886E6E6CC3CE223340FCC1C9D28B';
+
+        $params = [
+            'number'     => $post['number'],
+            'order_id'   => $post['order_id'],
+            'amount'     => $post['amount'],
+            'created_at' => $post['created_at'],
+            'username'   => $post['username'],
+            'notify_url' => $post['notify_url'],
+            'method_id'  => $post['method_id'],
+            'bank_id'    => $post['bank_id'],
+        ];
+
+        $encodeArr = [];
+
+        foreach ($params as $k => $v) {
+            $encodeArr[$k] = $v;
+        }
+
+        ksort($encodeArr);
+        $encodeArr['key'] = $bbKey;
+        $signStr          = strtoupper(md5(urldecode(http_build_query($encodeArr))));
+
+        if ($signStr != $post['sign']) {
+            echo '验签失败';
+            exit;
+        }
     }
 
 }

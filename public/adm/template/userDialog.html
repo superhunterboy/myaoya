@@ -5,9 +5,9 @@
         <input ng-show="!userId" class="input" type="text" maxlength="10" ng-model="user.username" ng-change="error=false" /><i ng-if="!userId" class="color-red ml-1">*</i>
         <input ng-show="userId" readonly class="input" type="text" ng-model="user.username" />
     </label>
-    <label class="input-box"><span>备注：</span>
+    <label class="input-box"><span>角色备注：</span>
         <input class="input" type="text" maxlength="10" ng-model="user.realname" /></label>
-    <label class="input-box"><span>角色：</span>
+    <label class="input-box" style="display: none;"><span>角色：</span>
         <select class="input" ng-model="user.type"><option value="1">管理员</option><option value="0">入款人员</option><option value="2">出款人员</option><option value="3">财务主管</option></select>
     </label>
     <div class="input-box"><span>业务平台：</span>
@@ -15,16 +15,16 @@
             <input ng-model="company.checked" type="checkbox">{{company.name}}
         </label>
     </div>
-    <!--<div class="input-box"><span>权限设置：</span>-->
-        <!--<div class="content-box" ng-repeat="permission in permissions">-->
-            <!--<div ng-bind="permission.category"></div>-->
-            <!--<div>-->
-                <!--<label class="ml-2" ng-repeat="item in permission.permission">-->
-                    <!--<input ng-model="item.checked" type="checkbox">{{item.name}}-->
-                <!--</label>-->
-            <!--</div>-->
-        <!--</div>-->
-    <!--</div>-->
+    <div class="input-box"><span>权限设置：</span>
+        <div class="content-box" ng-repeat="permission in permissions">
+            <div ng-bind="permission.category" class="color-green"></div>
+            <div>
+                <label class="ml-2" ng-repeat="item in permission.permission">
+                    <input ng-model="item.checked" type="checkbox">{{item.name}}
+                </label>
+            </div>
+        </div>
+    </div>
     <div align="center" class="color-red" ng-show="error" ng-bind="errorMsg"></div>
     <div align="center">
         <button ng-if="!user.id" class="btn btn-green" ng-click="save()">确定</button>

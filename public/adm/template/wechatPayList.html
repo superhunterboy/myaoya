@@ -1,4 +1,4 @@
-<div class="wechat-pay-list">
+<div ng-if="userInfo.permissions.split(',').indexOf('15')>-1" class="wechat-pay-list">
     <div class="page-title">微信支付记录</div>
     <div class="table">
         <div class="wechat-setting-box">
@@ -239,3 +239,4 @@
         </div>
     </div>
 </div>
+<div ng-if="userInfo.permissions.split(',').indexOf('15')<0" style="margin-top: 30px;text-align: center">无访问权限</div>

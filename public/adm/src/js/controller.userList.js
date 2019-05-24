@@ -10,23 +10,23 @@
             s.user.realname=s.ngDialogData.user.realname;
             s.user.username=s.ngDialogData.user.username;
             s.user.company_ids=s.ngDialogData.user.company_ids;
-            // s.user.permissions=s.ngDialogData.user.permissions;
+            s.user.permissions=s.ngDialogData.user.permissions;
             s.userCompanyIds=s.user.company_ids.split(",");
             for(var i =0;i<s.userCompanyIds.length;i++){
                 s.companyInfo[s.userCompanyIds[i]].checked=true;
             }
         };
-        // http.get("/admin/getPermissions",{},function (res) {
-        //    if(res.status==0){
-        //        s.permissions=res.data;
-        //        for(var i=0;i<s.permissions.length;i++){
-        //            for(var j=0;j<s.permissions[i].permission.length;j++){
-        //                if(s.user.permissions.split(",").indexOf(''+s.permissions[i].permission[j].id)>-1)
-        //                    s.permissions[i].permission[j].checked=true;
-        //            }
-        //        }
-        //    }
-        // });
+        http.get("/admin/getPermissions",{},function (res) {
+           if(res.status==0){
+               s.permissions=res.data;
+               for(var i=0;i<s.permissions.length;i++){
+                   for(var j=0;j<s.permissions[i].permission.length;j++){
+                       if(s.user.permissions.split(",").indexOf(''+s.permissions[i].permission[j].id)>-1)
+                           s.permissions[i].permission[j].checked=true;
+                   }
+               }
+           }
+        });
         s.check=function(){
             if(!s.user.username){
                 s.error=true;
@@ -39,14 +39,14 @@
                     s.userCompanyIds.push(s.companyInfo[i].id)
             }
             s.user.company_ids=s.userCompanyIds.join(',');
-            // var tempPermission=[];
-            // for(var i=0;i<s.permissions.length;i++){
-            //     for(var j=0;j<s.permissions[i].permission.length;j++){
-            //         if(s.permissions[i].permission[j].checked==true)
-            //             tempPermission.push(s.permissions[i].permission[j].id);
-            //     }
-            // }
-            // s.user.permissions=tempPermission.join(',');
+            var tempPermission=[];
+            for(var i=0;i<s.permissions.length;i++){
+                for(var j=0;j<s.permissions[i].permission.length;j++){
+                    if(s.permissions[i].permission[j].checked==true)
+                        tempPermission.push(s.permissions[i].permission[j].id);
+                }
+            }
+            s.user.permissions=tempPermission.join(',');
             if(!s.userId){
                 s.user.password='000000';
             }

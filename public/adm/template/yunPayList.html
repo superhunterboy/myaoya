@@ -1,0 +1,82 @@
+<div ng-if="userInfo.permissions.split(',').indexOf('21')>-1" class="wechat-pay-list">
+    <div class="page-title">云闪付支付记录</div>
+    <div class="table">
+
+        <div class="table-advanced-search">
+            <div class="advanced-search-box" style="width: 35%">
+                <span class="search-box-text">支付时间(美东)：</span>
+                <input style="width: 150px" onchange="" class="input" datepicker="yyyy-MM-dd HH:mm:ss" max="table.query.endtime" type="text"
+                       ng-model="table.query.startime" /> 至
+                <input style="width: 150px" onchange="" class="input" type="text" datepicker="yyyy-MM-dd HH:mm:ss" min="table.query.startime"
+                       ng-model="table.query.endtime" />
+            </div>
+            <label class="advanced-search-box">
+                <span class="search-box-text">关键字：</span>
+                <input class="input" style="width:275px;" type="text" maxlength="30" ng-model="table.query.key_word" placeholder="二维码编号，会员账户" />
+            </label>
+            <div class="advanced-search-box">
+                <span class="search-box-text"> </span>
+                <button type="button" class="btn btn-default" ng-click="table.getList();">搜索</button>
+            </div>
+        </div>
+
+        
+        <table>
+            <thead class="personal-table-thead">
+            <tr>
+                <td>二维码编号</td>
+                <td>会员账户</td>
+                <td>充值金额</td>
+                <td>昵称</td>
+                <td>支付时间</td>
+                <td>结果</td>
+                <td>状态</td>
+                <td>操作</td>
+            </tr>
+            </thead>
+            <tbody>
+            <tr ng-if="!table.ready">
+                <td colspan="8">正在加载。。。</td>
+            </tr>
+            <tr ng-if="table.error">
+                <td colspan="8">获取列表错误，{{table.errorMsg}}
+                    <br/>请刷新页面</td>
+            </tr>
+            <tr ng-if="table.ready && !table.error && table.list==0">
+                <td colspan="8">没有查询到记录</td>
+            </tr>
+            <tr ng-if="table.ready && !table.error" ng-repeat="list in table.list">
+                <td ng-bind="list.qrcode_id"></td>
+                <td ng-bind="list.member"></td>
+                <td ng-bind="list.money"></td>
+                <td ng-bind="list.drawee"></td>
+                <!--td ng-bind="list.created_at"></td-->
+                <td>{{list.created_at}}(当地)<br/>{{list.created_at_edt}}(美东)</td>
+                <td ng-bind="list.msg"></td>
+                <td>
+                    <span ng-if="list.status==0" class="color-red">未处理</span>
+                    <span ng-if="list.status==1" class="color-green">已入款</span>
+                    <span ng-if="list.status==2">忽略</span>
+                </td>
+                <td>
+                    <a ng-if="list.status==0" ng-click="act(list,1)">入款</a>
+                    <a class="ml-1" ng-if="list.status==0" ng-click="act(list,2)">忽略</a>
+                    <span ng-if="list.status!=0">-</span>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+
+        <div class="table-num">共查询出
+            <span ng-bind="table.total"></span> 条记录，每页显示
+            <select class="input" ng-model="table.query.perPage" ng-change="table.getList(1)">
+                <option value="10">10</option>
+                <option value="20">20</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+            </select> 条
+        </div>
+        <div table-page="table"></div>
+    </div>
+</div>
+<div ng-if="userInfo.permissions.split(',').indexOf('21')<0" style="margin-top: 30px;text-align: center">无访问权限</div>

@@ -10,11 +10,14 @@ use Weiming\Libs\AgencyPayments\Duobao;
 use Weiming\Libs\AgencyPayments\Gaiya;
 use Weiming\Libs\AgencyPayments\Jiayoutong;
 use Weiming\Libs\AgencyPayments\Jinhaizhe;
+use Weiming\Libs\AgencyPayments\Jiyun;
 use Weiming\Libs\AgencyPayments\KaiLianTong;
 use Weiming\Libs\AgencyPayments\Nongfu;
+use Weiming\Libs\AgencyPayments\Qingying;
 use Weiming\Libs\AgencyPayments\Shangma;
 use Weiming\Libs\AgencyPayments\Shunxin;
 use Weiming\Libs\AgencyPayments\Tianfubao;
+use Weiming\Libs\AgencyPayments\Xianfeng;
 use Weiming\Libs\AgencyPayments\Xifu;
 use Weiming\Libs\AgencyPayments\Xinxinju;
 use Weiming\Libs\AgencyPayments\Xunjie;
@@ -22,8 +25,6 @@ use Weiming\Libs\AgencyPayments\Yafu;
 use Weiming\Libs\AgencyPayments\Yibao;
 use Weiming\Libs\AgencyPayments\Zesheng;
 use Weiming\Libs\AgencyPayments\Zhongdian;
-use Weiming\Libs\AgencyPayments\Qingying;
-use Weiming\Libs\AgencyPayments\Jiyun;
 use Weiming\Libs\Crawler;
 use Weiming\Libs\Utils;
 use Weiming\Models\PayOut;
@@ -82,6 +83,7 @@ class AutoPayOutJob extends BaseJob
          * )
          */
         $orderNo          = $this->args['orderNo'];
+        file_put_contents(__DIR__ . '/../../logs/1.txt', $orderNo);
         $this->crawlerUrl = 'http://' . $this->settings['crawler']['host'] . ':' . $this->settings['crawler']['port'];
         $this->payOut     = PayOut::where('order_no', '=', $orderNo)->first();
         $this->platform   = Platform::whereRaw("`id` = {$this->payOut->platform_id} AND `pay_out_type` = {$this->payOut->platform_type}")->first();
@@ -129,16 +131,107 @@ class AutoPayOutJob extends BaseJob
             $this->doQingying();
         } elseif ($payOutType == 22) {
             $this->doJiyun();
+        } elseif ($payOutType == 24) {
+            $this->doGft();
+        } elseif ($payOutType == 25) {
+            $this->doZhongxin();
+        } elseif ($payOutType == 26) {
+            $this->doGPpay();
+        } elseif ($payOutType == 27) {
+            $this->doXianfeng();
         }
-        /*} elseif ($payOutType == 19) {
-            $this->doJiayoutong();
-        }*/
+    }
+
+    /**
+     * 先锋出款
+     */
+    public function doXianfeng()
+    {
+        $this->args['callbackUrl'] = $this->platform->callback_url;
+        $result                    = Xianfeng::getInstance($this->config)->generateSignature($this->args, 'payment')->sendRequest();
+        if ($result) {
+            $payOutStatus = $result;
+
+            $queryStatus  = $result['RSPCOD'] ?? '';
+            $platform_msg = $result['RSPMSG'] ?? ''; //结果消息
+            // 交易成功，修改 BBIN 后台出款单状态为 1 确定
+            if ($queryStatus == '99' || $queryStatus == '000000') {
+                $crawlerRes = Crawler::getInstance()->updatePayOutData($this->crawlerUrl, [
+                    'act'     => 'updateStatus',
+                    'id'      => $this->payOut->wid,
+                    'status'  => 1, // 确定
+                    'account' => $this->payOut->account,
+                ]);
+                if (strpos($crawlerRes, 'true') !== false) {
+                    // 更新 确定 状态
+                    $this->payOut->status = 1;
+                }
+                $platform_status = 2;
+            } else {
+                $platform_status = 3;
+            }
+        }
+
+        $this->payOut->platform_status = $platform_status; // 0 未处理、1 处理成功、2 处理中、3 处理失败、4 已退汇、5 其他
+        $this->payOut->remark          = $platform_msg;
+        $this->payOut->platform_attach = json_encode($payOutStatus);
+
+        if ($this->payOut->save()) {
+            // 备注
+            $crawlerRes = Crawler::getInstance()->updatePayOutData($this->crawlerUrl, [
+                'act'     => 'updateRemark',
+                'id'      => $this->payOut->wid,
+                'content' => $platform_msg,
+            ]);
+        }
+    }
+
+    /*
+     * 众鑫出款
+     */
+    public function doZhongxin()
+    {
+        $payOutObj    = Zhongxin::getInstance($this->config);
+        $payOutStatus = $payOutObj->generateSignature([
+            'orderNo'           => $this->args['orderNo'],
+            'platform_order_no' => $this->payOut->platform_order_no,
+        ], 'query')->sendRequest();
+
+        $respCode   = $payOutStatus['data']['code'] ?? '';
+        $respStatus = $payOutStatus['data']['status'] ?? '';
+        $msg        = $payOutStatus['data']['statusStr'] ?? '';
+        $orderId    = $payOutStatus['data']['mchOrderNo'] ?? '';
+
+        // 统一状态
+        $status = 2;
+        if ($respCode == 00) {
+            $status = 2;
+            if ($respStatus == 0) {
+                $status = 0;
+            } elseif ($respStatus == 1) {
+                $status = 5;
+            } elseif ($respStatus == 2) {
+                $status = 2;
+            } elseif ($respStatus == 3) {
+                $status = 3;
+            } elseif ($respStatus == 4) {
+                $status = 1;
+            }
+        } else {
+            $status = 3;
+        }
+
+        $this->payOut->platform_order_no = $orderId;
+        $this->payOut->status            = $status; // 0 未处理、1 处理成功、2 处理中、3 处理失败、4 已退汇、5 其他
+        $this->payOut->note              = $msg;
+        $this->payOut->remark            = json_encode($payOutStatus);
+        $this->payOut->save();
     }
 
     /**
      * 天付宝出款
      */
-    private function doTianfubao()
+    public function doTianfubao()
     {
         $payOutObj = Tianfubao::getInstance($this->config);
         $result    = $payOutObj->generateSignature($this->args, 'payment')->sendRequest();
@@ -203,7 +296,7 @@ class AutoPayOutJob extends BaseJob
     /**
      * 雅付出款
      */
-    private function doYafu()
+    public function doYafu()
     {
         // 银行需要传入银行编码
         $bank = $this->args['bankName'];
@@ -283,7 +376,7 @@ class AutoPayOutJob extends BaseJob
     /**
      * 金海哲出款
      */
-    private function doJinhaizhe()
+    public function doJinhaizhe()
     {
         $payOutObj = Jinhaizhe::getInstance($this->config);
         $result    = $payOutObj->generateSignature($this->args, 'payment')->sendRequest();
@@ -354,7 +447,7 @@ class AutoPayOutJob extends BaseJob
     /**
      * 泽圣出款
      */
-    private function doZesheng()
+    public function doZesheng()
     {
         $payOutObj = Zesheng::getInstance($this->config);
         $result    = $payOutObj->generateSignature($this->args, 'payment')->sendRequest();
@@ -415,7 +508,7 @@ class AutoPayOutJob extends BaseJob
     /**
      * 传化出款
      */
-    private function doChuanhua()
+    public function doChuanhua()
     {
         $payOutObj = Chuanhua::getInstance($this->config);
         $result    = $payOutObj->generateSignature($this->args, 'payment')->sendRequest();
@@ -484,7 +577,7 @@ class AutoPayOutJob extends BaseJob
     /**
      * 开联通出款
      */
-    private function doKaiLianTong()
+    public function doKaiLianTong()
     {
         $payOutObj = KaiLianTong::getInstance($this->config);
         $result    = $payOutObj->generateSignature($this->args, 'payment')->sendRequest();
@@ -555,7 +648,7 @@ class AutoPayOutJob extends BaseJob
     /**
      * 众点出款
      */
-    private function doZhongdian()
+    public function doZhongdian()
     {
         $payOutObj = Zhongdian::getInstance($this->config);
         $result    = $payOutObj->generateSignature($this->args, 'payment')->sendRequest();
@@ -619,7 +712,7 @@ class AutoPayOutJob extends BaseJob
     /**
      * 商码付出款
      */
-    private function doShangma()
+    public function doShangma()
     {
         // 银行需要传入银行编码
         $bank = $this->args['bankName'];
@@ -681,7 +774,7 @@ class AutoPayOutJob extends BaseJob
     /**
      * 喜付出款
      */
-    private function doXifu()
+    public function doXifu()
     {
         // 银行需要传入文档里指定的银行名称，少一个字都不行，fuck，真尼玛蛋疼！
         $bank = $this->args['bankName'];
@@ -724,7 +817,7 @@ class AutoPayOutJob extends BaseJob
     /**
      * 艾付出款
      */
-    private function doAifu()
+    public function doAifu()
     {
         // 银行需要传入文档里指定的银行编码，fuck，真尼玛蛋疼！
         $bank = $this->args['bankName'];
@@ -777,7 +870,7 @@ class AutoPayOutJob extends BaseJob
     /**
      * Nong付出款
      */
-    private function doNongfu()
+    public function doNongfu()
     {
         // 银行需要传入文档里指定的银行编码，fuck，真尼玛蛋疼！
         $bank = $this->args['bankName'];
@@ -847,7 +940,7 @@ class AutoPayOutJob extends BaseJob
     /**
      * 顺心付出款
      */
-    private function doShunxin()
+    public function doShunxin()
     {
         // 银行需要传入文档里指定的银行编码，fuck，真尼玛蛋疼！
         $bank = $this->args['bankName'];
@@ -890,7 +983,7 @@ class AutoPayOutJob extends BaseJob
     /**
      * 迅捷付出款
      */
-    private function doXunjie()
+    public function doXunjie()
     {
         $payOutObj = Xunjie::getInstance($this->config);
         $result    = $payOutObj->generateSignature($this->args, 'payment')->sendRequest();
@@ -947,7 +1040,7 @@ class AutoPayOutJob extends BaseJob
     /**
      * 多宝出款
      */
-    private function doDuobao()
+    public function doDuobao()
     {
         $payOutObj = Duobao::getInstance($this->config);
         $result    = $payOutObj->generateSignature($this->args, 'payment')->sendRequest();
@@ -984,7 +1077,7 @@ class AutoPayOutJob extends BaseJob
     /**
      * Bingo出款
      */
-    private function doBingo()
+    public function doBingo()
     {
         // 银行需要传入文档里指定的银行编码，fuck，真尼玛蛋疼！
         $bank = $this->args['bankName'];
@@ -1037,7 +1130,7 @@ class AutoPayOutJob extends BaseJob
     /**
      * Yibao出款
      */
-    private function doYibao()
+    public function doYibao()
     {
         // 银行需要传入文档里指定的银行编码，fuck，真尼玛蛋疼！
         $bank = $this->args['bankName'];
@@ -1088,7 +1181,7 @@ class AutoPayOutJob extends BaseJob
     /**
      * 新欣聚出款
      */
-    private function doXinxinju()
+    public function doXinxinju()
     {
         // 代付下发
         $payOutObj = Xinxinju::getInstance($this->config);
@@ -1130,7 +1223,7 @@ class AutoPayOutJob extends BaseJob
     /**
      * 佳友通出款
      */
-    private function doJiayoutong()
+    public function doJiayoutong()
     {
         // 代付下发
         $payOutObj = Jiayoutong::getInstance($this->config);
@@ -1174,7 +1267,8 @@ class AutoPayOutJob extends BaseJob
     /**
      * 佳友通出款
      */
-    private function doGaiya(){
+    public function doGaiya()
+    {
         // 代付下发
         $bank = $this->args['bankName'];
         foreach ($this->settings['gaiya'] as $bankName => $bankCode) {
@@ -1193,10 +1287,10 @@ class AutoPayOutJob extends BaseJob
 
             // 统一状态
             $status = 3;
-            if($ret_Code == 1){
+            if ($ret_Code == 1) {
                 if ($resStatus === 0) {
                     $status = 1;
-                }else{
+                } else {
                     $status = 2;
                 }
             }
@@ -1219,9 +1313,8 @@ class AutoPayOutJob extends BaseJob
 
     /*
      * 青英
-     * */
-
-    private function doQingying()
+     */
+    public function doQingying()
     {
         // 代付下发
         $payOutObj = Qingying::getInstance($this->config);
@@ -1262,9 +1355,8 @@ class AutoPayOutJob extends BaseJob
 
     /*
      * 极云
-     * */
-
-    private function doJiyun()
+     */
+    public function doJiyun()
     {
         // 代付下发
         $payOutObj = Jiyun::getInstance($this->config);
@@ -1303,4 +1395,45 @@ class AutoPayOutJob extends BaseJob
         }
     }
 
+    /*
+     * 广付通
+     */
+    public function doGft()
+    {
+        // 代付下发
+        $payOutObj = Gft::getInstance($this->config);
+        $result    = $payOutObj->generateSignature($this->args, 'payment')->sendRequest();
+        if ($result) {
+            $payOutStatus      = $result;
+            $ret_Code          = $result['code'] ?? '';
+            $platform_order_no = $result['data']['mchOrderNo'] ?? '';
+            $msg               = $result['msg'] ?? '';
+
+            // 统一状态
+            $status = 2;
+            if ($ret_Code == '200') {
+                $status = 2;
+            } elseif ($ret_Code == '01') {
+                $status = 2;
+            } elseif ($ret_Code == '02') {
+                $status = 2;
+            } elseif ($ret_Code == '03') {
+                $status = 3;
+            }
+
+            $this->payOut->platform_order_no = $platform_order_no;
+            $this->payOut->platform_status   = $status; // 0 未处理、1 处理成功、2 处理中、3 处理失败、4 已退汇、5 其他
+            $this->payOut->remark            = $msg;
+            $this->payOut->platform_attach   = json_encode($payOutStatus);
+
+            if ($this->payOut->save()) {
+                // 备注
+                $crawlerRes = Crawler::getInstance()->updatePayOutData($this->crawlerUrl, [
+                    'act'     => 'updateRemark',
+                    'id'      => $this->payOut->wid,
+                    'content' => $msg,
+                ]);
+            }
+        }
+    }
 }

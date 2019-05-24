@@ -6,6 +6,8 @@ use GuzzleHttp\Client;
 use Resque_Event;
 use Weiming\Jobs\BaseJob;
 use Weiming\Models\Pay;
+use Weiming\Models\Lock;
+use Exception;
 
 /**
  * 自动充值 Job
@@ -28,20 +30,39 @@ class AutoRechargeJob extends BaseJob
         $rechargeUrl             = $this->args['rechargeUrl'];
         $requestParams           = $this->args['requestParams'];
         $requestParams['act']    = 'useRecharge';
+        $requestParams['action']    = 'pay';
         $requestParams['remark'] = '第三方支付';
 
         // 未知错误
         $rechargeStatus = 8;
         $rechargeMsg    = '未知错误';
-
+        file_put_contents(__DIR__ . '/../../logs/AutoRechargeJob' . date('Ymd') . '.txt', var_export($requestParams,true) . "\n", FILE_APPEND | LOCK_EX);
         // 当前处理的订单
         $pay = Pay::where('order_no', '=', $requestParams['orderNo'])->first();
         if ($pay) {
+            try{
+                $res=Lock::insert(['order_no' => $requestParams['orderNo'], 'created_at'=>date('Y-m-d H:i:s')]);
+            }
+            catch(Exception $e)
+            {
+                file_put_contents(__DIR__ . '/../../logs/lock' . date('Ymd') . '.txt', var_export($requestParams,true) . "\n", FILE_APPEND | LOCK_EX);
+                return true;
+            }
             $client = new Client([
-                'http_errors' => false,
+                //'http_errors' => false,
                 'timeout' => 30
             ]);
-            $res    = $client->request('POST', $rechargeUrl, ['form_params' => $requestParams]);
+
+
+            $res = $client->request('POST', $rechargeUrl, ['form_params' => $requestParams]);
+            /*
+            $return = array();
+            $resDatalog = $res->getBody();
+            $resDatalog = json_decode($resDatalog, true);
+            $return['orderNo']  =$requestParams['orderNo'];
+            $return['data']     =$resDatalog;
+            file_put_contents(__DIR__ . '/../../logs/lock_return' . date('Ymd') . '.txt', var_export($return,true) .$http_code. "\n", FILE_APPEND | LOCK_EX);
+             */
             if ($res->getStatusCode() == '200') {
                 /**
                  * 充值接口返回数据格式

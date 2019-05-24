@@ -1,0 +1,87 @@
+<div ng-if="userInfo.permissions.split(',').indexOf('34')>-1" class="vendor-list">
+        <div class="page-title">
+            <span>支付方式</span>
+            <div class="page-btn">
+                <a ng-click="editPaymentMethod()" class="btn btn-green">添加支付方式</a>
+            </div>
+        </div>
+    
+        <div class="table">
+            <table-float-header data-float-element="table-advanced-search" data-float-thead="table-thead"></table-float-header>
+            <div class="table-advanced-search">
+                <label class="advanced-search-box">
+                        <span class="search-box-text">应用场景：</span>
+                        <select class="input" style="width: 162px" ng-model="table.query.position">
+                            <option ng-value="''">全部</option>
+                            <option ng-value="1">PC端</option>
+                            <option ng-value="2">移动端</option>
+                        </select>
+                </label>
+                <label class="advanced-search-box">
+                    <span class="search-box-text">状态：</span>
+                    <select class="input" style="width: 162px" ng-model="table.query.status">
+                        <option ng-value="''">全部</option>
+                        <option ng-value="0">禁用</option>
+                        <option ng-value="1">启用</option>
+                    </select>
+                </label>
+                </label>
+                <div class="advanced-search-box">
+                    <span class="search-box-text"> </span>
+                    <button type="button" class="btn btn-default" ng-click="table.ready=false;table.getList(1)">搜索</button>
+                </div>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <td>支付方式</td>
+                        <td>英文标识</td>
+                        <td>运用场景</td>
+                        <td>状态</td>
+                        <td>排序</td>
+                        <td>创建时间</td>
+                        <td>更新时间</td>
+                        <td>操作</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-if="!table.ready">
+                        <td colspan="7">正在加载。。。</td>
+                    </tr>
+                    <tr ng-if="table.error">
+                        <td colspan="7">获取列表错误，{{table.errorMsg}}<br/>请刷新页面</td>
+                    </tr>
+                    <tr ng-if="table.ready && !table.error && table.list==0">
+                        <td colspan="7">没有查询到数据</td>
+                    </tr>
+                    <tr ng-if="table.ready && !table.error" ng-repeat="list in table.list">
+                        <td ng-bind="list.name"></td>
+                        <td ng-bind="list.tag"></td>
+                        <td>
+                            <span ng-if="list.position === 1">PC端</span>
+                            <span ng-if="list.position === 2">移动端</span>
+                        </td>
+                        <td>
+                            <span ng-if="list.status==1" class="color-green">启用</span>
+                            <span ng-if="list.status==0" class="color-red">禁用</span>
+                        </td>
+                        <td ng-bind="list.sequence"></td>
+                        <td ng-bind="list.created_at"></td>
+                        <td ng-bind="list.updated_at"></td>
+                        <td>
+                            <a ng-click="editPaymentMethod(list)"><i class="icon-edit"></i> 修改</a>
+                            <a class="ml-1" ng-click="delVendor(list)"><i class="icon-delete"></i> 删除</a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="table-num">共查询出 <span ng-bind="table.total"></span> 条记录，每页显示
+                <select class="input" ng-model="table.query.perPage" ng-change="table.getList(1)">
+                    <option value="10">10</option><option value="20">20</option><option value="50">50</option><option value="100">100</option>
+                </select> 条
+            </div>
+            <div table-page="table"></div>
+        </div>
+    </div>
+    <div ng-if="userInfo.permissions.split(',').indexOf('5')<0" style="margin-top: 30px;text-align: center">无访问权限</div>
+    

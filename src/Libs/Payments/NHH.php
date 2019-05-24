@@ -1,0 +1,215 @@
+<?php
+
+namespace Weiming\Libs\Payments;
+
+use GuzzleHttp\Client;
+use Weiming\Libs\Payments\WMPay;
+use Weiming\Libs\Utils;
+
+class NHH implements WMPay
+{
+    /**
+     * 支付类型
+     */
+
+
+    public $paymentType = [
+        1  => [ //微信扫码
+            'WXP'=>'微信扫码'
+        ],
+        2  => [ //支付宝扫码
+        ],
+        3  => [ //网银
+        ],
+        4  => [ //QQ扫码
+        ],
+        5  => [ //京东扫码
+        ],
+        6  => [ //百度扫码
+        ],
+        7  => [ //银联扫码
+        ],
+        8  => [ //微信WAP
+            'WXP'=>'微信WAP'
+        ],
+        9  => [ //支付宝WAP
+        ],
+        10 => [ //QQWAP
+        ],
+        11 => [ //京东WAP
+        ],
+        12 => [ //百度WAP
+        ],
+        13 => [ //银联WAP
+        ],
+    ];
+
+    /**
+     * 支付网关地址
+     * @var string
+     */
+    public $getwayUrl = 'https://api.nmrlk.cn/v1/order';
+
+    /**
+     * 商户编号
+     * @var string
+     */
+    public $parterNo;
+
+    /**
+     * 商户key
+     * @var string
+     */
+    public $parterKey;
+    public $pubKey;
+    public $priKey;
+    public $payke;
+    public $paysecret;
+
+    /**
+     * 回调地址
+     * @var string
+     */
+    public $callbackUrl;
+
+    /**
+     * 通知地址
+     * @var string
+     */
+    public $notifyUrl;
+
+    /**
+     * 签名
+     * @var string
+     */
+    public $sign;
+
+    /**
+     * 提交参数
+     * @var array
+     */
+    public $params = [];
+    public $orderNo;
+    public $money;
+
+    /**
+     * 支付对象
+     * @var object
+     */
+    private static $instance;
+
+    public static function getInstance($conf = [])
+    {
+
+        if (!(static::$instance instanceof static )) {
+            static::$instance = new static($conf);
+        }
+        return static::$instance;
+    }
+
+    private function __construct($conf)
+    {
+        if ($conf) {
+            $this->parterNo = $conf['parterNo'];
+            $this->parterKey = $conf['parterKey'];
+
+            $this->callbackUrl = $conf['callbackUrl'];
+            $this->notifyUrl   = $conf['notifyUrl'];
+        }
+    }
+
+    private function __clone()
+    {}
+
+    /**
+     * 获取支付类型
+     */
+    public function getPayType()
+    {
+        return $this->paymentType;
+    }
+
+    /**
+     * 签名
+     */
+    public function signature($payType, $money, $orderId)
+    {
+        $this->orderNo = $orderId;
+        $this->money   = $money;
+
+        $this->params['merchant_no']             =$this->parterNo;
+        $this->params['nonce_str']               =rand(100000000,999999999);
+        $this->params['request_no']              =$orderId;
+        $this->params['amount']                  =$this->money;
+        $this->params['pay_channel']             =$payType;
+        $this->params['request_time']            =time();
+        $this->params['notify_url']              =$this->callbackUrl;
+
+        $this->params['sign']                    =$this->getSignStr($this->params,$this->parterKey);
+        return $this;
+    }
+
+    /**
+     * 支付请求
+     */
+    public function payment()
+    {
+        $client = new Client();
+        $res = $client->request('POST', $this->getwayUrl, ['form_params' => $this->params, 'verify' => false]);
+        $body = $res->getBody();
+        $resArr = json_decode($body, true);
+
+        if($resArr['success'] == 1){
+            $tmp = '<html>';
+            $tmp .= '<head>';
+            $tmp .= '<meta content="text/html; charset=UTF-8" http-equiv="Content-Type">';
+            $tmp .= '<title>Pay Page</title>';
+            $tmp .= '</head>';
+            $tmp .= '<body style="display:none;">';
+            $tmp .= '<form action="' . $resArr['data']['bank_url'] . '" method="post" name="orderForm">';
+            $tmp .= '</form>';
+            $tmp .= '<script type="text/javascript">';
+            $tmp .= 'document.orderForm.submit();';
+            $tmp .= '</script>';
+            $tmp .= '</body>';
+            $tmp .= '</html>';
+            return $tmp;
+        }else{
+            $data['msg']=$resArr['data']['info'][0]['message'];
+            return json_encode($data);
+        }
+    }
+
+    public function query($orderId)
+    {
+    }
+
+    /**
+     * callback回调验证
+     */
+    public function verifySign($params = [])
+    {
+        $sign = $params['sign'];
+        unset($params['sign']);
+        ksort($params);
+        $temps = '';
+        foreach ($params as $key => $value) {
+            if ($value != '') {
+                $temps .= $key . '=' . $value . '&';
+            }
+        }
+
+        return $sign == md5($temps.$this->parterKey);
+    }
+
+
+    private function getSignStr($params = [], $paysecret = '')
+    {
+
+        $arr = array_diff($params, ['']);
+        ksort($arr);
+        $str = urldecode(http_build_query($arr)).'&key='.$this->parterKey;
+        //echo "\n", $str,"\n";
+        return strtoupper(md5($str));
+    }
+}

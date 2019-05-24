@@ -198,6 +198,7 @@ class OfflinePayController extends BaseController
      */
     public function query(Request $request, Response $response, $args)
     {
+      $time=time();
         $getDatas   = $request->getQueryParams();
         $type       = $getDatas['type'] ?? '1';
         $key_word   = $getDatas['key_word'] ?? '';
@@ -221,8 +222,29 @@ class OfflinePayController extends BaseController
         }
 
         $offObj = $offObj->addSelect($this->db::raw("*, CONVERT_TZ(`created_at`, '+08:00', '-04:00') AS `created_at_edt`"));
+        $res    = $offObj->orderBy('id', 'DESC')->get();
+        //->toArray()
 
-        $res    = $offObj->orderBy('id', 'DESC')->get()->toArray();
+        foreach ($res as $k=>$offObj) {
+          $offObjarr[$k]['id'] = $offObj->id;
+          $offObjarr[$k]['order_no'] = $offObj->order_no;
+          $offObjarr[$k]['account'] = $offObj->account;
+          $offObjarr[$k]['amount'] = $offObj->amount;
+          $offObjarr[$k]['depositor'] = $offObj->depositor;
+          $offObjarr[$k]['bank_name'] = $offObj->bank_name;
+          $offObjarr[$k]['bank_card_no'] = $offObj->bank_card_no;
+          $offObjarr[$k]['type'] = $offObj->type;
+          $offObjarr[$k]['card_id'] = $offObj->card_id;
+          $offObjarr[$k]['card_user'] = $offObj->card_user;
+          $offObjarr[$k]['status'] = $offObj->status;
+          $offObjarr[$k]['remark'] = $offObj->remark;
+          $offObjarr[$k]['user_id'] = $offObj->user_id;
+          $offObjarr[$k]['created_at'] = $offObj->created_at->format('Y-m-d h:i:s');
+          $offObjarr[$k]['updated_at'] = $offObj->updated_at->format('Y-m-d h:i:s');
+          $offObjarr[$k]['created_at_edt'] = $offObj->created_at_edt;
+          $offObjarr[$k]['user'] = json_decode($offObj->user,true);
+        }
+
         $result = [];
         if ($key_word) {
             foreach ($res as $key => $value) {
@@ -235,11 +257,17 @@ class OfflinePayController extends BaseController
         }
 
         if (empty($down_excel)) {
+
             $data['total'] = count($result);
             $data['data']  = [];
             $range         = range($offset, $perPage * $page - 1);
             foreach ($result as $key => $value) {
                 if (in_array($key, $range)) {
+                    if((time()-strtotime($value['created_at']))>24*3600){
+                        $value['ishftrue']=1;      //超过24小时
+                    }else{
+                        $value['ishftrue']=2;      //24小时内
+                    }
                     $data['data'][] = $value;
                 }
             }
@@ -366,14 +394,15 @@ class OfflinePayController extends BaseController
             $amount           = $offlinePay->amount;
             // 加锁防止连续点击入款按钮
             $redisLockey = 'redisLock:' . $orderNo;
-            $isLock = 1;
-            // $isLock      = $this->redisLock->lock($redisLockey, 120); 
+            $isLock      = $this->redisLock->lock($redisLockey, 120);
+            $isLock=1;
             if ($isLock) {
                 // 充值
                 $company        = Company::where('no', '=', '00001')->first(); // 注：由于目前只有一个业务平台了，这里暂时写死为 00001 的业务平台
                 $isAutorecharge = $company->is_autorecharge;
                 $rechargeUrl    = $company->autorecharge_url;
                 if ($status == 1 && $offlinePayStatus == 0 && $isAutorecharge == 1 && !empty($rechargeUrl)) {
+
                     // 只有 未处理 的记录，才执行入款操作
                     $requestParams = [
                         'account'      => $offlinePay->account,
@@ -385,7 +414,7 @@ class OfflinePayController extends BaseController
                     $requestParams['act']    = 'useRecharge';
                     $requestParams['remark'] = $type == 1 ? '线下银行卡转账' : ($type == 2 ? '支付宝转银行卡' : '');
                     $client                  = new Client();
-                    $rechargeRes             = $client->request('POST', $rechargeUrl, ['form_params' => $requestParams]);
+                    $rechargeRes             = $client->request('POST', $rechargeUrl, ['form_params' => $requestParams]);die("====");
                     if ($rechargeRes->getStatusCode() == '200') {
                         $resData = $rechargeRes->getBody();
                         $resData = json_decode($resData, true);
@@ -402,6 +431,9 @@ class OfflinePayController extends BaseController
                             $data['status'] = 0;
                         }
                     }
+                }
+                if($status == 3){
+                    $data['status'] = 0;
                 }
                 $res = $offlinePay->update($data);
                 if ($res) {

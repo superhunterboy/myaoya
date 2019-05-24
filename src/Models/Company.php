@@ -28,7 +28,9 @@ class Company extends Eloquent
         'wap_union_vendor_id',
         'autorecharge_url',
         'is_autorecharge',
-        'is_5qrcode'
+        'is_5qrcode',
+        'yun_vendor_id',
+        'wap_yun_vendor_id'
     ];
 
     /**

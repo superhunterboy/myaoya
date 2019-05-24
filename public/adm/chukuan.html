@@ -1,10 +1,12 @@
 <!DOCTYPE html>
 <html lang="zh_cn">
-<head>
-    <meta charset="UTF-8">
-    <title>人工代付通道</title>
-    <style>
-        body{
+    <head>
+        <meta charset="utf-8">
+            <title>
+                人工代付通道
+            </title>
+            <style>
+                body{
             background: #ececec;
         }
         .content{
@@ -135,101 +137,220 @@
             padding: 3px;
             border: 1px solid #eee;
         }
-    </style>
-</head>
-<body>
-<div class="content" id="content">
-    <div class="loginHref" id="loginHref">请先点击<a target="_blank" href="/adm/index.html"><<登录>></a>，然后再访问此页面 (F5刷新即可) 进行代付操作！</div>
-    <h2 class="rechargeForm">人工代付通道</h2>
-    <form action="/admin/withdrawals" method="POST" id="rechargeForm" class="rechargeForm" onsubmit="return false">
-        <input type="hidden" name="platformType" id="platformType" value="0">
-        <label>
-            <span class="red">*</span>商户号：
-            <select name="mchtId" id="mchtId" style="width: 180px">
-            </select>
-        </label>
-        <label class="hiddenElement" id="channel">
-            <span class="red">*</span>通道：
-            <select name="channel" id="channel" style="width: 180px">
-                <option value="8002">D0-8002(当日)</option>
-                <option value="8001">T1-8001(次日)</option>
-            </select>
-        </label>
-        <label class="hiddenElement" id="account">
-            <span class="red"></span>会员账号：
-            <input type="text" name="account" class="cleanInput account">
-        </label>
-        <label class="hiddenElement" id="username">
-            <span class="red">*</span>姓名：
-            <input type="text" name="username" class="cleanInput username">
-        </label>
-        <label class="hiddenElement" id="bankNo">
-            <span class="red">*</span>银行卡号：
-            <input type="text" name="bankNo" class="cleanInput bankNo">
-        </label>
-        <label class="hiddenElement" id="province">
-            <span class="red">*</span>省份：
-            <input type="text" name="province" class="cleanInput province">
-        </label>
-        <label class="hiddenElement" id="city">
-            <span class="red">*</span>城市：
-            <input type="text" name="city" class="cleanInput city">
-        </label>
-        <label class="hiddenElement" id="bankName">
-            <span class="red">*</span>开户行：
-            <select name="bankName" style="width: 180px">
-                <option value="enterBankName">输入银行名称</option>
-                <option value="中国工商银行">中国工商银行</option>
-                <option value="中国农业银行">中国农业银行</option>
-                <option value="中国银行">中国银行</option>
-                <option value="中国建设银行">中国建设银行</option>
-                <option value="交通银行">交通银行</option>
-                <option value="中信银行">中信银行</option>
-                <option value="中国光大银行">中国光大银行</option>
-                <option value="华夏银行">华夏银行</option>
-                <option value="中国民生银行">中国民生银行</option>
-                <option value="广发银行">广发银行</option>
-                <option value="平安银行">平安银行</option>
-                <option value="招商银行">招商银行</option>
-                <option value="兴业银行">兴业银行</option>
-                <option value="上海浦东发展银行">上海浦东发展银行</option>
-                <option value="北京银行">北京银行</option>
-                <option value="汉口银行">汉口银行</option>
-                <option value="杭州银行">杭州银行</option>
-                <option value="晋城银行">晋城银行</option>
-                <option value="南京银行">南京银行</option>
-                <option value="宁波银行">宁波银行</option>
-                <option value="上海银行">上海银行</option>
-                <option value="长沙银行">长沙银行</option>
-                <option value="浙江稠州商业银行">浙江稠州商业银行</option>
-                <option value="顺德农村商业银行">顺德农村商业银行</option>
-                <option value="恒丰银行">恒丰银行</option>
-                <option value="浙商银行">浙商银行</option>
-                <option value="渤海银行">渤海银行</option>
-                <option value="徽商银行">徽商银行</option>
-                <option value="上海农商银行">上海农商银行</option>
-                <option value="北京农村商业银行">北京农村商业银行</option>
-                <option value="深圳农商行">深圳农商行</option>
-                <option value="中国邮政储蓄银行">中国邮政储蓄银行</option>
-            </select>
-            <input type="text" name="enterBankName" class="cleanInput enterBankName">
-        </label>
-        <label class="hiddenElement" id="branch">
-            <span class="red">*</span>支行：
-            <input type="text" name="branch" class="cleanInput branch">
-        </label>
-        <label class="hiddenElement" id="amount">
-            <span class="red">*</span>金额(元)：
-            <input type="text" name="amount" class="cleanInput amount">
-        </label>
-        <div class="submit">
-            <input type="submit" value="提交" onclick="return check(this.form)" class="btn btn-green" id="submit" />
-        </div>
-    </form>
-    <script src="/adm/js/jquery.min.js"></script>
-    <script src="/adm/js/layer/layer.js"></script>
-    <script>
-        $(window).bind('beforeunload', function () {
+            </style>
+        </meta>
+    </head>
+    <body>
+        <div class="content" id="content">
+            <div class="loginHref" id="loginHref">
+                请先点击
+                <a href="/adm/index.html" target="_blank">
+                    <<登录>>
+                </a>
+                ，然后再访问此页面 (F5刷新即可) 进行代付操作！
+            </div>
+            <h2 class="rechargeForm">
+                人工代付通道
+            </h2>
+            <form action="/admin/withdrawals" class="rechargeForm" id="rechargeForm" method="POST" onsubmit="return false">
+                <input id="platformType" name="platformType" type="hidden" value="0">
+                    <label>
+                        <span class="red">
+                            *
+                        </span>
+                        商户号：
+                        <select id="mchtId" name="mchtId" style="width: 180px">
+                        </select>
+                    </label>
+                    <label class="hiddenElement" id="channel">
+                        <span class="red">
+                            *
+                        </span>
+                        通道：
+                        <select id="channel" name="channel" style="width: 180px">
+                            <option value="8002">
+                                D0-8002(当日)
+                            </option>
+                            <option value="8001">
+                                T1-8001(次日)
+                            </option>
+                        </select>
+                    </label>
+                    <label class="hiddenElement" id="account">
+                        <span class="red">
+                        </span>
+                        会员账号：
+                        <input class="cleanInput account" name="account" type="text">
+                        </input>
+                    </label>
+                    <label class="hiddenElement" id="username">
+                        <span class="red">
+                            *
+                        </span>
+                        姓名：
+                        <input class="cleanInput username" name="username" type="text">
+                        </input>
+                    </label>
+                    <label class="hiddenElement" id="bankNo">
+                        <span class="red">
+                            *
+                        </span>
+                        银行卡号：
+                        <input class="cleanInput bankNo" name="bankNo" type="text">
+                        </input>
+                    </label>
+                    <label class="hiddenElement" id="province">
+                        <span class="red">
+                            *
+                        </span>
+                        省份：
+                        <input class="cleanInput province" name="province" type="text">
+                        </input>
+                    </label>
+                    <label class="hiddenElement" id="city">
+                        <span class="red">
+                            *
+                        </span>
+                        城市：
+                        <input class="cleanInput city" name="city" type="text">
+                        </input>
+                    </label>
+                    <label class="hiddenElement" id="bankName">
+                        <span class="red">
+                            *
+                        </span>
+                        开户行：
+                        <select name="bankName" style="width: 180px">
+                            <option value="enterBankName">
+                                输入银行名称
+                            </option>
+                            <option value="中国工商银行">
+                                中国工商银行
+                            </option>
+                            <option value="中国农业银行">
+                                中国农业银行
+                            </option>
+                            <option value="中国银行">
+                                中国银行
+                            </option>
+                            <option value="中国建设银行">
+                                中国建设银行
+                            </option>
+                            <option value="交通银行">
+                                交通银行
+                            </option>
+                            <option value="中信银行">
+                                中信银行
+                            </option>
+                            <option value="中国光大银行">
+                                中国光大银行
+                            </option>
+                            <option value="华夏银行">
+                                华夏银行
+                            </option>
+                            <option value="中国民生银行">
+                                中国民生银行
+                            </option>
+                            <option value="广发银行">
+                                广发银行
+                            </option>
+                            <option value="平安银行">
+                                平安银行
+                            </option>
+                            <option value="招商银行">
+                                招商银行
+                            </option>
+                            <option value="兴业银行">
+                                兴业银行
+                            </option>
+                            <option value="上海浦东发展银行">
+                                上海浦东发展银行
+                            </option>
+                            <option value="北京银行">
+                                北京银行
+                            </option>
+                            <option value="汉口银行">
+                                汉口银行
+                            </option>
+                            <option value="杭州银行">
+                                杭州银行
+                            </option>
+                            <option value="晋城银行">
+                                晋城银行
+                            </option>
+                            <option value="南京银行">
+                                南京银行
+                            </option>
+                            <option value="宁波银行">
+                                宁波银行
+                            </option>
+                            <option value="上海银行">
+                                上海银行
+                            </option>
+                            <option value="长沙银行">
+                                长沙银行
+                            </option>
+                            <option value="浙江稠州商业银行">
+                                浙江稠州商业银行
+                            </option>
+                            <option value="顺德农村商业银行">
+                                顺德农村商业银行
+                            </option>
+                            <option value="恒丰银行">
+                                恒丰银行
+                            </option>
+                            <option value="浙商银行">
+                                浙商银行
+                            </option>
+                            <option value="渤海银行">
+                                渤海银行
+                            </option>
+                            <option value="徽商银行">
+                                徽商银行
+                            </option>
+                            <option value="上海农商银行">
+                                上海农商银行
+                            </option>
+                            <option value="北京农村商业银行">
+                                北京农村商业银行
+                            </option>
+                            <option value="深圳农商行">
+                                深圳农商行
+                            </option>
+                            <option value="中国邮政储蓄银行">
+                                中国邮政储蓄银行
+                            </option>
+                        </select>
+                        <input class="cleanInput enterBankName" name="enterBankName" type="text">
+                        </input>
+                    </label>
+                    <label class="hiddenElement" id="branch">
+                        <span class="red">
+                            *
+                        </span>
+                        支行：
+                        <input class="cleanInput branch" name="branch" type="text">
+                        </input>
+                    </label>
+                    <label class="hiddenElement" id="amount">
+                        <span class="red">
+                            *
+                        </span>
+                        金额(元)：
+                        <input class="cleanInput amount" name="amount" type="text">
+                        </input>
+                    </label>
+                    <div class="submit">
+                        <input class="btn btn-green" id="submit" onclick="return check(this.form)" type="submit" value="提交"/>
+                    </div>
+                </input>
+            </form>
+            <script src="/adm/js/jquery.min.js">
+            </script>
+            <script src="/adm/js/layer/layer.js">
+            </script>
+            <script>
+                $(window).bind('beforeunload', function () {
             return "系统可能不会保存您所做的更改。";
         });
         $(function(){
@@ -266,7 +387,15 @@
                             //19:'佳友通',
                             20:'盖亚',
                             21:'青英',
-                            22:'极云'
+                            22:'极云',
+                            23:'RHPay',
+                            24:'广付通',
+                            25:'众鑫',
+                            26:'GPpay',
+                            27:'先锋',
+                            28:'通付',
+                            29:'SDpay',
+                            30:'汇天付',
                         };
                         $.each(res.data, function(i, v) {
                             op += '<option value="'+v.no+'" type-data="'+v.pay_out_type+'">'+v.no+' ['+type[v.pay_out_type]+']'+'</option>';
@@ -442,7 +571,54 @@
                         'username',
                         'bankNo',
                         'bankName'
-                    ]
+                    ],
+                    23:[
+                        'amount',
+                        'username',
+                        'bankNo',
+                        'bankName'
+                    ],
+                    24:[
+                        'amount',
+                        'username',
+                        'bankNo',
+                        'bankName'
+                    ],
+                    25:[
+                        'amount',
+                        'username',
+                        'bankNo',
+                        'bankName'
+                    ],
+                    26:[
+                        'amount',
+                        'username',
+                        'bankNo',
+                        'bankName'
+                    ],
+                    27:[
+                        'amount',
+                        'username',
+                        'bankNo',
+                    ],
+                    28:[
+                        'amount',
+                        'username',
+                        'bankNo',
+                        'bankName'
+                    ],
+                    29:[
+                        'amount',
+                        'username',
+                        'bankNo',
+                        'bankName'
+                    ],
+                    20:[
+                        'amount',
+                        'username',
+                        'bankNo',
+                        'bankName'
+                    ],
                 };
                 var platformType = $(this).children('option:selected').attr('type-data');
                 $('#platformType').val(platformType);
@@ -527,7 +703,7 @@
                 });
                 return false;
             }
-            if(platformType != 7 && platformType != 14) {
+            if(platformType != 7 && platformType != 14 && platformType != 27) {
                 if (form.bankName.value == 'enterBankName' && form.enterBankName.value.length <= 0) {
                     layer.alert("请输入开户行!", {closeBtn: 0, icon: 2}, function() {
                         form.enterBankName.focus();
@@ -577,7 +753,7 @@
                 }
             });
             tipContent += '</table>';
-            layer.confirm(tipContent, {btn: ['确定','取消']}, function() {
+            layer.confirm(tipContent, {btn: ['确定','取消'],}, function() {
                 var withdrawalsRes = $.ajax({
                     url: "/admin/withdrawals",
                     timeout: 30000, // 30秒
@@ -586,6 +762,11 @@
                     data: $('#rechargeForm').serialize(),
                     beforeSend: function () {
                         $("#submit").attr({disabled:"disabled"}).val('提交中...');
+                        $(".layui-layer-btn0").css({
+                            "pointer-events": "none",
+                            "background": "#ccc",
+                            "border": "none"
+                        })
                     },
                     success: function (res) {
                         if (res.status == 1) {
@@ -971,20 +1152,76 @@
                                     txdate:"日期",
                                     txtime:"时间",
                                     version:"版本号"
+                                },
+                                23:{
+                                    status:"返回状态码",
+                                    msg:"返回信息",
+                                    statusList:{
+                                        "M0000":"成功",
+                                        "M1111":"失败",
+                                        "M0001":"加密、解密失败",
+                                        "M0002":"CANS参数错误"
+                                    },
+                                    orderCode:"支付流水号"
+                                },
+                                24:{
+                                    code:"返回状态码",
+                                    msg:"返回信息",
+                                    timestamp:"日期"
+                                },
+                                25:{
+                                    code:"结果代码",
+                                    message:"结果描述",
+                                    order_no:"商户订单号",
+                                    trade_no:"系统流水号",
+                                    amount:"交易金额",
+                                    status:"代付结果",
+                                    sign:"签名"
+                                },
+                                26:{
+                                    merchant_no:"商户号",
+                                    order_no:"GP平台订单号",
+                                    mer_order_no:"商户订单号",
+                                    result_code:"返回码",
+                                    result:"代付结果",
+                                    result_msg:"返回消息"
+                                },
+                                27:{
+                                    RSPCOD:"返回码",
+                                    RSPMSG:"代付结果"
+                                },
+                                28:{
+                                    fxid:"商务号",
+                                    fxstatus:"状态",
+                                    fxmsg:"状态描述",
+                                    fxbody:"返回信息域",
+                                    fxsign:"签名",
+                                },
+                                29:{
+                                    code:"返回状态码",
+                                    status:"状态",
+                                    message:"状态描述",
+                                    results:"返回信息域"
+                                },
+                                30:{
+                                    ret_code:"返回码",
+                                    ret_msg:"代付结果"
                                 }
                             };
-                            console.log(res);
-                            console.log(friendly[platformType]);
                             var tip = '';
                             var option = {closeBtn: 0, area: '560px'};
                             if (res.data) {
                                 tip += '<p>以下为代付通道返回的消息：</p><table style="width:520px;">';
                                 for(var i in res.data) {
-                                    if ((platformType != 16 && i == 'status') || i == 'serialno_state' || i == 'orderStatus' || i == 'state' || i == 'result_code' || i == 'returnCode' || i == 'result' || i == 'Status' || i == 'r1_Code') {
-                                        tip += '<tr><td>' + friendly[platformType][i] + '</td><td>' + friendly[platformType].statusList[res.data[i]] + '</td></tr>';
+                                    if ((platformType != 16 && platformType != 25 && i == 'status') || i == 'serialno_state' || i == 'orderStatus' || i == 'state' || i == 'result_code' || i == 'returnCode' || i == 'result' || i == 'Status' || i == 'r1_Code') {
+                                        if (platformType == 26 || platformType == 29) {
+                                            tip += '<tr><td>' + friendly[platformType][i] + '</td><td>' + res.data[i] + '</td></tr>';
+                                        } else {
+                                            tip += '<tr><td>' + friendly[platformType][i] + '</td><td>' + friendly[platformType].statusList[res.data[i]] + '</td></tr>';
+                                        }
                                     } else {
                                         if (i != 'sign' && i != 'signMsg' && i != 'signature') {
-                                            tip += '<tr><td>' + friendly[platformType][i] + '</td><td>' + res.data[i] + '</td></tr>';
+                                            tip += '<tr><td>' + friendly[platformType][i] + '</td><td>' + res.data[i] + '</td></tr>';                                            
                                         }
                                     }
                                 }
@@ -1035,7 +1272,7 @@
             });
             return true;
         }
-    </script>
-</div>
-</body>
+            </script>
+        </div>
+    </body>
 </html>

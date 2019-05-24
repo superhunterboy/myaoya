@@ -1,4 +1,4 @@
-<div class="bank-list">
+<div ng-if="userInfo.permissions.split(',').indexOf('12')>-1" class="bank-list">
     <div class="page-title">
             <span>转到银行卡</span>
             <div class="page-btn">
@@ -31,3 +31,4 @@
         </table>
     </div>
 </div>
+<div ng-if="userInfo.permissions.split(',').indexOf('12')<0" style="margin-top: 30px;text-align: center">无访问权限</div>

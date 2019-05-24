@@ -1,0 +1,27 @@
+<div class="user-dialog">
+        <div ng-if="!paymentMethodId" class="dialog-title">添加支付方式</div>
+        <div ng-if="paymentMethodId" class="dialog-title">修改支付方式</div>
+        <label class="input-box"><span>支付方式：</span>
+            <input class="input" type="text" ng-model="paymentMethodObject.name" />
+        </label>
+        <label class="input-box"><span>英文标识：</span>
+            <input class="input" type="text" ng-model="paymentMethodObject.tag" />
+        </label>
+        <label class="input-box"><span>排序：</span>
+            <input class="input" type="text" ng-model="paymentMethodObject.sequence" />
+        </label>
+        <label class="input-box"><span>运用场景：</span>
+            <input type="radio" name="paymentMethod_position" ng-model="paymentMethodObject.position" ng-value="1"/>PC端
+            <input type="radio" name="paymentMethod_position" ng-model="paymentMethodObject.position" ng-value="2"/>移动端
+        </label>
+        <label class="input-box"><span>状态：</span>
+            <input type="radio" name="paymentMethod_status" ng-model="paymentMethodObject.status" ng-value="0"/>禁用
+            <input type="radio" name="paymentMethod_status" ng-model="paymentMethodObject.status" ng-value="1"/>启用
+        </label>
+        <div ng-class="{true: 'err-message_show', false: 'err-message_hide'}[error]" ng-bind="errorMsg"></div>
+        <div align="center">
+            <button ng-if="!paymentMethodId" class="btn btn-green" ng-click="save()">确定</button>
+            <button ng-if="paymentMethodId" class="btn btn-green" ng-click="update()">确定</button>
+            <button class="btn btn-default" ng-click="closeThisDialog()">取消</button>
+        </div>
+    </div>

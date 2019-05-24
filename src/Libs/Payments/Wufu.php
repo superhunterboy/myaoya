@@ -168,7 +168,6 @@ class Wufu implements WMPay
     {
         $sign   = $params['md5value'];
         $mySign = $this->getSignStr($params, $this->key);
-        file_put_contents('C:\wwwroot\pay\src\Controllers\1.txt', $params['md5value']."---------------".$mySign);
         $arr = array("sign" => $sign , "mySign" => $mySign);
 
         if ($sign === $mySign) {

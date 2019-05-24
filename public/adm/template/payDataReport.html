@@ -1,0 +1,26 @@
+<div ng-if="userInfo.permissions.split(',').indexOf('33')>-1" class="report-list">
+    <div class="page-title">入款数据报表</div>
+    <div class="compared">
+        统计对比：
+        <select class="input" ng-model="compared" ng-change="handleChangeCompared(compared)">
+            <option value="1day">当天</option>
+            <option value="2day">两天</option>
+            <option value="3day">三天</option>
+            <option value="5day">五天</option>
+            <option value="7day">一周</option>
+        </select>
+    </div>
+    <div class="frequency">
+        统计频率：
+        <select class="input" ng-model="frequency" ng-change="handleChangeFrequency(frequency)">
+            <option value="5min">5分钟</option>
+            <option value="10min">10分钟</option>
+            <option value="15min">15分钟</option>
+            <option value="20min">20分钟</option>
+            <option value="30min">半小时</option>
+            <option value="1hour">1小时</option>
+        </select>
+    </div>
+    <div id="chart-waper"></div>
+</div>
+<div ng-if="userInfo.permissions.split(',').indexOf('33')<0" style="margin-top: 30px;text-align: center">无访问权限</div>
